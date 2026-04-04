@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand */
+  --accent: #D97706;
+  --accent-hover: #B45309;
+
+  /* Surfaces */
+  --background: #FAFAFA;
+  --surface-card: #FFFFFF;
+  --surface-dark: #1A1A2E;
+  --foreground: #171717;
+  --foreground-muted: #6B7280;
+
+  /* Score colors */
+  --score-red: #DC2626;
+  --score-amber: #D97706;
+  --score-emerald: #059669;
+
+  /* Spacing grid */
+  --grid: 4px;
+
+  /* Layout */
+  --max-content: 1200px;
+  --sidebar-width: 240px;
+
+  /* Radii */
+  --radius-default: 4px;
+  --radius-card: 8px;
+  --radius-button: 0px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-surface-card: var(--surface-card);
+  --color-surface-dark: var(--surface-dark);
+  --color-score-red: var(--score-red);
+  --color-score-amber: var(--score-amber);
+  --color-score-emerald: var(--score-emerald);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
