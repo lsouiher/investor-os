@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { api } from "@/lib/api-client";
+import { api, ApiError } from "@/lib/api-client";
 import RadarChart, { type RadarData } from "@/components/identity/radar-chart";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
@@ -56,8 +56,13 @@ export default function SimulationPage() {
         initial[v.key] = v.current;
       });
       setSliderValues(initial);
-    } catch {
-      setError("Failed to load simulation config.");
+    } catch (err: unknown) {
+      const apiErr = err as { code?: string };
+      if (apiErr?.code === "NOT_FOUND" || apiErr?.code === "NON_JSON_RESPONSE") {
+        setConfig(null);
+      } else {
+        setError("Failed to load simulation config.");
+      }
     } finally {
       setLoading(false);
     }
@@ -108,7 +113,26 @@ export default function SimulationPage() {
     );
   }
 
-  if (!config) return null;
+  if (!config) {
+    return (
+      <div className="mx-auto max-w-5xl">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white px-6 py-16 text-center">
+          <h2 className="mb-2 text-lg font-semibold text-gray-900">
+            Simulations Unlock After Identity
+          </h2>
+          <p className="mb-6 max-w-sm text-sm text-gray-500">
+            Complete all 5 audits and build your identity to run what-if simulations.
+          </p>
+          <a
+            href="/hub"
+            className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+          >
+            Go to Identity Hub
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">

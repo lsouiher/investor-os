@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { api } from "@/lib/api-client";
+import { api, ApiError } from "@/lib/api-client";
 import IdentityCard from "@/components/identity/identity-card";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
@@ -48,8 +48,13 @@ export default function IdentityPage() {
           localStorage.setItem(REVEAL_KEY, "true");
         }
       }
-    } catch {
-      setError("Failed to load identity data.");
+    } catch (err: unknown) {
+      const apiErr = err as { code?: string };
+      if (apiErr?.code === "NOT_FOUND") {
+        setIdentity(null);
+      } else {
+        setError("Failed to load identity data.");
+      }
     } finally {
       setLoading(false);
     }
