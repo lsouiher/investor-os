@@ -3,6 +3,7 @@ import * as auditRepo from './repository.js';
 import { validateCompletionRequirements } from './validation.js';
 import { calculateSubScore } from './scoring.js';
 import { logAuditCompleted } from '../logging/service.js';
+import { autoTriggerSynthesis } from '../identity/service.js';
 import type { AuditSummary, AuditDetail } from './types.js';
 
 export async function getAuditSummaries(userId: number, tenantId: number): Promise<AuditSummary[]> {
@@ -46,8 +47,9 @@ export async function saveAudit(
     const subScore = calculateSubScore(auditType, responses);
     const audit = await auditRepo.completeAudit(userId, tenantId, auditType, responses, subScore);
 
-    // Fire-and-forget: log audit completion (don't block the response)
+    // Fire-and-forget: log audit completion and check if identity synthesis should trigger
     logAuditCompleted({ tenantId, userId }, auditType, audit.version).catch(() => {});
+    autoTriggerSynthesis(userId, tenantId).catch(() => {});
 
     return {
       id: audit.publicId,

@@ -16,7 +16,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     const roleTypeParam = req.query.role_type ? String(req.query.role_type) : undefined;
 
     if (roleTypeParam && !VALID_ROLE_TYPES.has(roleTypeParam)) {
-      throw new AppError('VALIDATION_ERROR', `Invalid role_type: ${roleTypeParam}`, 400);
+      throw new AppError('VALIDATION_ERROR', 'Invalid role_type.', 400);
     }
 
     const contacts = await contactService.listContacts(
@@ -73,7 +73,7 @@ router.put('/:contactId', async (req: Request, res: Response, next: NextFunction
     const { name, email, phone, roleType, notes, strategyRelevance, networkGapFilled, lastContactedAt } = req.body;
 
     if (roleType !== undefined && !VALID_ROLE_TYPES.has(roleType)) {
-      throw new AppError('VALIDATION_ERROR', `Invalid role_type: ${roleType}`, 400);
+      throw new AppError('VALIDATION_ERROR', 'Invalid role_type.', 400);
     }
 
     const contact = await contactService.updateContact(

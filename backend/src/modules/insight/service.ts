@@ -24,7 +24,7 @@ const InsightResponseSchema = z.object({
       title: z.string().min(1).max(200),
       message: z.string().min(1).max(2000),
       severity: z.enum(['info', 'warning', 'success']),
-      actionUrl: z.string().max(500).optional(),
+      actionUrl: z.string().max(500).startsWith('/').optional(),
     }),
   ).max(10),
 });

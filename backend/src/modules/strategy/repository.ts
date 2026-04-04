@@ -74,16 +74,18 @@ export async function getActiveStrategy(userId: number, tenantId: number) {
  * Activate a strategy: set isActive=true, deactivate all others for the user.
  */
 export async function activateStrategy(strategyId: number, userId: number, tenantId: number) {
-  // Deactivate all strategies for this user
-  await prisma.strategy.updateMany({
-    where: { userId, tenantId },
-    data: { isActive: false },
-  });
+  return prisma.$transaction(async (tx) => {
+    // Deactivate all strategies for this user
+    await tx.strategy.updateMany({
+      where: { userId, tenantId },
+      data: { isActive: false },
+    });
 
-  // Activate the selected one
-  return prisma.strategy.update({
-    where: { id: strategyId },
-    data: { isActive: true },
+    // Activate the selected one
+    return tx.strategy.update({
+      where: { id: strategyId },
+      data: { isActive: true },
+    });
   });
 }
 
