@@ -1,0 +1,335 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums ---
+
+enum UserRole {
+  investor
+  admin
+}
+
+enum AuditType {
+  financial
+  time
+  skills
+  risk
+  horizon
+}
+
+enum AuditStatus {
+  not_started
+  in_progress
+  completed
+}
+
+enum ContactRoleType {
+  agent
+  lender
+  contractor
+  attorney
+  cpa
+  mentor
+  partner
+  seller
+  property_manager
+  other
+}
+
+enum TaskSource {
+  ai_generated
+  identity_gap
+  manual
+}
+
+enum PromptServiceType {
+  identity_synthesis
+  strategy_generation
+  strategy_activation
+  simulation
+  insight
+  scoring
+}
+
+// --- Tables (12 total per engineering amendments) ---
+
+model Tenant {
+  id            Int       @id @default(autoincrement())
+  publicId      String    @unique @map("public_id")
+  configuration Json      @default("{}")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  deletedAt     DateTime? @map("deleted_at") // Soft delete (constitution IV)
+
+  users             User[]
+  audits            Audit[]
+  identityVersions  IdentityVersion[]
+  strategies        Strategy[]
+  contacts          Contact[]
+  tasks             Task[]
+  simulations       Simulation[]
+  activityLogs      ActivityLog[]
+  aiCallLogs        AiCallLog[]
+
+  @@map("tenants")
+}
+
+model User {
+  id                    Int       @id @default(autoincrement())
+  publicId              String    @unique @map("public_id")
+  tenantId              Int       @map("tenant_id")
+  email                 String    @unique
+  passwordHash          String    @map("password_hash")
+  role                  UserRole  @default(investor)
+  identityRevealSeenAt  DateTime? @map("identity_reveal_seen_at") // Set on first identity card reveal
+  lastLoginAt           DateTime? @map("last_login_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  deletedAt             DateTime? @map("deleted_at") // Soft delete
+  tokenInvalidatedAt    DateTime? @map("token_invalidated_at") // JWTs issued before this are rejected
+
+  tenant              Tenant              @relation(fields: [tenantId], references: [id])
+  audits              Audit[]
+  identityVersions    IdentityVersion[]
+  strategies          Strategy[]
+  contacts            Contact[]
+  tasks               Task[]
+  simulations         Simulation[]
+  activityLogs        ActivityLog[]
+  aiCallLogs          AiCallLog[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([tenantId])
+  @@map("users")
+}
+
+model Audit {
+  id          Int         @id @default(autoincrement())
+  publicId    String      @unique @map("public_id")
+  tenantId    Int         @map("tenant_id")
+  userId      Int         @map("user_id")
+  auditType   AuditType   @map("audit_type")
+  status      AuditStatus @default(not_started)
+  version     Int         @default(1)
+  responses   Json        @default("{}") // All audit data points; sensitive fields encrypted at repo layer
+  subScore    Int?        @map("sub_score") // 0-100, set on completion
+  lastSavedAt DateTime    @default(now()) @map("last_saved_at")
+  completedAt DateTime?   @map("completed_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([tenantId, userId, auditType, version])
+  @@index([tenantId])
+  @@index([userId])
+  @@map("audits")
+}
+
+model IdentityVersion {
+  id              Int      @id @default(autoincrement())
+  publicId        String   @unique @map("public_id")
+  tenantId        Int      @map("tenant_id")
+  userId          Int      @map("user_id")
+  version         Int
+  archetype       String
+  readinessScore  Int      @map("readiness_score") // Composite 0-100
+  subScores       Json     @map("sub_scores") // {financial, time, skills, risk, horizon}
+  radarData       Json     @map("radar_data") // {capital, time, skills, risk_tolerance, network, goal_clarity}
+  headlineInsight String   @map("headline_insight")
+  aiInsights      Json     @map("ai_insights") // Full AI synthesis output
+  auditSnapshot   Json     @map("audit_snapshot") // References to audit versions used
+  userRating      Int?     @map("user_rating") // 1-5 post-synthesis feedback
+  generatedAt     DateTime @default(now()) @map("generated_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  tenant      Tenant     @relation(fields: [tenantId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
+  strategies  Strategy[]
+  simulations Simulation[]
+
+  @@unique([tenantId, userId, version])
+  @@index([tenantId])
+  @@index([userId])
+  @@map("identity_versions")
+}
+
+// Strategy sub-tables collapsed to JSONB per engineering amendments
+model Strategy {
+  id                Int      @id @default(autoincrement())
+  publicId          String   @unique @map("public_id")
+  tenantId          Int      @map("tenant_id")
+  userId            Int      @map("user_id")
+  identityVersionId Int      @map("identity_version_id")
+  name              String
+  description       String
+  fitScore          Int      @map("fit_score") // 0-100
+  pros              Json     // Array of pro statements
+  cons              Json     // Array of con statements
+  rank              Int      // 1-3 ordering
+  isActive          Boolean  @default(false) @map("is_active")
+  needsRefresh      Boolean  @default(false) @map("needs_refresh") // Set when identity score shifts >10
+  actionPlan        Json?    @map("action_plan") // {items: [{id, title, description, sort_order, is_completed, completed_at}]}
+  roadmap           Json?    // {milestones: [{id, title, description, target_date, sort_order, is_completed, completed_at}]}
+  microPlan         Json?    @map("micro_plan") // {expires_at, tasks: [{id, title, ...}]}
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  tenant          Tenant          @relation(fields: [tenantId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
+  identityVersion IdentityVersion @relation(fields: [identityVersionId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, userId, identityVersionId])
+  @@map("strategies")
+}
+
+model Contact {
+  id                Int             @id @default(autoincrement())
+  publicId          String          @unique @map("public_id")
+  tenantId          Int             @map("tenant_id")
+  userId            Int             @map("user_id")
+  name              String
+  email             String?         // Nullable: not all contacts have email
+  phone             String?         // Nullable: not all contacts have phone
+  roleType          ContactRoleType @map("role_type")
+  notes             String?         // Nullable: optional free-text
+  strategyRelevance Json            @default("[]") @map("strategy_relevance") // Array of strategy IDs
+  networkGapFilled  String?         @map("network_gap_filled") // Which gap this contact fills
+  lastContactedAt   DateTime?       @map("last_contacted_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime?       @map("deleted_at") // Soft delete
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, userId])
+  @@index([tenantId, roleType])
+  @@map("contacts")
+}
+
+model Task {
+  id                  Int        @id @default(autoincrement())
+  publicId            String     @unique @map("public_id")
+  tenantId            Int        @map("tenant_id")
+  userId              Int        @map("user_id")
+  source              TaskSource
+  title               String
+  description         String?    // Nullable: not required for simple tasks
+  identityImpactScore Int?       @map("identity_impact_score") // 0-100, AI-set for non-manual
+  estimatedMinutes    Int?       @map("estimated_minutes") // Nullable: AI-calibrated
+  dueDate             DateTime?  @map("due_date") // Nullable: not all tasks have deadlines
+  isCompleted         Boolean    @default(false) @map("is_completed")
+  completedAt         DateTime?  @map("completed_at")
+  createdAt           DateTime   @default(now()) @map("created_at")
+  updatedAt           DateTime   @updatedAt @map("updated_at")
+  deletedAt           DateTime?  @map("deleted_at") // Soft delete
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, userId, isCompleted])
+  @@map("tasks")
+}
+
+model Simulation {
+  id                 Int      @id @default(autoincrement())
+  publicId           String   @unique @map("public_id")
+  tenantId           Int      @map("tenant_id")
+  userId             Int      @map("user_id")
+  identityVersionId  Int      @map("identity_version_id")
+  modifiedParameters Json     @map("modified_parameters")
+  resultDelta        Json     @map("result_delta")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  tenant          Tenant          @relation(fields: [tenantId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
+  identityVersion IdentityVersion @relation(fields: [identityVersionId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, userId])
+  @@index([tenantId, userId, createdAt])
+  @@map("simulations")
+}
+
+// System-level table, NOT tenant-scoped
+model PromptTemplate {
+  id              Int               @id @default(autoincrement())
+  publicId        String            @unique @map("public_id")
+  serviceType     PromptServiceType @map("service_type")
+  version         Int
+  templateContent String            @map("template_content")
+  outputSchema    Json?             @map("output_schema") // Nullable: not all templates need schema
+  isActive        Boolean           @default(false) @map("is_active")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  aiCallLogs AiCallLog[]
+
+  @@unique([serviceType, version])
+  @@map("prompt_templates")
+}
+
+model ActivityLog {
+  id        BigInt   @id @default(autoincrement())
+  tenantId  Int      @map("tenant_id")
+  userId    Int?     @map("user_id") // Nullable: null for system events
+  eventType String   @map("event_type")
+  payload   Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User?  @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, eventType])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  token     String    @unique
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at") // Nullable: set when consumed
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model AiCallLog {
+  id               BigInt            @id @default(autoincrement())
+  tenantId         Int               @map("tenant_id")
+  userId           Int               @map("user_id")
+  serviceType      PromptServiceType @map("service_type")
+  promptTemplateId Int?              @map("prompt_template_id") // Nullable: template may not exist
+  inputHash        String            @map("input_hash") // SHA-256 of full prompt
+  fullPrompt       String            @map("full_prompt") // Encrypted: contains sensitive audit data
+  fullResponse     String            @map("full_response")
+  model            String
+  tokensUsed       Int?              @map("tokens_used") // Nullable: may not be available
+  latencyMs        Int?              @map("latency_ms") // Nullable: may not be tracked
+  success          Boolean
+  errorMessage     String?           @map("error_message") // Nullable: only on failure
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  tenant         Tenant          @relation(fields: [tenantId], references: [id])
+  user           User            @relation(fields: [userId], references: [id])
+  promptTemplate PromptTemplate? @relation(fields: [promptTemplateId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, serviceType])
+  @@index([createdAt])
+  @@map("ai_call_logs")
+}
