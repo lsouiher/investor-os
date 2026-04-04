@@ -90,6 +90,7 @@ model User {
   createdAt             DateTime  @default(now()) @map("created_at")
   updatedAt             DateTime  @updatedAt @map("updated_at")
   deletedAt             DateTime? @map("deleted_at") // Soft delete
+  tokenInvalidatedAt    DateTime? @map("token_invalidated_at") // JWTs issued before this are rejected
 
   tenant              Tenant              @relation(fields: [tenantId], references: [id])
   audits              Audit[]

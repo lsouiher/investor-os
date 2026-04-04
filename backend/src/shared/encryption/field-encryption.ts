@@ -1,4 +1,5 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+import { logger } from '../logger.js';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -93,8 +94,12 @@ export function decryptSensitiveFields(responses: Record<string, unknown>, audit
       if (SENSITIVE_FINANCIAL_FIELDS.includes(key) && typeof value === 'string' && value.startsWith('v')) {
         try {
           (section as Record<string, unknown>)[key] = decryptField(value);
-        } catch {
-          // Field may not be encrypted (e.g., legacy data)
+        } catch (err) {
+          // Field may not be encrypted (e.g., legacy plain text data).
+          // If it looks like an encrypted value (v\d:...) but fails, log a warning.
+          if (/^v\d+:/.test(value)) {
+            logger.warn({ field: key, err }, 'Failed to decrypt field that appears encrypted');
+          }
         }
       }
     }

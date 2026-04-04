@@ -171,7 +171,8 @@ export async function generateBlueprint(userId: number, tenantId: number): Promi
 
   try {
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    page.setDefaultTimeout(15000);
+    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 10000 });
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,

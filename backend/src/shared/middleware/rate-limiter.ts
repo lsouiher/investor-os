@@ -1,4 +1,10 @@
 import rateLimit from 'express-rate-limit';
+import type { Request } from 'express';
+
+// Use userId for authenticated endpoints, IP for public endpoints
+function userOrIpKey(req: Request): string {
+  return (req as Request & { user?: { userId: number } }).user?.userId?.toString() ?? req.ip ?? 'unknown';
+}
 
 // Auth endpoints: 10 requests / 15 minutes
 export const authLimiter = rateLimit({
@@ -45,10 +51,11 @@ export const resetPasswordLimiter = rateLimit({
   },
 });
 
-// Identity synthesis: 5 requests / 5 minutes
+// Identity synthesis: 5 requests / 5 minutes (keyed by userId)
 export const synthesizerLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 5,
+  keyGenerator: userOrIpKey,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -60,10 +67,11 @@ export const synthesizerLimiter = rateLimit({
   },
 });
 
-// Strategy generation: 3 requests / 5 minutes
+// Strategy generation: 3 requests / 5 minutes (keyed by userId)
 export const strategyLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 3,
+  keyGenerator: userOrIpKey,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -75,10 +83,11 @@ export const strategyLimiter = rateLimit({
   },
 });
 
-// Blueprint generation: 5 requests / 1 hour
+// Blueprint generation: 5 requests / 1 hour (keyed by userId)
 export const blueprintLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 5,
+  keyGenerator: userOrIpKey,
   standardHeaders: true,
   legacyHeaders: false,
   message: {

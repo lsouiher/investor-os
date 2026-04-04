@@ -12,6 +12,9 @@ import { AiSynthesisResponseSchema } from './types.js';
 
 const ALL_AUDIT_TYPES: AuditType[] = ['financial', 'time', 'skills', 'risk', 'horizon'];
 
+// In-memory deduplication lock to prevent concurrent synthesis for the same user
+const synthesisInProgress = new Map<number, Promise<IdentityDetail | null>>();
+
 /**
  * Get the latest identity version for a user, formatted for API response.
  */
@@ -154,6 +157,24 @@ export async function synthesizeIdentity(
  * version is newer than the latest identity's audit snapshot.
  */
 export async function autoTriggerSynthesis(
+  userId: number,
+  tenantId: number,
+): Promise<IdentityDetail | null> {
+  // Deduplicate: if synthesis is already running for this user, return the same promise
+  const existing = synthesisInProgress.get(userId);
+  if (existing) {
+    logger.debug({ userId }, 'Synthesis already in progress, deduplicating');
+    return existing;
+  }
+
+  const promise = doAutoTriggerSynthesis(userId, tenantId).finally(() => {
+    synthesisInProgress.delete(userId);
+  });
+  synthesisInProgress.set(userId, promise);
+  return promise;
+}
+
+async function doAutoTriggerSynthesis(
   userId: number,
   tenantId: number,
 ): Promise<IdentityDetail | null> {

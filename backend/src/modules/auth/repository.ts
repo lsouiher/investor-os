@@ -1,5 +1,10 @@
+import { createHash } from 'crypto';
 import { prisma } from '../../shared/db.js';
 import { generatePublicId } from '../../shared/utils/id.js';
+
+function hashToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
+}
 
 export async function createUserWithTenant(email: string, passwordHash: string) {
   const tenantPublicId = generatePublicId();
@@ -45,14 +50,14 @@ export async function updateLastLogin(userId: number) {
 
 export async function createPasswordResetToken(userId: number, token: string, expiresAt: Date) {
   return prisma.passwordResetToken.create({
-    data: { userId, token, expiresAt },
+    data: { userId, token: hashToken(token), expiresAt },
   });
 }
 
 export async function findValidResetToken(token: string) {
   return prisma.passwordResetToken.findFirst({
     where: {
-      token,
+      token: hashToken(token),
       expiresAt: { gt: new Date() },
       usedAt: null,
     },
@@ -70,6 +75,13 @@ export async function markResetTokenUsed(tokenId: number) {
 export async function updatePassword(userId: number, passwordHash: string) {
   return prisma.user.update({
     where: { id: userId },
-    data: { passwordHash },
+    data: { passwordHash, tokenInvalidatedAt: new Date() },
+  });
+}
+
+export async function findUserByPublicId(publicId: string) {
+  return prisma.user.findFirst({
+    where: { publicId, deletedAt: null },
+    include: { tenant: true },
   });
 }

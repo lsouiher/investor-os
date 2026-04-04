@@ -8,14 +8,12 @@ import type { AuthResponse, UserProfile } from './types.js';
 const SALT_ROUNDS = 12;
 const RESET_TOKEN_EXPIRY_HOURS = 1;
 
-function generateToken(user: { id: number; publicId: string; tenantId: number; email: string; role: string }): string {
+function generateToken(user: { publicId: string; email: string; role: string }): string {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new AppError('INTERNAL_ERROR', 'JWT secret not configured.', 500);
 
   const payload = {
-    userId: user.id,
-    publicId: user.publicId,
-    tenantId: user.tenantId,
+    sub: user.publicId,
     email: user.email,
     role: user.role,
   };

@@ -126,22 +126,24 @@ export async function updateActionItem(
   itemId: string,
   updates: { is_completed?: boolean },
 ) {
-  const strategy = await prisma.strategy.findUnique({ where: { id: strategyId } });
-  if (!strategy || !strategy.actionPlan) return null;
+  return prisma.$transaction(async (tx) => {
+    const strategy = await tx.strategy.findUnique({ where: { id: strategyId } });
+    if (!strategy || !strategy.actionPlan) return null;
 
-  const plan = strategy.actionPlan as unknown as ActionPlanJson;
-  const item = plan.items.find((i) => i.id === itemId);
-  if (!item) return null;
+    const plan = strategy.actionPlan as unknown as ActionPlanJson;
+    const item = plan.items.find((i) => i.id === itemId);
+    if (!item) return null;
 
-  if (updates.is_completed !== undefined) {
-    item.is_completed = updates.is_completed;
-    item.completed_at = updates.is_completed ? new Date().toISOString() : null;
-  }
+    if (updates.is_completed !== undefined) {
+      item.is_completed = updates.is_completed;
+      item.completed_at = updates.is_completed ? new Date().toISOString() : null;
+    }
 
-  return prisma.strategy.update({
-    where: { id: strategyId },
-    data: { actionPlan: plan as unknown as Prisma.InputJsonValue },
-  });
+    return tx.strategy.update({
+      where: { id: strategyId },
+      data: { actionPlan: plan as unknown as Prisma.InputJsonValue },
+    });
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 }
 
 /**
@@ -152,22 +154,24 @@ export async function updateMilestone(
   milestoneId: string,
   updates: { is_completed?: boolean },
 ) {
-  const strategy = await prisma.strategy.findUnique({ where: { id: strategyId } });
-  if (!strategy || !strategy.roadmap) return null;
+  return prisma.$transaction(async (tx) => {
+    const strategy = await tx.strategy.findUnique({ where: { id: strategyId } });
+    if (!strategy || !strategy.roadmap) return null;
 
-  const roadmap = strategy.roadmap as unknown as RoadmapJson;
-  const milestone = roadmap.milestones.find((m) => m.id === milestoneId);
-  if (!milestone) return null;
+    const roadmap = strategy.roadmap as unknown as RoadmapJson;
+    const milestone = roadmap.milestones.find((m) => m.id === milestoneId);
+    if (!milestone) return null;
 
-  if (updates.is_completed !== undefined) {
-    milestone.is_completed = updates.is_completed;
-    milestone.completed_at = updates.is_completed ? new Date().toISOString() : null;
-  }
+    if (updates.is_completed !== undefined) {
+      milestone.is_completed = updates.is_completed;
+      milestone.completed_at = updates.is_completed ? new Date().toISOString() : null;
+    }
 
-  return prisma.strategy.update({
-    where: { id: strategyId },
-    data: { roadmap: roadmap as unknown as Prisma.InputJsonValue },
-  });
+    return tx.strategy.update({
+      where: { id: strategyId },
+      data: { roadmap: roadmap as unknown as Prisma.InputJsonValue },
+    });
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 }
 
 /**
@@ -178,22 +182,24 @@ export async function updateMicroTask(
   taskId: string,
   updates: { is_completed?: boolean },
 ) {
-  const strategy = await prisma.strategy.findUnique({ where: { id: strategyId } });
-  if (!strategy || !strategy.microPlan) return null;
+  return prisma.$transaction(async (tx) => {
+    const strategy = await tx.strategy.findUnique({ where: { id: strategyId } });
+    if (!strategy || !strategy.microPlan) return null;
 
-  const plan = strategy.microPlan as unknown as MicroPlanJson;
-  const task = plan.tasks.find((t) => t.id === taskId);
-  if (!task) return null;
+    const plan = strategy.microPlan as unknown as MicroPlanJson;
+    const task = plan.tasks.find((t) => t.id === taskId);
+    if (!task) return null;
 
-  if (updates.is_completed !== undefined) {
-    task.is_completed = updates.is_completed;
-    task.completed_at = updates.is_completed ? new Date().toISOString() : null;
-  }
+    if (updates.is_completed !== undefined) {
+      task.is_completed = updates.is_completed;
+      task.completed_at = updates.is_completed ? new Date().toISOString() : null;
+    }
 
-  return prisma.strategy.update({
-    where: { id: strategyId },
-    data: { microPlan: plan as unknown as Prisma.InputJsonValue },
-  });
+    return tx.strategy.update({
+      where: { id: strategyId },
+      data: { microPlan: plan as unknown as Prisma.InputJsonValue },
+    });
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 }
 
 /**

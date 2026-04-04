@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { createHash } from 'crypto';
 import { prisma } from '../db.js';
 import { logger } from '../logger.js';
+import { encryptField } from '../encryption/field-encryption.js';
 import type { PromptServiceType } from '@prisma/client';
 
 let client: Anthropic | null = null;
@@ -67,7 +68,7 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
 
     const tokensUsed = (response.usage?.input_tokens ?? 0) + (response.usage?.output_tokens ?? 0);
 
-    // Log the AI call
+    // Log the AI call (encrypt prompt/response — may contain decrypted financial data)
     await prisma.aiCallLog.create({
       data: {
         tenantId: options.tenantId,
@@ -75,8 +76,8 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
         serviceType: options.serviceType,
         promptTemplateId: options.promptTemplateId ?? null,
         inputHash,
-        fullPrompt,
-        fullResponse: content,
+        fullPrompt: encryptField(fullPrompt),
+        fullResponse: encryptField(content),
         model: 'claude-sonnet-4-20250514',
         tokensUsed,
         latencyMs,
@@ -95,7 +96,7 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
         serviceType: options.serviceType,
         promptTemplateId: options.promptTemplateId ?? null,
         inputHash,
-        fullPrompt,
+        fullPrompt: encryptField(fullPrompt),
         fullResponse: '',
         model: 'claude-sonnet-4-20250514',
         latencyMs,

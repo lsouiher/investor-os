@@ -22,13 +22,16 @@ import dashboardRoutes from './modules/dashboard/routes.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy for accurate IP in rate limiting behind load balancers
+app.set('trust proxy', 1);
+
 // Global middleware
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000', 'http://localhost:3002'],
   credentials: true,
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50kb' }));
 app.use(requestLogger);
 app.use(generalLimiter);
 
