@@ -2,9 +2,32 @@
 
 **Version:** v1
 **Base path:** /api/v1
-**Auth:** JWT Bearer token (except registration and login)
+**Auth:** JWT Bearer token (except registration, login, health check, and shared identity)
 **Content-Type:** application/json
 **Error format:** Consistent across all endpoints (constitution V)
+
+---
+
+## Health Check
+
+### GET /api/v1/health
+Platform health status. **No auth required.**
+
+**Response (200):**
+```json
+{
+  "data": {
+    "status": "ok",
+    "checks": {
+      "db": true,
+      "ai": true,
+      "encryption": true
+    }
+  }
+}
+```
+
+Status values: `ok` (all checks pass), `degraded` (some checks fail), `down` (critical checks fail).
 
 ---
 
@@ -235,32 +258,7 @@ Get all completed versions for an audit type. **Auth required.**
 }
 ```
 
-### POST /api/v1/audits/:auditType/converse
-Send a message in conversational audit mode. **Auth required.**
-
-**Request:**
-```json
-{
-  "message": "I make about $120,000 a year from my W-2 job",
-  "conversation_history": [
-    { "role": "assistant", "content": "Let's start with your income. What's your primary annual income?" }
-  ]
-}
-```
-
-**Response (200):**
-```json
-{
-  "data": {
-    "reply": "Great, $120K from a W-2 job gives you stable qualifying income. Do you have any secondary income sources?",
-    "extracted_data": {
-      "income.primary_income": "100000-150000",
-      "income.income_stability": "w2"
-    },
-    "progress_percentage": 15
-  }
-}
-```
+*Conversational audit endpoint deferred to post-MVP (CEO plan 2026-04-03). Form-only for all audits at launch.*
 
 ---
 
@@ -326,6 +324,39 @@ Manually trigger identity re-synthesis. **Auth required.** Normally triggered au
     "details": []
   }
 }
+```
+
+### GET /api/v1/identity/share
+Get a shareable link for the current identity. **Auth required.**
+
+**Response (200):**
+```json
+{
+  "data": {
+    "share_url": "/identity/clx4abc...?sig=hmac_signature_here"
+  }
+}
+```
+
+### GET /identity/:publicId (public route, not under /api/v1)
+View a shared identity card. **No auth required.** Requires valid HMAC signature.
+
+**Query params:** `sig` (HMAC-SHA256 signature, required)
+
+**Response (200):** HTML page showing archetype, readiness score, and radar chart. No sensitive data.
+**Response (404):** Invalid or missing signature.
+
+### PUT /api/v1/identity/:identityId/rate
+Submit post-synthesis feedback rating. **Auth required.**
+
+**Request:**
+```json
+{ "rating": 4 }
+```
+
+**Response (200):**
+```json
+{ "data": { "id": "clx4abc...", "user_rating": 4 } }
 ```
 
 ---
@@ -399,7 +430,7 @@ Update completion status.
 ## Simulation Service
 
 ### POST /api/v1/simulations
-Run a "What If" simulation. **Auth required.** Max 3 per session.
+Run a "What If" simulation. **Auth required.** Max 3 per 24-hour rolling window.
 
 **Request:**
 ```json
@@ -434,7 +465,7 @@ Run a "What If" simulation. **Auth required.** Max 3 per session.
 {
   "error": {
     "code": "RATE_LIMITED",
-    "message": "You've used all 3 simulations for this session. Start a new session to run more.",
+    "message": "You've used all 3 simulations in the last 24 hours. Try again later.",
     "details": []
   }
 }
@@ -661,6 +692,6 @@ Set a template as the active version for its service_type (deactivates previous)
 | Audit conversational | 60 requests | 1 minute |
 | Identity synthesis | 5 requests | 5 minutes |
 | Strategy generation | 3 requests | 5 minutes |
-| Simulation | 3 per session | Session lifetime |
+| Simulation | 3 per user | 24-hour rolling window |
 | Blueprint generation | 5 requests | 1 hour |
 | All other endpoints | 100 requests | 1 minute |

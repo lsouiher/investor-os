@@ -62,7 +62,7 @@ There is no platform that:
 2. User creates an account with email and password
 3. User sees the Identity Hub with 5 audit cards, all showing "Not Started"
 4. User selects the Financial Audit
-5. User completes the audit through a conversational AI walkthrough (or switches to form mode)
+5. User completes the audit through the form-based input mode
 6. After completion (~4 min), the Financial sub-score is revealed
 7. User continues with remaining audits (Time, Skills, Risk, Horizon)
 8. After all 5 audits are complete, AI synthesis is triggered
@@ -185,14 +185,13 @@ There is no platform that:
 - **Risk Profile**: Collects self-assessment, scenario-based behavioral questions (vacancy, unexpected repairs, market drops, time-pressured decisions, out-of-scope proposals), financial safety indicators (emergency fund, backup income, dependents, insurance), behavioral indicators (stock market reaction, check frequency, panic decisions), and comfort zones (leverage, single-deal risk, out-of-state, partners)
 - **Horizon & Goals**: Collects primary objective ranking, financial targets (passive income goal, net worth goal, property count, return expectations), timeline (first deal, financial freedom, retirement, exit strategy), lifestyle preferences (relocation, house hacking, full-time RE, family alignment), and constraints (geographic, property type, ethical, deal-breakers)
 
-### FR-3: Dual Input Modes and Audit Persistence
-- Each audit supports a conversational AI walkthrough mode (chat-style with quick-reply options)
-- Each audit supports a form-based speed mode (traditional form inputs)
-- Both modes collect the same data points and produce the same sub-scores
-- Users can switch between modes during an audit
+### FR-3: Form-Based Audit Input and Persistence
+- Each audit uses a form-based input mode (traditional form inputs with structured sections)
+- Conversational AI walkthrough mode is deferred to post-MVP (CEO plan decision 2026-04-03)
 - Partial audit progress is automatically saved and persists across sessions
 - Users can resume an in-progress audit from where they left off
 - Each audit has a lifecycle: Not Started → In Progress (draft saved) → Completed (sub-score generated)
+- Sub-scores are calculated using deterministic rules-based formulas (not AI), ensuring consistent, testable scoring
 
 ### FR-4: AI Identity Synthesis
 - After any audit completion or update, the system synthesizes all available audit data
@@ -206,10 +205,11 @@ There is no platform that:
 - Previous versions are preserved and accessible
 - The platform displays score progression over time, radar chart evolution, strategy shifts between versions, and narrative comparisons (e.g., "6 months ago you were a Conservative Builder. Now you're a Cash Flow Hunter.")
 
-### FR-6: Strategy Generation
-- When sufficient audit data exists (all 5 audits complete), the system generates 3 strategy recommendations with fit scores and pros/cons
-- Each strategy includes: a full action plan with trackable items, a milestone-based roadmap with timeline, and a 72-hour micro-plan with immediate actionable tasks
-- Strategy re-evaluation triggers when the identity score shifts by more than 10 points
+### FR-6: Strategy Generation (Chained)
+- When sufficient audit data exists (all 5 audits complete), the system generates 3 strategy recommendations with fit scores, pros/cons, and descriptions (AI Call 1)
+- When a user activates a strategy, the system generates the detailed plan: action plan with trackable items, milestone-based roadmap, and 72-hour micro-plan (AI Call 2, only for the activated strategy)
+- Non-activated strategies show fit scores, pros/cons, and description only (no detailed plans generated)
+- When identity score shifts by more than 10 points, active strategies are flagged as needing refresh (user-initiated regeneration via banner prompt, not automatic)
 
 ### FR-7: "What If" Simulation
 - Users can adjust identity variables to see how changes affect their scores and strategy recommendations
@@ -317,10 +317,15 @@ There is no platform that:
 ## Scope Boundaries
 
 ### In Scope (MVP)
-- All 5 audits with conversational and form modes
+- All 5 audits with form-based input mode (conversational mode deferred to post-MVP)
 - AI identity synthesis (archetype, scores, radar chart, insights)
-- Strategy generation (3 strategies + action plan + roadmap + micro-plan)
-- "What If" simulation (3 per session)
+- Strategy generation (3 strategies with chained detail generation on activation)
+- "What If" simulation (3 per 24-hour rolling window)
+- Shareable identity card (public URL with HMAC-signed token)
+- Post-synthesis feedback prompt (1-5 rating)
+- Health check endpoint
+- AI prompt/response audit logging
+- Guided audit ordering in onboarding
 - Investment Blueprint PDF generation and download
 - Identity dashboard (snapshot, tasks, intelligence feed)
 - Identity versioning and history
@@ -331,6 +336,8 @@ There is no platform that:
 - AI prompt template management
 
 ### Out of Scope (Post-MVP)
+- Conversational AI audit walkthrough mode (deferred from MVP per CEO plan 2026-04-03)
+- Identity version narrative comparison ("6 months ago you were X, now you're Y")
 - Deal pipeline with identity scoring (V3.1)
 - Full identity-driven task system beyond AI-generated tasks (V3.1)
 - Notification system — email and in-app (V3.2)
@@ -354,13 +361,12 @@ There is no platform that:
 ## Assumptions
 
 - Users are comfortable sharing detailed financial information through a web platform with appropriate security measures in place
-- The conversational AI walkthrough can maintain natural dialogue quality while collecting structured data points
-- 5 audits totaling approximately 80+ data points can be completed in under 20 minutes when using conversational mode
+- 5 audits totaling approximately 80+ data points can be completed in under 20 minutes using form-based input (this target was originally calibrated for conversational mode and may need re-validation)
 - Industry-standard session-based authentication with role-based access, combined with field-level encryption for sensitive financial data, is sufficient for MVP security needs
 - Append-only versioning for audits and identities is the appropriate data retention approach (no deletion of historical versions)
 - Each user operates within their own auto-created tenant for MVP; the schema supports future multi-user tenants without migration
 - The AI provider can produce consistent, high-quality outputs for archetype assignment, strategy generation, and insight generation with well-crafted prompt templates
-- 3 simulations per session is a reasonable rate limit that balances user exploration with cost management
+- 3 simulations per 24-hour rolling window is a reasonable rate limit that balances user exploration with cost management
 - A fixed, curated set of investor archetypes (managed via configuration) can meaningfully categorize the diversity of real estate investor profiles; the AI selects from this set rather than generating labels dynamically
 - Contact management at MVP scope is limited to manual entry; automated contact discovery or import is post-MVP
 - The platform targets English-speaking users in the US real estate market for MVP
@@ -374,6 +380,6 @@ There is no platform that:
 | Users abandon audit flow before completing all 5 | Incomplete identities reduce platform value | Medium | Progressive disclosure shows increasing value with each audit; partial identity still provides useful insights |
 | AI generates inconsistent or low-quality archetypes and strategies | Core value proposition undermined | Medium | Versioned prompt templates enable rapid iteration; retry logic with stricter formatting on failure |
 | Users distrust sharing sensitive financial data | Low registration and audit completion | Medium | Clear privacy messaging; data isolation guarantees; no third-party data sharing |
-| Conversational AI mode feels slow or unnatural | Users switch to form mode, reducing engagement | Low | Form mode serves as reliable fallback; conversational mode is optional, not required |
+| AI output quality untested with real data | Core value proposition may not be compelling | High | Prototype AI synthesis prompt with 3 sample profiles before implementation; post-synthesis feedback rating tracks quality |
 | Simulation rate limit (3/session) frustrates power users | Negative user sentiment | Low | Monitor simulation usage patterns; adjust limit based on data post-launch |
 | Identity versioning creates large data volumes over time | Storage and query performance concerns | Low | Append-only model is standard; archival strategy for old versions can be designed post-MVP |

@@ -29,6 +29,7 @@ tenants 1──1 users (MVP: 1:1, schema supports 1:many)
 
   prompt_templates (system-level, not tenant-scoped)
   activity_logs (cross-cutting, tenant-scoped)
+  ai_call_logs (tenant-scoped, encrypted prompts)
 ```
 
 ---
@@ -117,6 +118,7 @@ Single table for all 5 audit types. Versioned with draft support.
 | headline_insight | text | not null | AI-generated one-sentence summary |
 | ai_insights | jsonb | not null | Full AI synthesis output (contradictions, feasibility, gaps, etc.) |
 | audit_snapshot | jsonb | not null | References to audit versions used: {financial: v, time: v, ...} |
+| user_rating | int | nullable, CHECK (1-5) | Post-synthesis feedback: "How well does this describe you?" |
 | generated_at | timestamp | not null, default now() | |
 | created_at | timestamp | not null, default now() | |
 
@@ -275,10 +277,10 @@ Single table for all 5 audit types. Versioned with draft support.
 | identity_version_id | int (FK) | not null, indexed | Base identity version |
 | modified_parameters | jsonb | not null | What the user changed |
 | result_delta | jsonb | not null | Score changes, archetype change, strategy changes |
-| session_id | string | not null | Groups simulations within a session (max 3 per session) |
 | created_at | timestamp | not null, default now() | |
 
-**Indexes:** tenant_id, (tenant_id, user_id, session_id)
+**Indexes:** tenant_id, (tenant_id, user_id), (tenant_id, user_id, created_at)
+**Rate limiting:** Max 3 simulations per user per 24-hour rolling window. Enforced via query: `COUNT(*) WHERE user_id = ? AND created_at > NOW() - INTERVAL '24 hours'`
 
 ### prompt_templates
 
@@ -326,16 +328,30 @@ System-level table, NOT tenant-scoped.
 
 ---
 
-### sessions (for simulation rate limiting)
+### ai_call_logs
+
+Stores raw AI prompts and responses for debugging and prompt iteration.
 
 | Field | Type | Constraints | Notes |
 |-------|------|-------------|-------|
-| id | string (PK) | | Session identifier |
-| user_id | int (FK) | not null, indexed | |
+| id | bigint (PK) | auto-increment | Bigint for high volume |
 | tenant_id | int (FK) | not null, indexed | |
-| simulation_count | int | not null, default 0 | Max 3 per session |
+| user_id | int (FK) | not null, indexed | |
+| service_type | enum | not null | Values: identity_synthesis, strategy_generation, simulation, insight, scoring |
+| prompt_template_id | int (FK) | nullable | References prompt_templates.id |
+| input_hash | string | not null | SHA-256 of full prompt (for dedup/search) |
+| full_prompt | text | not null | Encrypted with AES-256-GCM (contains sensitive audit data) |
+| full_response | text | not null | Raw AI response |
+| model | string | not null | AI model used |
+| tokens_used | int | nullable | Total token count |
+| latency_ms | int | nullable | Request duration |
+| success | boolean | not null | Whether the call succeeded |
+| error_message | text | nullable | Error details if failed |
 | created_at | timestamp | not null, default now() | |
-| expires_at | timestamp | not null | Session expiry |
+
+**Indexes:** tenant_id, (tenant_id, service_type), created_at
+**Retention:** 90 days recommended. Manual purge for now, scheduled task post-MVP.
+**Note:** full_prompt is encrypted because it contains assembled audit data including sensitive financial fields. Same key versioning pattern as audit responses.
 
 ---
 
@@ -353,8 +369,12 @@ Prisma middleware sets `app.current_tenant_id` at the start of each request from
 
 ## Encryption Strategy
 
-Sensitive fields within `audits.responses` JSON are encrypted/decrypted at the repository layer using AES-256-GCM:
+Sensitive fields within `audits.responses` JSON and `ai_call_logs.full_prompt` are encrypted/decrypted at the repository layer using AES-256-GCM with key versioning:
 - Encryption happens before Prisma write
 - Decryption happens after Prisma read
-- Encryption key stored in environment variable `AUDIT_ENCRYPTION_KEY`
-- Each encrypted value stored as `{iv}:{authTag}:{ciphertext}` (base64 encoded)
+- Encryption keys stored in environment variables: `AUDIT_ENCRYPTION_KEY_V1`, `AUDIT_ENCRYPTION_KEY_V2`, etc.
+- Current version tracked in `CURRENT_ENCRYPTION_KEY_VERSION` env var
+- Each encrypted value stored as `v{N}:{iv}:{authTag}:{ciphertext}` (base64 encoded)
+- Decrypt reads the version prefix, selects the matching key
+- Encrypt always uses the latest version
+- Key rotation: add new env var, update version. Old keys kept for reading. Bulk re-encryption script available as one-off migration tool.
