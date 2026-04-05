@@ -125,6 +125,6 @@ describe('buildSubScores', () => {
     ];
     const result = buildSubScores(audits);
     expect(result.financial).toBe(80);
-    expect((result as Record<string, number>)['unknown']).toBeUndefined();
+    expect((result as unknown as Record<string, number>)['unknown']).toBeUndefined();
   });
 });
