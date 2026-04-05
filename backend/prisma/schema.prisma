@@ -54,6 +54,38 @@ enum PromptServiceType {
   simulation
   insight
   scoring
+  growth_path_generation
+  cross_path_analysis
+}
+
+enum GrowthPathType {
+  portfolio
+  income_capital
+  skills_knowledge
+  time_operations
+}
+
+enum GrowthPathStatus {
+  locked
+  unlocked
+  generating
+  generated
+}
+
+enum GrowthStrategyStatus {
+  active
+  superseded
+}
+
+enum UnlockType {
+  organic
+  manual
+  system
+}
+
+enum ExportType {
+  markdown
+  pdf
 }
 
 // --- Tables (12 total per engineering amendments) ---
@@ -62,18 +94,22 @@ model Tenant {
   id            Int       @id @default(autoincrement())
   publicId      String    @unique @map("public_id")
   configuration Json      @default("{}")
+  featureFlags  Json      @default("{}") @map("feature_flags")
   createdAt     DateTime  @default(now()) @map("created_at")
   deletedAt     DateTime? @map("deleted_at") // Soft delete (constitution IV)
 
-  users             User[]
-  audits            Audit[]
-  identityVersions  IdentityVersion[]
-  strategies        Strategy[]
-  contacts          Contact[]
-  tasks             Task[]
-  simulations       Simulation[]
-  activityLogs      ActivityLog[]
-  aiCallLogs        AiCallLog[]
+  users              User[]
+  audits             Audit[]
+  identityVersions   IdentityVersion[]
+  strategies         Strategy[]
+  contacts           Contact[]
+  tasks              Task[]
+  simulations        Simulation[]
+  activityLogs       ActivityLog[]
+  aiCallLogs         AiCallLog[]
+  growthStrategies   GrowthStrategy[]
+  growthPaths        GrowthPath[]
+  exportHistory      ExportHistory[]
 
   @@map("tenants")
 }
@@ -102,6 +138,9 @@ model User {
   activityLogs        ActivityLog[]
   aiCallLogs          AiCallLog[]
   passwordResetTokens PasswordResetToken[]
+  growthStrategies    GrowthStrategy[]
+  growthPaths         GrowthPath[]
+  exportHistory       ExportHistory[]
 
   @@index([tenantId])
   @@map("users")
@@ -147,10 +186,11 @@ model IdentityVersion {
   generatedAt     DateTime @default(now()) @map("generated_at")
   createdAt       DateTime @default(now()) @map("created_at")
 
-  tenant      Tenant     @relation(fields: [tenantId], references: [id])
-  user        User       @relation(fields: [userId], references: [id])
-  strategies  Strategy[]
-  simulations Simulation[]
+  tenant           Tenant           @relation(fields: [tenantId], references: [id])
+  user             User             @relation(fields: [userId], references: [id])
+  strategies       Strategy[]
+  simulations      Simulation[]
+  growthStrategies GrowthStrategy[]
 
   @@unique([tenantId, userId, version])
   @@index([tenantId])
@@ -181,6 +221,7 @@ model Strategy {
   tenant          Tenant          @relation(fields: [tenantId], references: [id])
   user            User            @relation(fields: [userId], references: [id])
   identityVersion IdentityVersion @relation(fields: [identityVersionId], references: [id])
+  growthPaths     GrowthPath[]
 
   @@index([tenantId])
   @@index([tenantId, userId, identityVersionId])
@@ -332,4 +373,88 @@ model AiCallLog {
   @@index([tenantId, serviceType])
   @@index([createdAt])
   @@map("ai_call_logs")
+}
+
+// --- Growth Strategy Engine (V2) ---
+
+model GrowthStrategy {
+  id                Int                  @id @default(autoincrement())
+  publicId          String               @unique @map("public_id")
+  tenantId          Int                  @map("tenant_id")
+  userId            Int                  @map("user_id")
+  identityVersionId Int                  @map("identity_version_id")
+  status            GrowthStrategyStatus @default(active)
+  overallProgress   Int                  @default(0) @map("overall_progress") // 0-100
+  growthScore       Int                  @default(0) @map("growth_score") // 0-100 weighted avg of path progress
+  crossPathLinks    Json                 @default("[]") @map("cross_path_links") // Array of cross-path link objects
+  nextBestAction    Json?                @map("next_best_action") // Computed next best action
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+
+  tenant          Tenant          @relation(fields: [tenantId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
+  identityVersion IdentityVersion @relation(fields: [identityVersionId], references: [id])
+  paths           GrowthPath[]
+
+  @@unique([userId, tenantId, status], name: "growth_strategies_one_active_per_user")
+  @@index([tenantId])
+  @@index([tenantId, userId])
+  @@index([tenantId, userId, status])
+  @@map("growth_strategies")
+}
+
+model GrowthPath {
+  id                     Int              @id @default(autoincrement())
+  publicId               String           @unique @map("public_id")
+  tenantId               Int              @map("tenant_id")
+  userId                 Int              @map("user_id")
+  growthStrategyId       Int              @map("growth_strategy_id")
+  pathType               GrowthPathType   @map("path_type")
+  status                 GrowthPathStatus @default(locked)
+  version                Int              @default(1)
+  isCurrent              Boolean          @default(true) @map("is_current") // Only one current per (strategy, pathType)
+  strategyId             Int?             @map("strategy_id") // FK to V1 Strategy (Portfolio Growth only)
+  content                Json             @default("{}") // Path-type-specific AI-generated content
+  actionItems            Json             @default("[]") @map("action_items") // Array of action item objects
+  progress               Int              @default(0) // 0-100 based on action item completion
+  summary                String?          // Short AI-generated summary for dashboard card
+  unlockType             UnlockType?      @map("unlock_type") // Null while locked
+  unlockedAt             DateTime?        @map("unlocked_at")
+  unlockTrigger          Json?            @map("unlock_trigger") // Details about what triggered the unlock
+  generatedAt            DateTime?        @map("generated_at") // Last successful generation time
+  generationCooldownUntil DateTime?       @map("generation_cooldown_until") // Rate limit
+  createdAt              DateTime         @default(now()) @map("created_at")
+  updatedAt              DateTime         @updatedAt @map("updated_at")
+
+  tenant         Tenant         @relation(fields: [tenantId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+  growthStrategy GrowthStrategy @relation(fields: [growthStrategyId], references: [id])
+  strategy       Strategy?      @relation(fields: [strategyId], references: [id])
+
+  @@unique([tenantId, growthStrategyId, pathType, version])
+  @@index([tenantId])
+  @@index([tenantId, growthStrategyId])
+  @@index([tenantId, userId])
+  @@map("growth_paths")
+}
+
+model ExportHistory {
+  id              Int        @id @default(autoincrement())
+  publicId        String     @unique @map("public_id")
+  tenantId        Int        @map("tenant_id")
+  userId          Int        @map("user_id")
+  exportType      ExportType @map("export_type")
+  identityVersion Int        @map("identity_version") // Identity version at export time
+  pathVersions    Json       @map("path_versions") // {portfolio: 1, income_capital: 2, ...}
+  pathsIncluded   Json       @map("paths_included") // Array of path types included
+  consentGiven    Boolean    @default(false) @map("consent_given")
+  createdAt       DateTime   @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, userId])
+  @@index([tenantId, userId, exportType, createdAt])
+  @@map("export_history")
 }
