@@ -2,6 +2,23 @@
 
 All notable changes to InvestorOS will be documented in this file.
 
+## [0.3.1.0] - 2026-09-12
+
+Dark mode with system preference detection and persistent theme toggle. (Originally built as 0.2.1.0 in April; rebased onto the v0.3 pages.)
+
+### Added
+
+- **Dark mode** with three-mode toggle (light, dark, system) and FOUC prevention via inline script
+- **Custom ThemeProvider** context with localStorage persistence and real-time system preference tracking
+- **7 new semantic color tokens** (border, border-muted, surface-subtle, foreground-strong, foreground-secondary, foreground-tertiary) for theme-aware styling
+- **Dark color palette** with `color-scheme` CSS property for native UI element theming (scrollbars, selects, autofill)
+
+### Changed
+
+- Migrated hardcoded Tailwind gray/white color classes to semantic tokens across all page and component files
+- Converted inline hex colors in SVG charts (radar, sparkline, gauge) to CSS variable references
+- Added `dark:` variant overrides for colored badges (amber, red, emerald, blue status pills)
+
 ## [0.3.0.0] - 2026-09-12
 
 Integration release: the first version where the AI pipeline and every page work end-to-end. Verified with a full API smoke test (24/24) and a browser walk-through against a local mock of the Anthropic API.
