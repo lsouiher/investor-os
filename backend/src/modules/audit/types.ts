@@ -166,12 +166,12 @@ export type AuditResponses =
 
 export interface AuditSummary {
   id: string;
-  auditType: string;
+  audit_type: string;
   status: string;
   version: number;
-  subScore: number | null;
-  lastSavedAt: string;
-  completedAt: string | null;
+  sub_score: number | null;
+  last_saved_at: string;
+  completed_at: string | null;
 }
 
 export interface AuditDetail extends AuditSummary {

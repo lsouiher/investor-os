@@ -77,7 +77,7 @@ describe('validateCompletionRequirements', () => {
     const responses = {
       availability: { hours: '10' },
       flexibility: { schedule: 'flexible' },
-      preference: { involvement: 'active' },
+      preferences: { involvement: 'active' },
       runway: { months: '12' },
     };
     expect(() => validateCompletionRequirements('time', responses)).not.toThrow();

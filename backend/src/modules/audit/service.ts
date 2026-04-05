@@ -10,12 +10,12 @@ export async function getAuditSummaries(userId: number, tenantId: number): Promi
   const audits = await auditRepo.getLatestAuditsByUser(userId, tenantId);
   return audits.map((a) => ({
     id: a.publicId,
-    auditType: a.auditType,
+    audit_type: a.auditType,
     status: a.status,
     version: a.version,
-    subScore: a.subScore,
-    lastSavedAt: a.lastSavedAt.toISOString(),
-    completedAt: a.completedAt?.toISOString() ?? null,
+    sub_score: a.subScore,
+    last_saved_at: a.lastSavedAt.toISOString(),
+    completed_at: a.completedAt?.toISOString() ?? null,
   }));
 }
 
@@ -25,12 +25,12 @@ export async function getAuditDetail(userId: number, tenantId: number, auditType
 
   return {
     id: audit.publicId,
-    auditType: audit.auditType,
+    audit_type: audit.auditType,
     status: audit.status,
     version: audit.version,
-    subScore: audit.subScore,
-    lastSavedAt: audit.lastSavedAt.toISOString(),
-    completedAt: audit.completedAt?.toISOString() ?? null,
+    sub_score: audit.subScore,
+    last_saved_at: audit.lastSavedAt.toISOString(),
+    completed_at: audit.completedAt?.toISOString() ?? null,
     responses: audit.responses as Record<string, unknown>,
   };
 }
@@ -53,24 +53,24 @@ export async function saveAudit(
 
     return {
       id: audit.publicId,
-      auditType: audit.auditType,
+      audit_type: audit.auditType,
       status: audit.status,
       version: audit.version,
-      subScore: audit.subScore,
-      lastSavedAt: audit.lastSavedAt.toISOString(),
-      completedAt: audit.completedAt?.toISOString() ?? null,
+      sub_score: audit.subScore,
+      last_saved_at: audit.lastSavedAt.toISOString(),
+      completed_at: audit.completedAt?.toISOString() ?? null,
     };
   }
 
   const audit = await auditRepo.upsertDraft(userId, tenantId, auditType, responses);
   return {
     id: audit.publicId,
-    auditType: audit.auditType,
+    audit_type: audit.auditType,
     status: audit.status,
     version: audit.version,
-    subScore: audit.subScore,
-    lastSavedAt: audit.lastSavedAt.toISOString(),
-    completedAt: audit.completedAt?.toISOString() ?? null,
+    sub_score: audit.subScore,
+    last_saved_at: audit.lastSavedAt.toISOString(),
+    completed_at: audit.completedAt?.toISOString() ?? null,
   };
 }
 

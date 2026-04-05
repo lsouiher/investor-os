@@ -13,10 +13,10 @@ export function validateAuditType(auditType: string): AuditType {
 // Required sections per audit type for completion
 const REQUIRED_SECTIONS: Record<string, string[]> = {
   financial: ['income', 'assets', 'liabilities', 'credit', 'tax'],
-  time: ['availability', 'flexibility', 'preference', 'runway'],
+  time: ['availability', 'flexibility', 'preferences', 'runway'],
   skills: ['re_experience', 'professional', 'transferable', 'education', 'network'],
-  risk: ['self_assessment', 'scenarios', 'financial_safety', 'behavioral', 'comfort_zones'],
-  horizon: ['primary_objective', 'financial_targets', 'timeline', 'lifestyle', 'constraints'],
+  risk: ['self_assessment', 'scenarios', 'safety', 'behavioral', 'comfort_zones'],
+  horizon: ['objectives', 'financial_targets', 'timeline', 'lifestyle', 'constraints'],
 };
 
 export function validateCompletionRequirements(
