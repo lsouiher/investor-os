@@ -5,6 +5,7 @@ import { api } from "@/lib/api-client";
 import RadarChart, { type RadarData } from "@/components/identity/radar-chart";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
+import { useTranslation } from "@/lib/i18n";
 
 interface SimulationConfig {
   remaining_simulations: number;
@@ -96,6 +97,7 @@ function scoreColorClass(score: number): string {
 }
 
 export default function SimulationPage() {
+  const { t } = useTranslation();
   const [config, setConfig] = useState<SimulationConfig | null>(null);
   const [sliderValues, setSliderValues] = useState<Record<string, number>>({});
   const [result, setResult] = useState<SimulationResult | null>(null);
@@ -119,7 +121,7 @@ export default function SimulationPage() {
       if (apiErr?.code === "NOT_FOUND" || apiErr?.code === "NON_JSON_RESPONSE") {
         setConfig(null);
       } else {
-        setError("Failed to load simulation config.");
+        setError(t("simulation.error.load_failed"));
       }
     } finally {
       setLoading(false);
@@ -146,7 +148,7 @@ export default function SimulationPage() {
         if (value !== undefined && value !== v.current) modified[v.key] = value;
       });
       if (Object.keys(modified).length === 0) {
-        setError("Move at least one slider to run a simulation.");
+        setError(t("simulation.error.no_change"));
         return;
       }
       const data = await api.post<SimulationResponse>("/simulations", {
@@ -160,8 +162,8 @@ export default function SimulationPage() {
       const apiErr = err as { code?: string; message?: string };
       setError(
         apiErr?.code === "RATE_LIMITED"
-          ? apiErr.message ?? "Simulation limit reached for today."
-          : "Simulation failed. Please try again."
+          ? t("simulation.error.rate_limited")
+          : t("simulation.error.failed")
       );
     } finally {
       setSimulating(false);
@@ -189,16 +191,16 @@ export default function SimulationPage() {
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-col items-center justify-center rounded-lg border border-border bg-surface-card px-6 py-16 text-center">
           <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
-            Simulations Unlock After Identity
+            {t("simulation.empty.title")}
           </h2>
           <p className="mb-6 max-w-sm text-sm text-foreground-muted">
-            Complete all 5 audits and build your identity to run what-if simulations.
+            {t("simulation.empty.description")}
           </p>
           <a
             href="/hub"
             className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
           >
-            Go to Identity Hub
+            {t("simulation.goto_hub")}
           </a>
         </div>
       </div>
@@ -207,17 +209,17 @@ export default function SimulationPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      {simulating && <SpinnerOverlay label="Running simulation..." />}
+      {simulating && <SpinnerOverlay label={t("simulation.running")} />}
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground-strong">What-If Simulation</h1>
+          <h1 className="text-2xl font-bold text-foreground-strong">{t("simulation.title")}</h1>
           <p className="mt-1 text-sm text-foreground-muted">
-            Adjust variables and see how your identity would change
+            {t("simulation.subtitle")}
           </p>
         </div>
         <div className="text-right">
-          <span className="text-sm text-foreground-muted">Remaining simulations</span>
+          <span className="text-sm text-foreground-muted">{t("simulation.remaining")}</span>
           <p className="text-2xl font-bold text-amber-600">
             {config.remaining_simulations}
           </p>
@@ -231,7 +233,7 @@ export default function SimulationPage() {
         {/* Left: Current identity */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
-            Current
+            {t("simulation.current")}
           </h3>
           <p className="mb-1 text-lg font-bold text-foreground-strong">
             {config.current_identity.archetype}
@@ -245,7 +247,7 @@ export default function SimulationPage() {
         {/* Center: Sliders */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
-            Adjust Variables
+            {t("simulation.adjust")}
           </h3>
           <div className="space-y-5">
             {config.variables.map((variable) => (
@@ -282,15 +284,16 @@ export default function SimulationPage() {
             className="mt-6 w-full rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
           >
             {config.remaining_simulations <= 0
-              ? "No Simulations Remaining"
-              : "Run Full Simulation"}
+              ? t("simulation.no_remaining")
+              : t("simulation.run")
+            }
           </button>
         </div>
 
         {/* Right: Simulated result */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
-            Simulated
+            {t("simulation.simulated")}
           </h3>
           {result ? (
             <>
@@ -329,7 +332,7 @@ export default function SimulationPage() {
             </>
           ) : (
             <div className="flex h-48 items-center justify-center text-sm text-foreground-tertiary">
-              Run a simulation to see results
+              {t("simulation.no_results")}
             </div>
           )}
         </div>

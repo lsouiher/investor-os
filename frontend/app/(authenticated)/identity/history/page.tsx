@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api-client";
+import { useTranslation } from "@/lib/i18n";
 import RadarChart, { type RadarData } from "@/components/identity/radar-chart";
 import ScoreSparkline from "@/components/identity/score-sparkline";
 import { SkeletonCard } from "@/components/shared/loading-states";
@@ -26,6 +27,7 @@ function scoreColorClass(score: number): string {
 }
 
 export default function IdentityHistoryPage() {
+  const { t } = useTranslation();
   const [versions, setVersions] = useState<IdentityVersion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export default function IdentityHistoryPage() {
         setCompareA(0);
       }
     } catch {
-      setError("Failed to load identity history.");
+      setError(t("identity_history.error.load_failed"));
     } finally {
       setLoading(false);
     }
@@ -81,30 +83,30 @@ export default function IdentityHistoryPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground-strong">Identity History</h1>
+          <h1 className="text-2xl font-bold text-foreground-strong">{t("identity_history.title")}</h1>
           <p className="mt-1 text-sm text-foreground-muted">
-            Track how your investor identity evolves
+            {t("identity_history.subtitle")}
           </p>
         </div>
         <Link
           href="/identity"
           className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
         >
-          Back to Identity
+          {t("identity_history.back")}
         </Link>
       </div>
 
       {/* Score trend */}
       {scoreHistory.length > 1 && (
         <div className="rounded-lg border border-border bg-surface-card p-6">
-          <h3 className="mb-3 text-sm font-medium text-foreground-secondary">Score Trend</h3>
+          <h3 className="mb-3 text-sm font-medium text-foreground-secondary">{t("identity_history.score_trend")}</h3>
           <ScoreSparkline scores={scoreHistory} width={400} height={60} />
         </div>
       )}
 
       {/* Version timeline */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-foreground-secondary">Versions</h3>
+        <h3 className="text-sm font-medium text-foreground-secondary">{t("identity_history.versions")}</h3>
         {versions.map((version, idx) => {
           const isSelected = compareA === idx || compareB === idx;
           return (
@@ -166,7 +168,7 @@ export default function IdentityHistoryPage() {
       {versionA && (
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <h3 className="mb-4 text-sm font-medium text-foreground-secondary">
-            Comparison{versionB ? ` (v${versionA.version} vs v${versionB.version})` : ""}
+            {t("identity_history.comparison")}{versionB ? ` (v${versionA.version} vs v${versionB.version})` : ""}
           </h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Version A */}
@@ -205,7 +207,7 @@ export default function IdentityHistoryPage() {
               </div>
             ) : (
               <div className="flex items-center justify-center text-sm text-foreground-tertiary">
-                Select a second version to compare
+                {t("identity_history.select_second")}
               </div>
             )}
           </div>
@@ -215,13 +217,13 @@ export default function IdentityHistoryPage() {
       {versions.length === 0 && (
         <div className="rounded-lg border border-border bg-surface-card p-8 text-center">
           <p className="text-sm text-foreground-muted">
-            No identity versions yet. Complete your audits and synthesize your identity.
+            {t("identity_history.empty")}
           </p>
           <Link
             href="/hub"
             className="mt-4 inline-block rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-amber-700"
           >
-            Go to Identity Hub
+            {t("identity_history.goto_hub")}
           </Link>
         </div>
       )}

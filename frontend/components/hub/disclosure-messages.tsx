@@ -1,15 +1,15 @@
-export function getDisclosureMessage(completedCount: number): string {
+export function getDisclosureMessage(completedCount: number, t: (key: string) => string): string {
   if (completedCount <= 0) {
-    return "Start your first audit to begin building your investor identity.";
+    return t("hub.disclosure.start_first");
   }
   if (completedCount === 1) {
-    return "Getting to know you...";
+    return t("hub.disclosure.one_complete");
   }
   if (completedCount <= 3) {
-    return "Partial profile, add more for sharper insights.";
+    return t("hub.disclosure.partial");
   }
   if (completedCount === 4) {
-    return "Almost there, one more for full identity.";
+    return t("hub.disclosure.almost");
   }
-  return "Full identity unlocked.";
+  return t("hub.disclosure.complete");
 }

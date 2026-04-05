@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n";
 // Matches the roadmap milestone shape from GET /api/v1/strategies/:id
 interface Milestone {
   id: string;
@@ -19,12 +20,13 @@ export default function RoadmapTimeline({
   milestones,
   onComplete,
 }: RoadmapTimelineProps) {
+  const { t } = useTranslation();
   const sorted = [...milestones].sort((a, b) => a.sort_order - b.sort_order);
 
   if (sorted.length === 0) {
     return (
       <p className="py-8 text-center text-sm text-foreground-tertiary">
-        No milestones defined yet.
+        {t("roadmap.empty")}
       </p>
     );
   }
@@ -51,7 +53,7 @@ export default function RoadmapTimeline({
                       ? "border-red-300 bg-surface-card text-red-400 hover:border-red-400"
                       : "border-border bg-surface-card text-foreground-tertiary hover:border-amber-400 hover:text-amber-500"
                 }`}
-                title={milestone.is_completed ? "Completed" : "Click to mark complete"}
+                title={milestone.is_completed ? t("roadmap.completed") : t("roadmap.mark_complete")}
               >
                 {milestone.is_completed ? (
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -87,7 +89,7 @@ export default function RoadmapTimeline({
                 )}
                 {!milestone.is_completed && isPast && (
                   <span className="rounded bg-red-50 dark:bg-red-950 px-1.5 py-0.5 text-xs font-medium text-red-600 dark:text-red-400">
-                    Overdue
+                    {t("roadmap.overdue")}
                   </span>
                 )}
               </div>

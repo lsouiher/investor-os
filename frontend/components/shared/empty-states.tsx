@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 
 function EmptyWrapper({
@@ -91,48 +92,52 @@ const TasksIcon = (
 );
 
 export function DashboardEmpty() {
+  const { t } = useTranslation();
   return (
     <EmptyWrapper
       icon={IdentityIcon}
-      title="Build Your Investor Identity"
-      description="Complete 5 structured audits to discover your unique investor archetype and readiness score."
-      actionLabel="Start Building"
+      title={t("empty.dashboard.title")}
+      description={t("empty.dashboard.description")}
+      actionLabel={t("empty.dashboard.action")}
       actionHref="/hub"
     />
   );
 }
 
 export function StrategyEmpty() {
+  const { t } = useTranslation();
   return (
     <EmptyWrapper
       icon={StrategyIcon}
-      title="Unlock Your Strategies"
-      description="Complete your investor identity to receive personalized investment strategies matched to your profile."
-      actionLabel="Go to Identity Hub"
+      title={t("empty.strategies.title")}
+      description={t("empty.strategies.description")}
+      actionLabel={t("empty.strategies.action")}
       actionHref="/hub"
     />
   );
 }
 
 export function ContactsEmpty() {
+  const { t } = useTranslation();
   return (
     <EmptyWrapper
       icon={ContactsIcon}
-      title="Build Your Network"
-      description="Add contacts to track your real estate network -- agents, lenders, mentors, and partners."
-      actionLabel="Add First Contact"
+      title={t("empty.contacts.title")}
+      description={t("empty.contacts.description")}
+      actionLabel={t("empty.contacts.action")}
       actionHref="/contacts?add=true"
     />
   );
 }
 
 export function TasksEmpty() {
+  const { t } = useTranslation();
   return (
     <EmptyWrapper
       icon={TasksIcon}
-      title="No Tasks Yet"
-      description="Activate a strategy and its action plan shows up here, or add your own task above."
-      actionLabel="View Strategies"
+      title={t("empty.tasks.title")}
+      description={t("empty.tasks.description")}
+      actionLabel={t("empty.tasks.action")}
       actionHref="/strategies"
     />
   );

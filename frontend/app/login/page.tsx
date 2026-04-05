@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api-client";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { useTranslation } from "@/lib/i18n";
 
 export default function LoginPage() {
   return (
@@ -18,6 +19,7 @@ export default function LoginPage() {
 function LoginForm() {
   const router = useRouter();
   const { login } = useAuth();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,11 +31,11 @@ function LoginForm() {
     setError(null);
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email address.");
+      setError(t("auth.validation.invalid_email"));
       return;
     }
     if (!password) {
-      setError("Please enter your password.");
+      setError(t("auth.validation.password_required"));
       return;
     }
 
@@ -45,7 +47,7 @@ function LoginForm() {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        setError("Something went wrong. Please try again.");
+        setError(t("auth.error.generic"));
       }
     } finally {
       setSubmitting(false);
@@ -63,10 +65,10 @@ function LoginForm() {
       >
         <div className="mb-8 text-center">
           <p className="text-sm font-semibold tracking-widest uppercase text-accent">
-            InvestorOS
+            {t("nav.brand")}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground">
-            Welcome back
+            {t("auth.login.title")}
           </h1>
         </div>
 
@@ -81,12 +83,12 @@ function LoginForm() {
           )}
 
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-foreground">Email</span>
+            <span className="text-sm font-medium text-foreground">{t("auth.login.email_label")}</span>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder={t("auth.login.email_placeholder")}
               autoComplete="email"
               className="h-10 border border-foreground/10 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-accent"
               style={{ borderRadius: "var(--radius-default)" }}
@@ -95,13 +97,13 @@ function LoginForm() {
 
           <label className="flex flex-col gap-1">
             <span className="text-sm font-medium text-foreground">
-              Password
+              {t("auth.login.password_label")}
             </span>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Your password"
+              placeholder={t("auth.login.password_placeholder")}
               autoComplete="current-password"
               className="h-10 border border-foreground/10 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-accent"
               style={{ borderRadius: "var(--radius-default)" }}
@@ -114,17 +116,17 @@ function LoginForm() {
             className="mt-2 h-10 bg-accent text-sm font-semibold text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
             style={{ borderRadius: "var(--radius-button)" }}
           >
-            {submitting ? "Signing in..." : "Sign in"}
+            {submitting ? t("auth.login.submitting") : t("auth.login.submit")}
           </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-foreground-muted">
-          Don&apos;t have an account?{" "}
+          {t("auth.login.no_account")}{" "}
           <Link
             href="/register"
             className="font-medium text-accent underline underline-offset-2 hover:text-accent-hover"
           >
-            Create one
+            {t("auth.login.create_link")}
           </Link>
         </p>
       </div>

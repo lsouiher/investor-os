@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n";
+
 interface StalenessAlertProps {
   isStale: boolean;
   changedSinceExport: string[];
@@ -11,6 +13,7 @@ export default function StalenessAlert({
   changedSinceExport,
   onDownloadFresh,
 }: StalenessAlertProps) {
+  const { t } = useTranslation();
   if (!isStale) return null;
 
   return (
@@ -31,7 +34,7 @@ export default function StalenessAlert({
         </svg>
         <div className="flex-1">
           <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-            Your identity has been updated since your last export.
+            {t("export.staleness.message")}
           </p>
           {changedSinceExport.length > 0 && (
             <ul className="mt-1 list-inside list-disc text-sm text-amber-700 dark:text-amber-300">
@@ -44,7 +47,7 @@ export default function StalenessAlert({
             onClick={onDownloadFresh}
             className="mt-2 text-sm font-medium text-amber-900 underline hover:text-amber-700"
           >
-            Download fresh copy
+            {t("export.staleness.download_fresh")}
           </button>
         </div>
       </div>

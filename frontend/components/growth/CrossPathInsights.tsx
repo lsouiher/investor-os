@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 interface CrossPathLink {
   id: string;
@@ -27,18 +28,23 @@ const LINK_COLORS: Record<string, string> = {
   conflict: "text-amber-600 bg-amber-50",
 };
 
-const PATH_NAMES: Record<string, string> = {
-  portfolio: "Portfolio",
-  income_capital: "Income",
-  skills_knowledge: "Skills",
-  time_operations: "Time",
-};
+function usePathNamesShort() {
+  const { t } = useTranslation();
+  return {
+    portfolio: t("growth.path_short.portfolio"),
+    income_capital: t("growth.path_short.income"),
+    skills_knowledge: t("growth.path_short.skills"),
+    time_operations: t("growth.path_short.time"),
+  } as Record<string, string>;
+}
 
 interface CrossPathInsightsProps {
   links: CrossPathLink[];
 }
 
 export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
+  const { t } = useTranslation();
+  const PATH_NAMES = usePathNamesShort();
   const [expanded, setExpanded] = useState(false);
 
   if (links.length === 0) return null;
@@ -51,7 +57,7 @@ export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
         aria-expanded={expanded}
       >
         <span className="text-sm font-semibold text-foreground-secondary">
-          Cross-Path Connections ({links.length})
+          {t("growth.cross_path_connections", { count: String(links.length) })}
         </span>
         <span className={`text-foreground-tertiary transition-transform ${expanded ? "rotate-90" : ""}`}>
           ›
@@ -73,7 +79,7 @@ export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
                 <div className="mt-0.5 text-xs text-foreground-muted">{link.description}</div>
                 {link.type === "conflict" && link.resolution && (
                   <div className="mt-1 rounded bg-amber-50 dark:bg-amber-950 px-2 py-1 text-xs text-amber-700 dark:text-amber-300">
-                    Resolution: {link.resolution}
+                    {t("growth.resolution")}: {link.resolution}
                   </div>
                 )}
               </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
+import { useTranslation } from "@/lib/i18n";
 import { api } from "@/lib/api-client";
 import RadarChart, { type RadarData } from "@/components/identity/radar-chart";
 import ScoreSparkline from "@/components/identity/score-sparkline";
@@ -107,6 +108,7 @@ function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export default function DashboardPage() {
       const result = await api.get<DashboardData>("/dashboard");
       setData(result);
     } catch {
-      setError("Failed to load dashboard data.");
+      setError(t("dashboard.error.load_failed"));
     } finally {
       setLoading(false);
     }
@@ -165,9 +167,9 @@ export default function DashboardPage() {
     return (
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground-strong">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-foreground-strong">{t("dashboard.title")}</h1>
           <p className="mt-1 text-sm text-foreground-muted">
-            Welcome{user?.email ? `, ${user.email}` : ""}
+            {user?.email ? t("dashboard.welcome_user", { email: user.email }) : t("dashboard.welcome")}
           </p>
         </div>
         <div className="rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-950 p-6 text-center">
@@ -176,7 +178,7 @@ export default function DashboardPage() {
             onClick={fetchDashboard}
             className="mt-3 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
           >
-            Retry
+            {t("common.retry")}
           </button>
         </div>
       </div>
@@ -188,9 +190,9 @@ export default function DashboardPage() {
     return (
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground-strong">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-foreground-strong">{t("dashboard.title")}</h1>
           <p className="mt-1 text-sm text-foreground-muted">
-            Welcome{user?.email ? `, ${user.email}` : ""}
+            {user?.email ? t("dashboard.welcome_user", { email: user.email }) : t("dashboard.welcome")}
           </p>
         </div>
         <DashboardEmpty />
@@ -203,9 +205,9 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground-strong">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-foreground-strong">{t("dashboard.title")}</h1>
         <p className="mt-1 text-sm text-foreground-muted">
-          Welcome back{user?.email ? `, ${user.email}` : ""}
+          {user?.email ? t("dashboard.welcome_user", { email: user.email }) : t("dashboard.welcome")}
         </p>
       </div>
 
@@ -213,13 +215,13 @@ export default function DashboardPage() {
       <div className="rounded-lg border border-border bg-surface-card p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
-            Investor Identity
+            {t("dashboard.identity_section")}
           </h2>
           <Link
             href="/identity"
             className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
           >
-            View Full Card
+            {t("dashboard.view_full_identity")}
           </Link>
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-6">
@@ -241,7 +243,7 @@ export default function DashboardPage() {
               <p className="text-sm font-bold text-foreground-strong">
                 {identity.archetype}
               </p>
-              <p className="text-xs text-foreground-muted">Archetype</p>
+              <p className="text-xs text-foreground-muted">{t("dashboard.archetype_label")}</p>
             </div>
           </div>
 
@@ -257,7 +259,7 @@ export default function DashboardPage() {
           {identity.score_history.length > 1 && (
             <div>
               <ScoreSparkline scores={identity.score_history} width={100} height={36} />
-              <p className="mt-1 text-xs text-foreground-tertiary">Score trend</p>
+              <p className="mt-1 text-xs text-foreground-tertiary">{t("dashboard.score_trend")}</p>
             </div>
           )}
         </div>
@@ -268,14 +270,14 @@ export default function DashboardPage() {
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
-              Active Strategy
+              {t("dashboard.active_strategy")}
             </h2>
             {active_strategy && (
               <Link
                 href={`/strategies/${active_strategy.id}`}
                 className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
               >
-                View
+                {t("common.view")}
               </Link>
             )}
           </div>
@@ -286,7 +288,7 @@ export default function DashboardPage() {
               </p>
               <div className="mt-3">
                 <div className="mb-1 flex justify-between text-xs text-foreground-muted">
-                  <span>Progress</span>
+                  <span>{t("dashboard.progress")}</span>
                   <span>
                     {active_strategy.progress
                       ? `${active_strategy.progress.completed}/${active_strategy.progress.total}`
@@ -303,12 +305,12 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="mt-4">
-              <p className="text-sm text-foreground-muted">No active strategy</p>
+              <p className="text-sm text-foreground-muted">{t("dashboard.no_strategy")}</p>
               <Link
                 href="/strategies"
                 className="mt-2 inline-block text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
               >
-                Browse strategies
+                {t("dashboard.browse_strategies")}
               </Link>
             </div>
           )}
@@ -318,13 +320,13 @@ export default function DashboardPage() {
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
-              Priority Tasks
+              {t("dashboard.priority_tasks")}
             </h2>
             <Link
               href="/tasks"
               className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
             >
-              All Tasks
+              {t("dashboard.all_tasks")}
             </Link>
           </div>
           <div className="mt-4 space-y-2">
@@ -360,7 +362,7 @@ export default function DashboardPage() {
                 </div>
               ))
             ) : (
-              <p className="text-sm text-foreground-muted">No priority tasks</p>
+              <p className="text-sm text-foreground-muted">{t("dashboard.no_priority_tasks")}</p>
             )}
           </div>
         </div>
@@ -406,7 +408,7 @@ export default function DashboardPage() {
       {/* Intelligence feed */}
       <div className="rounded-lg border border-border bg-surface-card p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
-          Intelligence Feed
+          {t("dashboard.intelligence_feed")}
         </h2>
         {intelligence_feed.length > 0 ? (
           <div className="mt-4 max-h-64 space-y-3 overflow-y-auto">
@@ -432,7 +434,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <p className="mt-4 text-sm text-foreground-muted">
-            Insights will appear here as you use the platform.
+            {t("dashboard.no_insights")}
           </p>
         )}
       </div>

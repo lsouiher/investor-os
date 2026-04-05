@@ -5,6 +5,7 @@ import { api } from "@/lib/api-client";
 import { TasksEmpty } from "@/components/shared/empty-states";
 import { SkeletonCard } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
+import { useTranslation } from "@/lib/i18n";
 
 // Shape of GET /api/v1/tasks items (snake_case per contracts/api-v1.md)
 interface Task {
@@ -42,6 +43,7 @@ const IMPACT_STYLES: Record<string, string> = {
 };
 
 export default function TasksPage() {
+  const { t } = useTranslation();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +59,7 @@ export default function TasksPage() {
       const data = await api.get<Task[]>("/tasks");
       setTasks(data);
     } catch {
-      setError("Failed to load tasks.");
+      setError(t("tasks.error.load_failed"));
     } finally {
       setLoading(false);
     }
@@ -79,7 +81,7 @@ export default function TasksPage() {
         )
       );
     } catch {
-      setError("Failed to update task.");
+      setError(t("tasks.error.update_failed"));
     }
   };
 
@@ -98,7 +100,7 @@ export default function TasksPage() {
       setNewImpact("medium");
       setShowAddForm(false);
     } catch {
-      setError("Failed to add task.");
+      setError(t("tasks.error.add_failed"));
     }
   };
 
@@ -125,16 +127,16 @@ export default function TasksPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground-strong">Tasks</h1>
+          <h1 className="text-2xl font-bold text-foreground-strong">{t("tasks.title")}</h1>
           <p className="mt-1 text-sm text-foreground-muted">
-            {completedCount}/{tasks.length} completed, ordered by identity impact
+            {t("tasks.progress", { completed: String(completedCount), total: String(tasks.length) })}
           </p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
         >
-          {showAddForm ? "Cancel" : "Add Task"}
+          {showAddForm ? t("common.cancel") : t("tasks.add")}
         </button>
       </div>
 
@@ -151,7 +153,7 @@ export default function TasksPage() {
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Task title"
+              placeholder={t("tasks.form.title_placeholder")}
               required
               className="w-full rounded-lg border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
@@ -159,11 +161,11 @@ export default function TasksPage() {
               type="text"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
-              placeholder="Description (optional)"
+              placeholder={t("tasks.form.description_placeholder")}
               className="w-full rounded-lg border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-foreground-secondary">Impact:</label>
+              <label className="text-sm font-medium text-foreground-secondary">{t("tasks.form.impact_label")}</label>
               {(["high", "medium", "low"] as const).map((level) => (
                 <button
                   key={level}
@@ -175,7 +177,7 @@ export default function TasksPage() {
                       : "bg-surface-card text-foreground-secondary hover:bg-surface-subtle"
                   }`}
                 >
-                  {level}
+                  {t(`tasks.impact.${level}`)}
                 </button>
               ))}
             </div>
@@ -184,7 +186,7 @@ export default function TasksPage() {
               disabled={!newTitle.trim()}
               className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
             >
-              Add Task
+              {t("tasks.add")}
             </button>
           </div>
         </form>
@@ -230,7 +232,7 @@ export default function TasksPage() {
                 </span>
                 {task.source !== "manual" && (
                   <span className="rounded bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
-                    {task.source === "strategy" ? "Strategy" : task.source === "identity_gap" ? "Identity gap" : "AI"}
+                    {t(`tasks.source.${task.source}`)}
                   </span>
                 )}
               </div>
