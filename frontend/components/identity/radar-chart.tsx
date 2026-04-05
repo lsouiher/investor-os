@@ -51,7 +51,7 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
   if (axes.length === 0) {
     return (
       <div
-        className="flex items-center justify-center text-sm text-gray-400"
+        className="flex items-center justify-center text-sm text-foreground-tertiary"
         style={{ width: size, height: size }}
       >
         No data available
@@ -93,7 +93,7 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
             key={scale}
             d={ringPath}
             fill="none"
-            stroke="#e5e7eb"
+            stroke="var(--border)"
             strokeWidth={1}
           />
         );
@@ -110,18 +110,18 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
             y1={center}
             x2={end.x}
             y2={end.y}
-            stroke="#e5e7eb"
+            stroke="var(--border)"
             strokeWidth={1}
           />
         );
       })}
 
       {/* Data fill */}
-      <path d={dataPath} fill="#D97706" fillOpacity={0.3} stroke="#D97706" strokeWidth={2} />
+      <path d={dataPath} fill="var(--accent)" fillOpacity={0.3} stroke="var(--accent)" strokeWidth={2} />
 
       {/* Data dots */}
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={4} fill="#D97706" />
+        <circle key={i} cx={p.x} cy={p.y} r={4} fill="var(--accent)" />
       ))}
 
       {/* Labels */}
@@ -138,7 +138,7 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
             y={pos.y}
             textAnchor={anchor}
             dominantBaseline="central"
-            className="fill-gray-600 text-xs font-medium"
+            className="fill-foreground-secondary text-xs font-medium"
           >
             {axis.label}
           </text>

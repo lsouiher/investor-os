@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
 import { api } from "@/lib/api-client";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutIcon },
@@ -114,6 +115,7 @@ function AuthenticatedShell({
               </p>
               <p className="text-xs text-foreground-muted">Score: {score ?? "--"}</p>
             </div>
+            <ThemeToggle />
             <button
               onClick={logout}
               className="text-xs text-foreground-muted hover:text-foreground"

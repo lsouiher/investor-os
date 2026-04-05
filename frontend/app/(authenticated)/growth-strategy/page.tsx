@@ -194,12 +194,12 @@ export default function GrowthStrategyPage() {
   if (!strategy) {
     return (
       <div className="mx-auto max-w-3xl py-16 text-center">
-        <div className="rounded-lg border border-gray-200 bg-white p-12">
+        <div className="rounded-lg border border-border bg-surface-card p-12">
           {hasIdentity ? (
             <>
-              <h2 className="text-xl font-semibold text-gray-900">Your investor identity is ready. Build your Growth Strategy.</h2>
-              <p className="mt-2 text-gray-600">Four growth paths, generated from your identity, that unlock as you make progress.</p>
-              {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+              <h2 className="text-xl font-semibold text-foreground-strong">Your investor identity is ready. Build your Growth Strategy.</h2>
+              <p className="mt-2 text-foreground-secondary">Four growth paths, generated from your identity, that unlock as you make progress.</p>
+              {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
               <button
                 onClick={handleCreate}
                 disabled={creating}
@@ -210,8 +210,8 @@ export default function GrowthStrategyPage() {
             </>
           ) : (
             <>
-              <h2 className="text-xl font-semibold text-gray-900">Your Growth Strategy unlocks after completing your investor identity.</h2>
-              <p className="mt-2 text-gray-600">Complete all 5 audits and your identity synthesis to get started.</p>
+              <h2 className="text-xl font-semibold text-foreground-strong">Your Growth Strategy unlocks after completing your investor identity.</h2>
+              <p className="mt-2 text-foreground-secondary">Complete all 5 audits and your identity synthesis to get started.</p>
               <Link
                 href="/hub"
                 className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700"
@@ -234,8 +234,8 @@ export default function GrowthStrategyPage() {
       {/* Header: Growth Score + Archetype */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Growth Strategy</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground-strong">Growth Strategy</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
             {strategy.identity_version.archetype} · Readiness {strategy.identity_version.readiness_score}/100
           </p>
         </div>
@@ -292,14 +292,14 @@ export default function GrowthStrategyPage() {
 
       {/* Next Best Action */}
       {strategy.next_best_action && (
-        <div className="rounded-lg border-2 border-amber-200 bg-amber-50 px-5 py-4">
-          <div className="text-xs font-medium uppercase text-amber-700">Next Best Action</div>
-          <div className="mt-1 font-medium text-gray-900">{strategy.next_best_action.title}</div>
-          <div className="mt-1 text-sm text-gray-600">{strategy.next_best_action.reason}</div>
+        <div className="rounded-lg border-2 border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-5 py-4">
+          <div className="text-xs font-medium uppercase text-amber-700 dark:text-amber-300">Next Best Action</div>
+          <div className="mt-1 font-medium text-foreground-strong">{strategy.next_best_action.title}</div>
+          <div className="mt-1 text-sm text-foreground-secondary">{strategy.next_best_action.reason}</div>
           {strategy.next_best_action.cross_path_impact.length > 0 && (
             <div className="mt-2 flex gap-2">
               {strategy.next_best_action.cross_path_impact.map((impact) => (
-                <span key={impact} className="rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-700">
+                <span key={impact} className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-300">
                   {PATH_NAMES[impact] || impact}
                 </span>
               ))}
@@ -310,13 +310,13 @@ export default function GrowthStrategyPage() {
 
       {/* First-visit hero */}
       {showFirstVisitHero && !hasCompletedAnyAction && (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 px-5 py-4">
-          <p className="text-sm text-gray-700">
+        <div className="rounded-lg border border-border bg-surface-subtle px-5 py-4">
+          <p className="text-sm text-foreground-secondary">
             Your Growth Strategy starts here. Complete tasks to unlock new growth dimensions.
           </p>
           <button
             onClick={() => setShowFirstVisitHero(false)}
-            className="mt-1 text-xs text-gray-400 hover:text-gray-600"
+            className="mt-1 text-xs text-foreground-tertiary hover:text-foreground-secondary"
           >
             Dismiss
           </button>
@@ -324,7 +324,7 @@ export default function GrowthStrategyPage() {
       )}
 
       {error && (
-        <div className="rounded border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
+        <div className="rounded border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-950 px-4 py-2 text-sm text-red-700 dark:text-red-300">
           {error}
         </div>
       )}
@@ -351,7 +351,7 @@ export default function GrowthStrategyPage() {
       {/* Stub paths (collapsed section) */}
       {stubPaths.length > 0 && (
         <details className="group">
-          <summary className="cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-700">
+          <summary className="cursor-pointer text-sm font-medium text-foreground-muted hover:text-foreground-secondary">
             Future Growth Paths
             <span className="ml-1 transition-transform group-open:rotate-90">›</span>
           </summary>
@@ -377,12 +377,12 @@ export default function GrowthStrategyPage() {
       <CrossPathInsights links={strategy.cross_path_insights ?? []} />
 
       {/* Overall progress */}
-      <div className="rounded-lg border border-gray-200 bg-white px-5 py-4">
+      <div className="rounded-lg border border-border bg-surface-card px-5 py-4">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600">Overall Progress</span>
+          <span className="text-foreground-secondary">Overall Progress</span>
           <span className="font-medium">{strategy.overall_progress}%</span>
         </div>
-        <div className="mt-2 h-2 w-full rounded-full bg-gray-100">
+        <div className="mt-2 h-2 w-full rounded-full bg-surface-subtle">
           <div
             className="h-2 rounded-full bg-amber-500 transition-all"
             style={{ width: `${strategy.overall_progress}%` }}

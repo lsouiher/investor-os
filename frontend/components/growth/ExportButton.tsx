@@ -106,7 +106,7 @@ export default function ExportButton({
         className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
           isStale
             ? "bg-amber-600 text-white hover:bg-amber-700"
-            : "bg-gray-900 text-white hover:bg-gray-800"
+            : "bg-foreground-strong text-background hover:bg-foreground-secondary"
         } disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       >
         {isDownloading ? (
@@ -135,7 +135,7 @@ export default function ExportButton({
       </button>
 
       {error && (
-        <p className="mt-2 text-sm text-red-600">{error}</p>
+        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
 
       {showConsent && (
@@ -144,16 +144,16 @@ export default function ExportButton({
           role="dialog"
           aria-modal="true"
         >
-          <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-            <h2 className="text-lg font-semibold text-gray-900">
+          <div className="mx-4 w-full max-w-md rounded-lg bg-surface-card p-6 shadow-xl">
+            <h2 className="text-lg font-semibold text-foreground-strong">
               Export Growth Strategy
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-foreground-secondary">
               Your export will include your investor identity profile, growth
               strategy, and action plans as markdown files in a zip archive.
             </p>
-            <div className="mt-3 rounded-md bg-amber-50 p-3">
-              <p className="text-sm text-amber-800">
+            <div className="mt-3 rounded-md bg-amber-50 dark:bg-amber-950 p-3">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
                 <strong>Sensitive data notice:</strong> This export may include
                 financial data such as income figures, capital targets, and
                 funding channel details. Store the downloaded file securely and
@@ -163,7 +163,7 @@ export default function ExportButton({
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={handleConsentCancel}
-                className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                className="rounded border border-border px-4 py-2 text-sm text-foreground-secondary hover:bg-surface-subtle"
               >
                 Cancel
               </button>

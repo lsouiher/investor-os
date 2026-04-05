@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api-client";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 export default function LoginPage() {
   return (
@@ -52,7 +53,10 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-background px-4">
+    <div className="relative flex flex-1 items-center justify-center bg-background px-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div
         className="w-full max-w-md bg-surface-card p-8 shadow-sm"
         style={{ borderRadius: "var(--radius-card)" }}

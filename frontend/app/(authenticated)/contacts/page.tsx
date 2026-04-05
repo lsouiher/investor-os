@@ -40,18 +40,18 @@ function lastContactedBadge(lastContacted: string | null): {
   className: string;
 } {
   if (!lastContacted) {
-    return { label: "Never", className: "bg-gray-100 text-gray-500" };
+    return { label: "Never", className: "bg-surface-subtle text-foreground-muted" };
   }
   const days = Math.floor(
     (Date.now() - new Date(lastContacted).getTime()) / (1000 * 60 * 60 * 24)
   );
   if (days <= 7) {
-    return { label: `${days}d ago`, className: "bg-emerald-100 text-emerald-700" };
+    return { label: `${days}d ago`, className: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" };
   }
   if (days <= 30) {
-    return { label: `${days}d ago`, className: "bg-amber-100 text-amber-700" };
+    return { label: `${days}d ago`, className: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300" };
   }
-  return { label: `${days}d ago`, className: "bg-red-100 text-red-700" };
+  return { label: `${days}d ago`, className: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300" };
 }
 
 export default function ContactsPage() {
@@ -170,8 +170,8 @@ function ContactsPageContent() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Contacts</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground-strong">Contacts</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
             Your real estate network ({contacts.length} contacts)
           </p>
         </div>
@@ -197,7 +197,7 @@ function ContactsPageContent() {
             className={`flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               activeFilter === role.key
                 ? "bg-amber-600 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-surface-subtle text-foreground-secondary hover:bg-border"
             }`}
           >
             {role.label}
@@ -213,24 +213,24 @@ function ContactsPageContent() {
             <button
               key={contact.id}
               onClick={() => handleEdit(contact)}
-              className="flex w-full items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 text-left transition-colors hover:border-gray-300"
+              className="flex w-full items-center gap-4 rounded-lg border border-border bg-surface-card p-4 text-left transition-colors hover:border-border"
             >
               {/* Avatar */}
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-sm font-bold text-amber-700">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-sm font-bold text-amber-700 dark:text-amber-300">
                 {contact.name.charAt(0).toUpperCase()}
               </div>
 
               {/* Info */}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold text-foreground-strong">
                     {contact.name}
                   </p>
-                  <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-500">
+                  <span className="rounded bg-surface-subtle px-1.5 py-0.5 text-xs text-foreground-muted">
                     {contact.role_type}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-foreground-muted">
                   {contact.email || contact.phone || "No contact info"}
                 </p>
               </div>
@@ -238,8 +238,8 @@ function ContactsPageContent() {
               {/* Gap filled by this contact */}
               {contact.network_gap_filled && (
                 <div className="text-right">
-                  <p className="text-xs font-medium text-emerald-600">Fills gap</p>
-                  <p className="text-xs text-gray-400">{contact.network_gap_filled.replace("_", " ")}</p>
+                  <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Fills gap</p>
+                  <p className="text-xs text-foreground-tertiary">{contact.network_gap_filled.replace("_", " ")}</p>
                 </div>
               )}
 
@@ -254,7 +254,7 @@ function ContactsPageContent() {
         })}
 
         {filteredContacts.length === 0 && (
-          <p className="py-8 text-center text-sm text-gray-400">
+          <p className="py-8 text-center text-sm text-foreground-tertiary">
             No contacts matching this filter.
           </p>
         )}

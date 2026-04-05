@@ -63,9 +63,9 @@ const PATH_LABELS: Record<string, string> = {
 };
 
 const SEVERITY_STYLES: Record<string, string> = {
-  info: "bg-blue-100 text-blue-700",
-  warning: "bg-amber-100 text-amber-700",
-  success: "bg-emerald-100 text-emerald-700",
+  info: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
+  warning: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
+  success: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300",
 };
 
 function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
@@ -165,13 +165,13 @@ export default function DashboardPage() {
     return (
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground-strong">Dashboard</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
             Welcome{user?.email ? `, ${user.email}` : ""}
           </p>
         </div>
-        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-950 p-6 text-center">
+          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
           <button
             onClick={fetchDashboard}
             className="mt-3 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
@@ -188,8 +188,8 @@ export default function DashboardPage() {
     return (
       <div className="mx-auto max-w-5xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground-strong">Dashboard</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
             Welcome{user?.email ? `, ${user.email}` : ""}
           </p>
         </div>
@@ -203,21 +203,21 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-2xl font-bold text-foreground-strong">Dashboard</h1>
+        <p className="mt-1 text-sm text-foreground-muted">
           Welcome back{user?.email ? `, ${user.email}` : ""}
         </p>
       </div>
 
       {/* Identity snapshot */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
+      <div className="rounded-lg border border-border bg-surface-card p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
             Investor Identity
           </h2>
           <Link
             href="/identity"
-            className="text-xs font-medium text-amber-600 hover:text-amber-700"
+            className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
           >
             View Full Card
           </Link>
@@ -225,9 +225,9 @@ export default function DashboardPage() {
         <div className="mt-4 flex flex-wrap items-center gap-6">
           {/* Archetype badge */}
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
               <svg
-                className="h-5 w-5 text-amber-600"
+                className="h-5 w-5 text-amber-600 dark:text-amber-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -238,10 +238,10 @@ export default function DashboardPage() {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-bold text-gray-900">
+              <p className="text-sm font-bold text-foreground-strong">
                 {identity.archetype}
               </p>
-              <p className="text-xs text-gray-500">Archetype</p>
+              <p className="text-xs text-foreground-muted">Archetype</p>
             </div>
           </div>
 
@@ -257,7 +257,7 @@ export default function DashboardPage() {
           {identity.score_history.length > 1 && (
             <div>
               <ScoreSparkline scores={identity.score_history} width={100} height={36} />
-              <p className="mt-1 text-xs text-gray-400">Score trend</p>
+              <p className="mt-1 text-xs text-foreground-tertiary">Score trend</p>
             </div>
           )}
         </div>
@@ -265,15 +265,15 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Active strategy progress */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
+        <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
               Active Strategy
             </h2>
             {active_strategy && (
               <Link
                 href={`/strategies/${active_strategy.id}`}
-                className="text-xs font-medium text-amber-600 hover:text-amber-700"
+                className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
               >
                 View
               </Link>
@@ -281,11 +281,11 @@ export default function DashboardPage() {
           </div>
           {active_strategy ? (
             <div className="mt-4">
-              <p className="text-sm font-bold text-gray-900">
+              <p className="text-sm font-bold text-foreground-strong">
                 {active_strategy.name}
               </p>
               <div className="mt-3">
-                <div className="mb-1 flex justify-between text-xs text-gray-500">
+                <div className="mb-1 flex justify-between text-xs text-foreground-muted">
                   <span>Progress</span>
                   <span>
                     {active_strategy.progress
@@ -293,7 +293,7 @@ export default function DashboardPage() {
                       : "Plan generating…"}
                   </span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+                <div className="h-2 overflow-hidden rounded-full bg-surface-subtle">
                   <div
                     className="h-full rounded-full bg-amber-600 transition-all duration-500"
                     style={{ width: `${active_strategy.progress?.percentage ?? 0}%` }}
@@ -303,10 +303,10 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="mt-4">
-              <p className="text-sm text-gray-500">No active strategy</p>
+              <p className="text-sm text-foreground-muted">No active strategy</p>
               <Link
                 href="/strategies"
-                className="mt-2 inline-block text-sm font-medium text-amber-600 hover:text-amber-700"
+                className="mt-2 inline-block text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
               >
                 Browse strategies
               </Link>
@@ -315,14 +315,14 @@ export default function DashboardPage() {
         </div>
 
         {/* Priority tasks */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
+        <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
               Priority Tasks
             </h2>
             <Link
               href="/tasks"
-              className="text-xs font-medium text-amber-600 hover:text-amber-700"
+              className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
             >
               All Tasks
             </Link>
@@ -339,7 +339,7 @@ export default function DashboardPage() {
                     className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
                       task.completed
                         ? "border-emerald-500 bg-emerald-500 text-white"
-                        : "border-gray-300 hover:border-amber-400"
+                        : "border-border hover:border-amber-400"
                     }`}
                   >
                     {task.completed && (
@@ -351,8 +351,8 @@ export default function DashboardPage() {
                   <span
                     className={`text-sm ${
                       task.completed
-                        ? "text-gray-400 line-through"
-                        : "text-gray-700"
+                        ? "text-foreground-tertiary line-through"
+                        : "text-foreground-secondary"
                     }`}
                   >
                     {task.title}
@@ -360,7 +360,7 @@ export default function DashboardPage() {
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500">No priority tasks</p>
+              <p className="text-sm text-foreground-muted">No priority tasks</p>
             )}
           </div>
         </div>
@@ -368,44 +368,44 @@ export default function DashboardPage() {
 
       {/* Growth strategy (feature-flagged; null when off or not yet created) */}
       {growth_strategy && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
+        <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
               Growth Strategy
             </h2>
             <Link
               href="/growth-strategy"
-              className="text-xs font-medium text-amber-600 hover:text-amber-700"
+              className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
             >
               View Paths
             </Link>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {growth_strategy.paths.map((p) => (
-              <div key={p.path_type} className="rounded-md border border-gray-100 bg-gray-50 px-3 py-2">
-                <p className="truncate text-xs font-medium text-gray-700">{PATH_LABELS[p.path_type] ?? p.path_type}</p>
-                <p className="mt-0.5 text-xs text-gray-500">
+              <div key={p.path_type} className="rounded-md border border-border bg-surface-subtle px-3 py-2">
+                <p className="truncate text-xs font-medium text-foreground-secondary">{PATH_LABELS[p.path_type] ?? p.path_type}</p>
+                <p className="mt-0.5 text-xs text-foreground-muted">
                   {p.status === "locked" ? "Locked" : p.status === "generating" ? "Generating…" : `${p.progress}%`}
                 </p>
               </div>
             ))}
           </div>
           {growth_strategy.next_best_action && (
-            <div className="mt-4 rounded-md border border-amber-100 bg-amber-50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">Next best action</p>
-              <p className="mt-1 text-sm font-medium text-gray-900">{growth_strategy.next_best_action.title}</p>
-              <p className="mt-0.5 text-xs text-gray-600">{growth_strategy.next_best_action.reason}</p>
+            <div className="mt-4 rounded-md border border-amber-100 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">Next best action</p>
+              <p className="mt-1 text-sm font-medium text-foreground-strong">{growth_strategy.next_best_action.title}</p>
+              <p className="mt-0.5 text-xs text-foreground-secondary">{growth_strategy.next_best_action.reason}</p>
             </div>
           )}
           {growth_strategy.export_is_stale && (
-            <p className="mt-3 text-xs text-gray-500">Your last export is out of date.</p>
+            <p className="mt-3 text-xs text-foreground-muted">Your last export is out of date.</p>
           )}
         </div>
       )}
 
       {/* Intelligence feed */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">
+      <div className="rounded-lg border border-border bg-surface-card p-6">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
           Intelligence Feed
         </h2>
         {intelligence_feed.length > 0 ? (
@@ -413,17 +413,17 @@ export default function DashboardPage() {
             {intelligence_feed.map((insight, i) => (
               <div
                 key={`${insight.type}-${i}`}
-                className="rounded-md border border-gray-100 bg-gray-50 px-4 py-3"
+                className="rounded-md border border-border bg-surface-subtle px-4 py-3"
               >
                 <div className="flex items-center gap-2">
                   <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${SEVERITY_STYLES[insight.severity] ?? SEVERITY_STYLES.info}`}>
                     {insight.type.replace("_", " ")}
                   </span>
-                  <span className="text-sm font-medium text-gray-800">{insight.title}</span>
+                  <span className="text-sm font-medium text-foreground-strong">{insight.title}</span>
                 </div>
-                <p className="mt-1 text-sm text-gray-600">{insight.message}</p>
+                <p className="mt-1 text-sm text-foreground-secondary">{insight.message}</p>
                 {insight.action_url && (
-                  <Link href={insight.action_url} className="mt-1 inline-block text-xs font-medium text-amber-600 hover:text-amber-700">
+                  <Link href={insight.action_url} className="mt-1 inline-block text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700">
                     Take action →
                   </Link>
                 )}
@@ -431,7 +431,7 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : (
-          <p className="mt-4 text-sm text-gray-500">
+          <p className="mt-4 text-sm text-foreground-muted">
             Insights will appear here as you use the platform.
           </p>
         )}

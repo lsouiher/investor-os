@@ -36,9 +36,9 @@ function impactOf(task: Task): Impact {
 const IMPACT_TO_SCORE: Record<Impact, number> = { high: 80, medium: 50, low: 20 };
 
 const IMPACT_STYLES: Record<string, string> = {
-  high: "bg-red-50 text-red-700",
-  medium: "bg-amber-50 text-amber-700",
-  low: "bg-gray-100 text-gray-600",
+  high: "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300",
+  medium: "bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300",
+  low: "bg-surface-subtle text-foreground-secondary",
 };
 
 export default function TasksPage() {
@@ -125,8 +125,8 @@ export default function TasksPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground-strong">Tasks</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
             {completedCount}/{tasks.length} completed, ordered by identity impact
           </p>
         </div>
@@ -144,7 +144,7 @@ export default function TasksPage() {
       {showAddForm && (
         <form
           onSubmit={addTask}
-          className="rounded-lg border border-amber-200 bg-amber-50 p-4"
+          className="rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4"
         >
           <div className="space-y-3">
             <input
@@ -153,17 +153,17 @@ export default function TasksPage() {
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="Task title"
               required
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded-lg border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
             <input
               type="text"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
               placeholder="Description (optional)"
-              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded-lg border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-gray-700">Impact:</label>
+              <label className="text-sm font-medium text-foreground-secondary">Impact:</label>
               {(["high", "medium", "low"] as const).map((level) => (
                 <button
                   key={level}
@@ -172,7 +172,7 @@ export default function TasksPage() {
                   className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
                     newImpact === level
                       ? "bg-amber-600 text-white"
-                      : "bg-white text-gray-600 hover:bg-gray-100"
+                      : "bg-surface-card text-foreground-secondary hover:bg-surface-subtle"
                   }`}
                 >
                   {level}
@@ -196,14 +196,14 @@ export default function TasksPage() {
         {sortedTasks.map((task) => (
           <div
             key={task.id}
-            className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4"
+            className="flex items-start gap-3 rounded-lg border border-border bg-surface-card p-4"
           >
             <button
               onClick={() => toggleTask(task.id)}
               className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
                 task.is_completed
                   ? "border-emerald-500 bg-emerald-500 text-white"
-                  : "border-gray-300 hover:border-amber-400"
+                  : "border-border hover:border-amber-400"
               }`}
             >
               {task.is_completed && (
@@ -216,7 +216,7 @@ export default function TasksPage() {
               <div className="flex items-center gap-2">
                 <p
                   className={`text-sm font-medium ${
-                    task.is_completed ? "text-gray-400 line-through" : "text-gray-900"
+                    task.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"
                   }`}
                 >
                   {task.title}
@@ -229,13 +229,13 @@ export default function TasksPage() {
                   {impactOf(task)}
                 </span>
                 {task.source !== "manual" && (
-                  <span className="rounded bg-blue-50 px-1.5 py-0.5 text-xs text-blue-600">
+                  <span className="rounded bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
                     {task.source === "strategy" ? "Strategy" : task.source === "identity_gap" ? "Identity gap" : "AI"}
                   </span>
                 )}
               </div>
               {task.description && (
-                <p className="mt-0.5 text-xs text-gray-500">{task.description}</p>
+                <p className="mt-0.5 text-xs text-foreground-muted">{task.description}</p>
               )}
             </div>
           </div>

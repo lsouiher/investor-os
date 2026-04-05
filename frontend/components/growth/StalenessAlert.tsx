@@ -14,7 +14,7 @@ export default function StalenessAlert({
   if (!isStale) return null;
 
   return (
-    <div className="w-full rounded-md border border-amber-200 bg-amber-50 px-4 py-3">
+    <div className="w-full rounded-md border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-4 py-3">
       <div className="flex items-start gap-3">
         <svg
           className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600"
@@ -30,11 +30,11 @@ export default function StalenessAlert({
           />
         </svg>
         <div className="flex-1">
-          <p className="text-sm font-medium text-amber-800">
+          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
             Your identity has been updated since your last export.
           </p>
           {changedSinceExport.length > 0 && (
-            <ul className="mt-1 list-inside list-disc text-sm text-amber-700">
+            <ul className="mt-1 list-inside list-disc text-sm text-amber-700 dark:text-amber-300">
               {changedSinceExport.map((change, i) => (
                 <li key={i}>{change}</li>
               ))}
