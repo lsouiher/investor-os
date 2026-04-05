@@ -53,6 +53,38 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
       }
     }
 
+    // Growth strategy summary (conditional on feature flag)
+    let growthStrategySummary = null;
+    try {
+      const { prisma } = await import('../../shared/db.js');
+      const tenant = await prisma.tenant.findUnique({
+        where: { id: tenantId },
+        select: { featureFlags: true },
+      });
+      const flags = (tenant?.featureFlags ?? {}) as Record<string, unknown>;
+      if (flags.growth_strategy_enabled) {
+        const { getGrowthStrategy, getRefreshSuggestions } = await import('../growth/service.js');
+        const gs = await getGrowthStrategy(userId, tenantId);
+        if (gs) {
+          const stalePathNames = await getRefreshSuggestions(userId, tenantId);
+          growthStrategySummary = {
+            id: gs.id,
+            overall_progress: gs.overall_progress,
+            growth_score: gs.growth_score,
+            paths: gs.paths.map((p) => ({
+              path_type: p.path_type,
+              status: p.status,
+              progress: p.progress,
+              summary: p.summary,
+            })),
+            next_best_action: gs.next_best_action,
+            export_is_stale: gs.export_staleness.is_stale,
+            refresh_suggestions: stalePathNames,
+          };
+        }
+      }
+    } catch { /* growth module not available or feature flag off — skip silently */ }
+
     res.json({
       data: {
         identity: identity
@@ -87,6 +119,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
         })),
         intelligenceFeed: insights,
         auditCompletion: auditSummaries,
+        growthStrategy: growthStrategySummary,
       },
     });
   } catch (err) {

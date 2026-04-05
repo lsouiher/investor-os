@@ -138,6 +138,17 @@ export async function synthesizeIdentity(
     'Identity synthesized',
   );
 
+  // Growth strategy hooks (fire-and-forget)
+  try {
+    const growthService = await import('../growth/service.js');
+    // Auto-create if feature flag is on and no strategy exists
+    await growthService.maybeCreateGrowthStrategy(userId, tenantId, identity.id);
+    // Check if score delta warrants regeneration suggestion
+    await growthService.checkRegenerationSuggestion(userId, tenantId, readinessScore);
+  } catch (err) {
+    logger.error({ err, userId }, 'Failed to run growth strategy hooks (non-blocking)');
+  }
+
   return {
     id: identity.publicId,
     version: identity.version,

@@ -123,6 +123,53 @@ export async function generateBlueprint(userId: number, tenantId: number): Promi
     orderBy: { rank: 'asc' },
   });
 
+  // Check growth strategy feature flag for conditional sections
+  let growthHtml = '';
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    select: { featureFlags: true },
+  });
+  const featureFlags = (tenant?.featureFlags ?? {}) as Record<string, unknown>;
+
+  if (featureFlags.growth_strategy_enabled) {
+    const growthStrategy = await prisma.growthStrategy.findFirst({
+      where: { userId, tenantId, status: 'active' },
+      include: { paths: { where: { isCurrent: true }, orderBy: { pathType: 'asc' } } },
+    });
+
+    if (growthStrategy) {
+      const pathCards = growthStrategy.paths.map((p) => {
+        const pathNames: Record<string, string> = {
+          portfolio: 'Portfolio Growth',
+          income_capital: 'Income & Capital',
+          skills_knowledge: 'Skills & Knowledge',
+          time_operations: 'Time & Operations',
+        };
+        const name = pathNames[p.pathType] || p.pathType;
+
+        if (p.status === 'generated') {
+          return `<div class="growth-path-card">
+            <h4>${escapeHtml(name)}</h4>
+            <p>${escapeHtml(p.summary || 'Generated')}</p>
+            <div class="progress-bar"><div style="width:${p.progress}%"></div></div>
+            <span>${p.progress}% complete</span>
+          </div>`;
+        }
+        return `<div class="growth-path-card locked">
+          <h4>${escapeHtml(name)}</h4>
+          <p>This section will be added when you unlock ${escapeHtml(name)}.</p>
+        </div>`;
+      }).join('');
+
+      growthHtml = `
+        <div class="section growth-strategy">
+          <h2>Growth Strategy</h2>
+          <p>Overall Progress: ${growthStrategy.overallProgress}%</p>
+          <div class="growth-paths-grid">${pathCards}</div>
+        </div>`;
+    }
+  }
+
   // Build HTML
   const template = loadTemplate();
   const radarData = identity.radarData as Record<string, number>;
@@ -159,7 +206,8 @@ export async function generateBlueprint(userId: number, tenantId: number): Promi
         })),
       ),
     )
-    .replace('{{insights}}', renderInsightsHtml(insightStrings));
+    .replace('{{insights}}', renderInsightsHtml(insightStrings))
+    .replace('{{growthStrategy}}', growthHtml);
 
   // Generate PDF via Puppeteer
   // TODO: In production, use a browser pool (e.g. puppeteer-cluster) to avoid

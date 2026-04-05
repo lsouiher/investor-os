@@ -339,7 +339,16 @@ export async function updateItemCompletion(
       }
     }
 
-    if (result) return;
+    if (result) {
+      // Evaluate growth path unlocks after V1 task/action completion (fire-and-forget)
+      try {
+        const { evaluateUnlocks } = await import('../growth/service.js');
+        await evaluateUnlocks(userId, tenantId);
+      } catch (err) {
+        logger.error({ err, userId }, 'Failed to evaluate growth unlocks (non-blocking)');
+      }
+      return;
+    }
   }
 
   throw new AppError('NOT_FOUND', `${itemType} not found.`, 404);
