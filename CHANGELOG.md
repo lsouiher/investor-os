@@ -2,6 +2,23 @@
 
 All notable changes to InvestorOS will be documented in this file.
 
+## [0.3.2.0] - 2026-09-12
+
+French language support with instant toggle, no page reload required. (Originally built as 0.2.2.0 in April; rebased onto the v0.3 pages.)
+
+### Added
+
+- **French language support** with EN/FR toggle in sidebar footer
+- **I18nProvider** with `t()` translation function, `{{param}}` interpolation, and English fallback for missing keys
+- **~330 translation keys** covering landing, auth, dashboard, hub, identity, strategies, contacts, tasks, simulation, growth strategy, and all shared components — including the v0.3 additions (synthesize CTA, growth strategy creation, strategy activation and micro-plan, full contact role enum, task sources)
+- **Language persistence** via localStorage with `<html lang>` attribute updates
+
+### Changed
+
+- All user-facing strings in 30+ page and component files replaced with `t()` calls
+- Navigation labels, form labels, error messages, empty states, and button text are now translatable
+- Audit form strings (5 audit pages) remain in English for this release
+
 ## [0.3.1.0] - 2026-09-12
 
 Dark mode with system preference detection and persistent theme toggle. (Originally built as 0.2.1.0 in April; rebased onto the v0.3 pages.)
