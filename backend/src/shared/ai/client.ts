@@ -12,7 +12,12 @@ export const AI_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
 
 function getClient(): Anthropic {
   if (!client) {
-    client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    // Org-level keys (not scoped to a workspace) must name the workspace on every request.
+    const workspaceId = process.env.ANTHROPIC_WORKSPACE_ID;
+    client = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      defaultHeaders: workspaceId ? { 'anthropic-workspace-id': workspaceId } : undefined,
+    });
   }
   return client;
 }
@@ -35,6 +40,10 @@ export async function verifyAiCredentials(): Promise<boolean> {
   } catch (err) {
     if (err instanceof Anthropic.AuthenticationError) {
       logger.error('ANTHROPIC_API_KEY is invalid — all AI features will fail');
+    } else if (err instanceof Anthropic.BadRequestError && /workspace/i.test(err.message)) {
+      logger.error(
+        'ANTHROPIC_API_KEY is an org-level key: set ANTHROPIC_WORKSPACE_ID (console → Settings → Workspaces) or use a workspace-scoped key',
+      );
     } else if (err instanceof Anthropic.NotFoundError) {
       logger.error({ model: AI_MODEL }, 'Configured ANTHROPIC_MODEL does not exist');
     } else {
