@@ -37,7 +37,7 @@ describe('calculateSubScore', () => {
     const responses = {
       availability: { hours_per_week: '10' },
       flexibility: { schedule: 'flexible' },
-      preference: { involvement: 'active' },
+      preferences: { involvement: 'active' },
       runway: { months: '12' },
     };
     expect(calculateSubScore('time', responses)).toBe(100);
@@ -58,7 +58,7 @@ describe('calculateSubScore', () => {
     const responses = {
       self_assessment: { risk_tolerance: 'moderate' },
       scenarios: { answer: 'hold' },
-      financial_safety: { emergency_fund: 'yes' },
+      safety: { emergency_fund: 'yes' },
       behavioral: { past_decisions: 'conservative' },
       comfort_zones: { max_loss: '20%' },
     };
@@ -67,7 +67,7 @@ describe('calculateSubScore', () => {
 
   it('handles horizon audit type', () => {
     const responses = {
-      primary_objective: { goal: 'retirement' },
+      objectives: { goal: 'retirement' },
       financial_targets: { target_income: '100000' },
       timeline: { years: '10' },
       lifestyle: { preference: 'passive' },

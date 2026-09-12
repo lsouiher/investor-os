@@ -35,13 +35,13 @@ export function calculateSubScore(auditType: string, responses: Record<string, u
     case 'financial':
       return sectionCompleteness(responses, ['income', 'assets', 'liabilities', 'credit', 'tax']);
     case 'time':
-      return sectionCompleteness(responses, ['availability', 'flexibility', 'preference', 'runway']);
+      return sectionCompleteness(responses, ['availability', 'flexibility', 'preferences', 'runway']);
     case 'skills':
       return sectionCompleteness(responses, ['re_experience', 'professional', 'transferable', 'education', 'network']);
     case 'risk':
-      return sectionCompleteness(responses, ['self_assessment', 'scenarios', 'financial_safety', 'behavioral', 'comfort_zones']);
+      return sectionCompleteness(responses, ['self_assessment', 'scenarios', 'safety', 'behavioral', 'comfort_zones']);
     case 'horizon':
-      return sectionCompleteness(responses, ['primary_objective', 'financial_targets', 'timeline', 'lifestyle', 'constraints']);
+      return sectionCompleteness(responses, ['objectives', 'financial_targets', 'timeline', 'lifestyle', 'constraints']);
     default:
       return 0;
   }
