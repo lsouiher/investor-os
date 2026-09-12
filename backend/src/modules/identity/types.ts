@@ -5,6 +5,9 @@ export interface IdentitySummary {
   version: number;
   archetype: string;
   readinessScore: number;
+  subScores: Record<string, number>;
+  radarData: Record<string, number>;
+  headlineInsight: string;
   generatedAt: string;
 }
 

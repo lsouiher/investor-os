@@ -15,8 +15,8 @@ interface IdentityVersion {
   readiness_score: number;
   headline_insight: string;
   radar_data: RadarData;
-  sub_scores: { label: string; value: number }[];
-  created_at: string;
+  sub_scores: Record<string, number>;
+  generated_at: string;
 }
 
 function scoreColorClass(score: number): string {
@@ -148,7 +148,7 @@ export default function IdentityHistoryPage() {
                     v{version.version}
                   </span>
                   <span className="text-xs text-gray-400">
-                    {new Date(version.created_at).toLocaleDateString()}
+                    {new Date(version.generated_at).toLocaleDateString()}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600">{version.archetype}</p>

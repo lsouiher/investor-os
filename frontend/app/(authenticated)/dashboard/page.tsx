@@ -9,33 +9,63 @@ import ScoreSparkline from "@/components/identity/score-sparkline";
 import { DashboardEmpty } from "@/components/shared/empty-states";
 import { SkeletonCard } from "@/components/shared/loading-states";
 
+// Shape of GET /api/v1/dashboard (snake_case per contracts/api-v1.md)
 interface DashboardData {
   identity: {
+    id: string;
     archetype: string;
     readiness_score: number;
     radar_data: RadarData;
+    headline_insight: string;
     score_history: number[];
   } | null;
   active_strategy: {
     id: string;
     name: string;
-    progress: number;
-    total_actions: number;
-    completed_actions: number;
+    description: string;
+    fit_score: number;
+    needs_refresh: boolean;
+    progress: { total: number; completed: number; percentage: number } | null;
   } | null;
-  priority_tasks: {
+  top_tasks: {
     id: string;
+    source: "strategy" | "manual";
     title: string;
-    completed: boolean;
-    impact: string;
+    description: string | null;
+    identity_impact_score: number;
+    due_date: string | null;
+    completed?: boolean; // local UI state after toggling
   }[];
-  insights: {
-    id: string;
-    content: string;
+  intelligence_feed: {
     type: string;
-    created_at: string;
+    title: string;
+    message: string;
+    severity: "info" | "warning" | "success";
+    action_url?: string;
   }[];
+  growth_strategy: {
+    id: string;
+    overall_progress: number;
+    growth_score: number | null;
+    paths: { path_type: string; status: string; progress: number; summary: string | null }[];
+    next_best_action: { title: string; path_type: string; reason: string } | null;
+    export_is_stale: boolean;
+    refresh_suggestions: string[];
+  } | null;
 }
+
+const PATH_LABELS: Record<string, string> = {
+  portfolio: "Portfolio",
+  income_capital: "Income & Capital",
+  skills_knowledge: "Skills & Knowledge",
+  time_operations: "Time & Operations",
+};
+
+const SEVERITY_STYLES: Record<string, string> = {
+  info: "bg-blue-100 text-blue-700",
+  warning: "bg-amber-100 text-amber-700",
+  success: "bg-emerald-100 text-emerald-700",
+};
 
 function scoreColorClass(score: number): string {
   if (score < 40) return "text-red-600";
@@ -105,14 +135,15 @@ export default function DashboardPage() {
 
   const toggleTask = async (taskId: string) => {
     if (!data) return;
-    const task = data.priority_tasks.find((t) => t.id === taskId);
+    const task = data.top_tasks.find((t) => t.id === taskId);
     if (!task) return;
+    const next = !task.completed;
     try {
-      await api.put(`/tasks/${taskId}`, { completed: !task.completed });
+      await api.put(`/tasks/${taskId}`, { is_completed: next });
       setData({
         ...data,
-        priority_tasks: data.priority_tasks.map((t) =>
-          t.id === taskId ? { ...t, completed: !t.completed } : t
+        top_tasks: data.top_tasks.map((t) =>
+          t.id === taskId ? { ...t, completed: next } : t
         ),
       });
     } catch {
@@ -170,7 +201,7 @@ export default function DashboardPage() {
     );
   }
 
-  const { identity, active_strategy, priority_tasks, insights } = data;
+  const { identity, active_strategy, top_tasks, intelligence_feed, growth_strategy } = data;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -260,14 +291,15 @@ export default function DashboardPage() {
                 <div className="mb-1 flex justify-between text-xs text-gray-500">
                   <span>Progress</span>
                   <span>
-                    {active_strategy.completed_actions}/
-                    {active_strategy.total_actions}
+                    {active_strategy.progress
+                      ? `${active_strategy.progress.completed}/${active_strategy.progress.total}`
+                      : "Plan generating…"}
                   </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-gray-100">
                   <div
                     className="h-full rounded-full bg-amber-600 transition-all duration-500"
-                    style={{ width: `${active_strategy.progress}%` }}
+                    style={{ width: `${active_strategy.progress?.percentage ?? 0}%` }}
                   />
                 </div>
               </div>
@@ -299,8 +331,8 @@ export default function DashboardPage() {
             </Link>
           </div>
           <div className="mt-4 space-y-2">
-            {priority_tasks.length > 0 ? (
-              priority_tasks.slice(0, 3).map((task) => (
+            {top_tasks.length > 0 ? (
+              top_tasks.slice(0, 3).map((task) => (
                 <div
                   key={task.id}
                   className="flex items-center gap-3"
@@ -337,27 +369,67 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Growth strategy (feature-flagged; null when off or not yet created) */}
+      {growth_strategy && (
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">
+              Growth Strategy
+            </h2>
+            <Link
+              href="/growth-strategy"
+              className="text-xs font-medium text-amber-600 hover:text-amber-700"
+            >
+              View Paths
+            </Link>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {growth_strategy.paths.map((p) => (
+              <div key={p.path_type} className="rounded-md border border-gray-100 bg-gray-50 px-3 py-2">
+                <p className="truncate text-xs font-medium text-gray-700">{PATH_LABELS[p.path_type] ?? p.path_type}</p>
+                <p className="mt-0.5 text-xs text-gray-500">
+                  {p.status === "locked" ? "Locked" : p.status === "generating" ? "Generating…" : `${p.progress}%`}
+                </p>
+              </div>
+            ))}
+          </div>
+          {growth_strategy.next_best_action && (
+            <div className="mt-4 rounded-md border border-amber-100 bg-amber-50 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">Next best action</p>
+              <p className="mt-1 text-sm font-medium text-gray-900">{growth_strategy.next_best_action.title}</p>
+              <p className="mt-0.5 text-xs text-gray-600">{growth_strategy.next_best_action.reason}</p>
+            </div>
+          )}
+          {growth_strategy.export_is_stale && (
+            <p className="mt-3 text-xs text-gray-500">Your last export is out of date.</p>
+          )}
+        </div>
+      )}
+
       {/* Intelligence feed */}
       <div className="rounded-lg border border-gray-200 bg-white p-6">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400">
           Intelligence Feed
         </h2>
-        {insights.length > 0 ? (
+        {intelligence_feed.length > 0 ? (
           <div className="mt-4 max-h-64 space-y-3 overflow-y-auto">
-            {insights.map((insight) => (
+            {intelligence_feed.map((insight, i) => (
               <div
-                key={insight.id}
+                key={`${insight.type}-${i}`}
                 className="rounded-md border border-gray-100 bg-gray-50 px-4 py-3"
               >
                 <div className="flex items-center gap-2">
-                  <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700">
-                    {insight.type}
+                  <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${SEVERITY_STYLES[insight.severity] ?? SEVERITY_STYLES.info}`}>
+                    {insight.type.replace("_", " ")}
                   </span>
-                  <span className="text-xs text-gray-400">
-                    {new Date(insight.created_at).toLocaleDateString()}
-                  </span>
+                  <span className="text-sm font-medium text-gray-800">{insight.title}</span>
                 </div>
-                <p className="mt-1 text-sm text-gray-600">{insight.content}</p>
+                <p className="mt-1 text-sm text-gray-600">{insight.message}</p>
+                {insight.action_url && (
+                  <Link href={insight.action_url} className="mt-1 inline-block text-xs font-medium text-amber-600 hover:text-amber-700">
+                    Take action →
+                  </Link>
+                )}
               </div>
             ))}
           </div>

@@ -6,6 +6,7 @@ import { api, ApiError } from "@/lib/api-client";
 import IdentityCard from "@/components/identity/identity-card";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
+import { toSubScoreList } from "@/lib/identity";
 
 interface IdentityData {
   id: string;
@@ -20,8 +21,15 @@ interface IdentityData {
     network?: number | null;
     goal_clarity?: number | null;
   };
-  sub_scores: { label: string; value: number }[];
+  sub_scores: Record<string, number>;
 }
+
+interface AuditSummary {
+  audit_type: string;
+  status: string;
+}
+
+const REQUIRED_AUDITS = 5;
 
 const REVEAL_KEY = "investoros_identity_revealed";
 
@@ -33,6 +41,7 @@ export default function IdentityPage() {
   const [showReveal, setShowReveal] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState<number | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [auditsComplete, setAuditsComplete] = useState(false);
 
   const fetchIdentity = useCallback(async () => {
     try {
@@ -51,7 +60,15 @@ export default function IdentityPage() {
     } catch (err: unknown) {
       const apiErr = err as { code?: string };
       if (apiErr?.code === "NOT_FOUND") {
+        // No identity yet. If all audits are done, synthesis is the missing step —
+        // offer it here instead of sending the user back to the hub in a loop.
         setIdentity(null);
+        try {
+          const audits = await api.get<AuditSummary[]>("/audits");
+          setAuditsComplete(audits.filter((a) => a.status === "completed").length >= REQUIRED_AUDITS);
+        } catch {
+          setAuditsComplete(false);
+        }
       } else {
         setError("Failed to load identity data.");
       }
@@ -82,9 +99,10 @@ export default function IdentityPage() {
   };
 
   const handleFeedback = async (rating: number) => {
+    if (!identity) return;
     setFeedbackRating(rating);
     try {
-      await api.post("/identity/feedback", { rating });
+      await api.put(`/identity/${identity.id}/rate`, { rating });
       setFeedbackSubmitted(true);
     } catch {
       // Silent fail for feedback
@@ -110,7 +128,11 @@ export default function IdentityPage() {
 
   if (!identity) {
     return (
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-5xl space-y-4">
+        {synthesizing && <SpinnerOverlay label="Synthesizing your identity..." />}
+        {error && (
+          <AiErrorState severity="medium" message={error} onRetry={handleSynthesize} />
+        )}
         <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white px-6 py-16 text-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
             <svg
@@ -127,15 +149,32 @@ export default function IdentityPage() {
           <h2 className="mb-2 text-lg font-semibold text-gray-900">
             Your Identity Card Awaits
           </h2>
-          <p className="mb-6 max-w-sm text-sm text-gray-500">
-            Complete all 5 audits to see your Investor Identity Card.
-          </p>
-          <Link
-            href="/hub"
-            className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
-          >
-            Go to Identity Hub
-          </Link>
+          {auditsComplete ? (
+            <>
+              <p className="mb-6 max-w-sm text-sm text-gray-500">
+                All 5 audits are complete. Synthesize your Investor Identity to reveal your archetype and readiness score.
+              </p>
+              <button
+                onClick={handleSynthesize}
+                disabled={synthesizing}
+                className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+              >
+                Synthesize My Identity
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="mb-6 max-w-sm text-sm text-gray-500">
+                Complete all 5 audits to see your Investor Identity Card.
+              </p>
+              <Link
+                href="/hub"
+                className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+              >
+                Go to Identity Hub
+              </Link>
+            </>
+          )}
         </div>
       </div>
     );
@@ -172,7 +211,7 @@ export default function IdentityPage() {
           readinessScore={identity.readiness_score}
           radarData={identity.radar_data}
           headlineInsight={identity.headline_insight}
-          subScores={identity.sub_scores}
+          subScores={toSubScoreList(identity.sub_scores)}
         />
       </div>
 

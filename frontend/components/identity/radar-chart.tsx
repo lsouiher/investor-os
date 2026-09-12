@@ -77,7 +77,7 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
       width={size}
       height={size}
       viewBox={`0 0 ${size} ${size}`}
-      className="select-none"
+      className="select-none overflow-visible"
     >
       {/* Background rings */}
       {rings.map((scale) => {
@@ -128,12 +128,15 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
       {axes.map((axis, i) => {
         const angle = startAngle + i * angleStep;
         const pos = polarToCartesian(center, center, labelOffset, angle);
+        // Anchor side labels away from the chart so they never overlap the rings or clip
+        const dx = pos.x - center;
+        const anchor = Math.abs(dx) < 1 ? "middle" : dx > 0 ? "start" : "end";
         return (
           <text
             key={axis.key}
             x={pos.x}
             y={pos.y}
-            textAnchor="middle"
+            textAnchor={anchor}
             dominantBaseline="central"
             className="fill-gray-600 text-xs font-medium"
           >

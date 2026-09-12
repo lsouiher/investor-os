@@ -7,6 +7,7 @@ import { SkeletonCard } from "@/components/shared/loading-states";
 import { StrategyEmpty } from "@/components/shared/empty-states";
 import AiErrorState from "@/components/shared/ai-error-state";
 
+// Shape of GET /api/v1/strategies items (snake_case per contracts/api-v1.md)
 interface Strategy {
   id: string;
   name: string;
@@ -14,7 +15,8 @@ interface Strategy {
   fit_score: number;
   pros: string[];
   cons: string[];
-  status: "recommended" | "active" | "completed";
+  rank: number;
+  is_active: boolean;
 }
 
 function scoreColorClass(score: number): string {
@@ -33,7 +35,7 @@ export default function StrategiesPage() {
       setLoading(true);
       setError(null);
       const data = await api.get<Strategy[]>("/strategies");
-      setStrategies(data);
+      setStrategies([...data].sort((a, b) => a.rank - b.rank));
     } catch {
       setError("Failed to load strategies.");
     } finally {
@@ -47,9 +49,10 @@ export default function StrategiesPage() {
 
   const handleActivate = async (id: string) => {
     try {
-      await api.post(`/strategies/${id}/activate`);
+      await api.put(`/strategies/${id}/activate`);
+      // Only one strategy is active at a time
       setStrategies((prev) =>
-        prev.map((s) => (s.id === id ? { ...s, status: "active" } : s))
+        prev.map((s) => ({ ...s, is_active: s.id === id }))
       );
     } catch {
       setError("Failed to activate strategy.");
@@ -105,7 +108,7 @@ export default function StrategiesPage() {
               <span className="text-xs font-semibold uppercase tracking-wider text-amber-600">
                 Top Match
               </span>
-              {primary.status === "active" && (
+              {primary.is_active && (
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
                   Active
                 </span>
@@ -168,7 +171,7 @@ export default function StrategiesPage() {
         </div>
 
         <div className="flex gap-3">
-          {primary.status !== "active" && (
+          {!primary.is_active && (
             <button
               onClick={() => handleActivate(primary.id)}
               className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
@@ -197,7 +200,7 @@ export default function StrategiesPage() {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-gray-900">{strategy.name}</h3>
-              {strategy.status === "active" && (
+              {strategy.is_active && (
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
                   Active
                 </span>

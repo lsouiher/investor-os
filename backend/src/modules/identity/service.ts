@@ -51,6 +51,9 @@ export async function getIdentityHistory(
     version: v.version,
     archetype: v.archetype,
     readinessScore: v.readinessScore,
+    subScores: v.subScores as Record<string, number>,
+    radarData: v.radarData as Record<string, number>,
+    headlineInsight: v.headlineInsight,
     generatedAt: v.generatedAt.toISOString(),
   }));
 }

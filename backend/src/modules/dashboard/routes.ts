@@ -17,6 +17,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 
     const [
       identity,
+      scoreHistory,
       activeStrategy,
       topTasks,
       auditSummaries,
@@ -24,6 +25,9 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
     ] = await Promise.all([
       // Latest identity snapshot
       identityRepo.getLatestIdentity(userId, tenantId),
+
+      // Score trend (oldest -> newest) for the sparkline
+      identityRepo.getIdentityHistory(userId, tenantId).then((h) => h.map((v) => v.readinessScore).reverse()),
 
       // Active strategy with progress
       strategyRepo.getActiveStrategy(userId, tenantId),
@@ -97,6 +101,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
               headlineInsight: identity.headlineInsight,
               version: identity.version,
               generatedAt: identity.generatedAt.toISOString(),
+              scoreHistory,
             }
           : null,
         activeStrategy: activeStrategy

@@ -269,6 +269,28 @@ async function generateDetailedPlans(
 }
 
 /**
+ * Full strategy detail for the strategy page: summary + action plan + roadmap + micro-plan.
+ * Plans are null until the async generation after activation completes.
+ */
+export async function getStrategyDetail(
+  strategyPublicId: string,
+  userId: number,
+  tenantId: number,
+) {
+  const strategy = await strategyRepo.getStrategyByPublicId(strategyPublicId, tenantId);
+  if (!strategy || strategy.userId !== userId) {
+    throw new AppError('NOT_FOUND', 'Strategy not found.', 404);
+  }
+  return {
+    ...formatStrategy(strategy),
+    needsRefresh: strategy.needsRefresh,
+    actionPlan: (strategy.actionPlan as unknown as ActionPlanJson | null) ?? null,
+    roadmap: (strategy.roadmap as unknown as RoadmapJson | null) ?? null,
+    microPlan: (strategy.microPlan as unknown as MicroPlanJson | null) ?? null,
+  };
+}
+
+/**
  * Get action plan for a strategy.
  */
 export async function getActionPlan(

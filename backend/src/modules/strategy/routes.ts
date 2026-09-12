@@ -14,6 +14,20 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+// GET /strategies/:strategyId — full detail (summary + plans)
+router.get('/:strategyId', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const detail = await strategyService.getStrategyDetail(
+      String(req.params.strategyId),
+      req.user!.userId,
+      req.user!.tenantId,
+    );
+    res.json({ data: detail });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PUT /strategies/:strategyId/activate — activate a strategy
 router.put('/:strategyId/activate', async (req: Request, res: Response, next: NextFunction) => {
   try {

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
+import { api } from "@/lib/api-client";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutIcon },
@@ -33,12 +34,22 @@ function AuthenticatedShell({
   const { token, user, loading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [score, setScore] = useState<number | null>(null);
 
   useEffect(() => {
     if (!loading && !token) {
       router.push("/login");
     }
   }, [loading, token, router]);
+
+  // Sidebar readiness score; re-fetched on navigation so a fresh synthesis shows up
+  useEffect(() => {
+    if (!token) return;
+    api
+      .get<{ readiness_score: number } | null>("/identity")
+      .then((identity) => setScore(identity?.readiness_score ?? null))
+      .catch(() => setScore(null));
+  }, [token, pathname]);
 
   if (loading) {
     return (
@@ -101,7 +112,7 @@ function AuthenticatedShell({
               <p className="truncate text-xs font-medium text-foreground">
                 {user?.email ?? "Investor"}
               </p>
-              <p className="text-xs text-foreground-muted">Score: --</p>
+              <p className="text-xs text-foreground-muted">Score: {score ?? "--"}</p>
             </div>
             <button
               onClick={logout}
