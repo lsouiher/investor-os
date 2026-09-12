@@ -21,31 +21,22 @@ export interface IdentityDetail {
 }
 
 /**
- * Shape of the AI synthesis response we expect back from Claude.
- */
-export interface AiSynthesisResponse {
-  archetype: string;
-  headline_insight: string;
-  insights: {
-    contradictions: string[];
-    feasibility: Record<string, unknown>;
-    gaps: string[];
-    strengths: string[];
-    recommendations: string[];
-  };
-}
-
-/**
  * Zod schema for runtime validation of the AI synthesis response.
  */
 export const AiSynthesisResponseSchema = z.object({
   archetype: z.string().min(1).max(100),
   headline_insight: z.string().min(1).max(2000),
-  insights: z.object({
-    contradictions: z.array(z.string().max(2000)),
-    feasibility: z.record(z.string(), z.unknown()),
-    gaps: z.array(z.string().max(2000)),
-    strengths: z.array(z.string().max(2000)),
-    recommendations: z.array(z.string().max(2000)),
-  }),
+  // Key name matches the identity_synthesis prompt template; sub-fields are lenient
+  // because the model may omit sections for thin profiles.
+  ai_insights: z
+    .object({
+      contradictions: z.array(z.string().max(2000)).default([]),
+      feasibility: z.record(z.string(), z.unknown()).default({}),
+      gaps: z.array(z.string().max(2000)).default([]),
+      strengths: z.array(z.string().max(2000)).default([]),
+      recommendations: z.array(z.string().max(2000)).default([]),
+    })
+    .default({ contradictions: [], feasibility: {}, gaps: [], strengths: [], recommendations: [] }),
 });
+
+export type AiSynthesisResponse = z.infer<typeof AiSynthesisResponseSchema>;

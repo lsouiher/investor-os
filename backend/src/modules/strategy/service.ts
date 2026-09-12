@@ -21,47 +21,58 @@ import { AiStrategyResponseSchema, AiActivationResponseSchema } from './types.js
 /**
  * Get all strategies for the current user, formatted for API response.
  */
+type StrategyRow = Awaited<ReturnType<typeof strategyRepo.getStrategiesByUser>>[number];
+
+function formatStrategy(s: StrategyRow): StrategySummary {
+  const actionPlan = s.actionPlan as unknown as ActionPlanJson | null;
+  const roadmap = s.roadmap as unknown as RoadmapJson | null;
+  const microPlan = s.microPlan as unknown as MicroPlanJson | null;
+
+  return {
+    id: s.publicId,
+    name: s.name,
+    description: s.description,
+    fitScore: s.fitScore,
+    pros: s.pros as unknown as string[],
+    cons: s.cons as unknown as string[],
+    rank: s.rank,
+    isActive: s.isActive,
+    actionPlan: actionPlan
+      ? {
+          itemCount: actionPlan.items.length,
+          completedCount: actionPlan.items.filter((i) => i.is_completed).length,
+        }
+      : null,
+    roadmap: roadmap
+      ? {
+          milestoneCount: roadmap.milestones.length,
+          completedCount: roadmap.milestones.filter((m) => m.is_completed).length,
+        }
+      : null,
+    microPlan: microPlan
+      ? {
+          taskCount: microPlan.tasks.length,
+          completedCount: microPlan.tasks.filter((t) => t.is_completed).length,
+          expiresAt: microPlan.expires_at,
+        }
+      : null,
+  };
+}
+
 export async function getStrategies(
   userId: number,
   tenantId: number,
 ): Promise<StrategySummary[]> {
-  const strategies = await strategyRepo.getStrategiesByUser(userId, tenantId);
+  // Recommendations belong to the current identity version. If none exist yet (first synthesis,
+  // or the chained generation failed), generate them now so the page never dead-ends.
+  const identity = await identityRepo.getLatestIdentity(userId, tenantId);
+  if (!identity) return [];
 
-  return strategies.map((s) => {
-    const actionPlan = s.actionPlan as unknown as ActionPlanJson | null;
-    const roadmap = s.roadmap as unknown as RoadmapJson | null;
-    const microPlan = s.microPlan as unknown as MicroPlanJson | null;
-
-    return {
-      id: s.publicId,
-      name: s.name,
-      description: s.description,
-      fitScore: s.fitScore,
-      pros: s.pros as unknown as string[],
-      cons: s.cons as unknown as string[],
-      rank: s.rank,
-      isActive: s.isActive,
-      actionPlan: actionPlan
-        ? {
-            itemCount: actionPlan.items.length,
-            completedCount: actionPlan.items.filter((i) => i.is_completed).length,
-          }
-        : null,
-      roadmap: roadmap
-        ? {
-            milestoneCount: roadmap.milestones.length,
-            completedCount: roadmap.milestones.filter((m) => m.is_completed).length,
-          }
-        : null,
-      microPlan: microPlan
-        ? {
-            taskCount: microPlan.tasks.length,
-            completedCount: microPlan.tasks.filter((t) => t.is_completed).length,
-            expiresAt: microPlan.expires_at,
-          }
-        : null,
-    };
-  });
+  const strategies = await strategyRepo.getStrategiesByUser(userId, tenantId, identity.id);
+  if (strategies.length === 0) {
+    return generateStrategies(userId, tenantId);
+  }
+  return strategies.map(formatStrategy);
 }
 
 /**
@@ -84,13 +95,20 @@ export async function generateStrategies(
 
   const template = await loadActiveTemplate('strategy_generation');
 
+  // Placeholder names must match the strategy_generation template exactly (case-sensitive)
   const userContent = assemblePrompt(template.templateContent, {
-    archetype: identity.archetype,
-    readiness_score: String(identity.readinessScore),
-    sub_scores: JSON.stringify(identity.subScores),
-    radar_data: JSON.stringify(identity.radarData),
-    headline_insight: identity.headlineInsight,
-    ai_insights: JSON.stringify(identity.aiInsights),
+    IDENTITY: JSON.stringify(
+      {
+        archetype: identity.archetype,
+        readiness_score: identity.readinessScore,
+        sub_scores: identity.subScores,
+        radar_data: identity.radarData,
+        headline_insight: identity.headlineInsight,
+        ai_insights: identity.aiInsights,
+      },
+      null,
+      2,
+    ),
   });
 
   const aiResult = await callClaudeWithRetry({
@@ -133,7 +151,8 @@ export async function generateStrategies(
     'Strategies generated',
   );
 
-  return getStrategies(userId, tenantId);
+  const stored = await strategyRepo.getStrategiesByUser(userId, tenantId, identity.id);
+  return stored.map(formatStrategy);
 }
 
 /**
@@ -187,12 +206,12 @@ async function generateDetailedPlans(
   const identity = fullStrategy.identityVersion;
 
   const userContent = assemblePrompt(template.templateContent, {
-    strategy_name: fullStrategy.name,
-    strategy_description: fullStrategy.description,
-    archetype: identity.archetype,
-    readiness_score: String(identity.readinessScore),
-    sub_scores: JSON.stringify(identity.subScores),
-    radar_data: JSON.stringify(identity.radarData),
+    STRATEGY_NAME: fullStrategy.name,
+    STRATEGY_DESCRIPTION: fullStrategy.description,
+    ARCHETYPE: identity.archetype,
+    READINESS_SCORE: String(identity.readinessScore),
+    SUB_SCORES: JSON.stringify(identity.subScores),
+    RADAR_DATA: JSON.stringify(identity.radarData),
   });
 
   const aiResult = await callClaudeWithRetry({

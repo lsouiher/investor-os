@@ -17,9 +17,16 @@ Given the following audit data for an investor:
 {{AUDIT_DATA}}
 </audit_data>
 
-Available archetypes:
+Select exactly one archetype from this curated set (edit this list to expand it):
 <archetypes>
-{{ARCHETYPES}}
+- Cash Flow Hunter — prioritizes monthly income over appreciation
+- Conservative Builder — slow, low-leverage, reserves-first
+- Wealth Architect — long-horizon equity and tax strategy
+- Value-Add Operator — hands-on rehabs and forced appreciation
+- House Hacker — owner-occupied small multifamily to start
+- Passive Capital Partner — deploys capital through others' deals
+- Skilled Trades Investor — leverages construction/contractor expertise
+- Portfolio Scaler — systems-driven acquisition at volume
 </archetypes>
 
 Analyze the investor's profile and provide:
@@ -155,12 +162,18 @@ Given the investor context:
 {{CONTEXT}}
 </context>
 
-Generate relevant insights. Types: progress, contradiction, score_change, milestone, network_alert.
+Generate 2-5 relevant insights. Types: progress, contradiction, score_change, milestone, network_alert.
 
 Respond in JSON format:
 {
   "insights": [
-    {"type": "string", "message": "string", "priority": "high|medium|low"}
+    {
+      "type": "progress|contradiction|score_change|milestone|network_alert",
+      "title": "short headline",
+      "message": "one or two sentences",
+      "severity": "info|warning|success",
+      "action_url": "relative app path such as /contacts, or null"
+    }
   ]
 }`,
       outputSchema: { type: 'object', required: ['insights'] },

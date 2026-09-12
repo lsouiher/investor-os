@@ -17,6 +17,7 @@ export interface Insight {
 /**
  * Zod schema for runtime validation of the AI insight response.
  */
+// Keys match the insight prompt template's JSON output format
 const InsightResponseSchema = z.object({
   insights: z.array(
     z.object({
@@ -24,7 +25,7 @@ const InsightResponseSchema = z.object({
       title: z.string().min(1).max(200),
       message: z.string().min(1).max(2000),
       severity: z.enum(['info', 'warning', 'success']),
-      actionUrl: z.string().max(500).startsWith('/').optional(),
+      action_url: z.string().max(500).startsWith('/').nullable().optional(),
     }),
   ).max(10),
 });
@@ -72,13 +73,19 @@ export async function generateInsights(userId: number, tenantId: number): Promis
   // Load prompt template and call AI
   const template = await loadActiveTemplate('insight');
   const prompt = assemblePrompt(template.templateContent, {
-    archetype: context.identity.archetype,
-    readinessScore: String(context.identity.readinessScore),
-    subScores: JSON.stringify(context.identity.subScores),
-    radarData: JSON.stringify(context.identity.radarData),
-    activeStrategy: context.activeStrategy ? JSON.stringify(context.activeStrategy) : 'None selected',
-    taskStats: JSON.stringify(context.taskStats),
-    contactStats: JSON.stringify(context.contactStats),
+    CONTEXT: JSON.stringify(
+      {
+        archetype: context.identity.archetype,
+        readiness_score: context.identity.readinessScore,
+        sub_scores: context.identity.subScores,
+        radar_data: context.identity.radarData,
+        active_strategy: context.activeStrategy ?? 'None selected',
+        task_stats: context.taskStats,
+        contact_stats: context.contactStats,
+      },
+      null,
+      2,
+    ),
   });
 
   const aiResult = await callClaudeWithRetry({
@@ -90,14 +97,16 @@ export async function generateInsights(userId: number, tenantId: number): Promis
     userContent: prompt,
   });
 
-  const parsed = parseJsonResponse<{ insights: Insight[] }>(aiResult.content, InsightResponseSchema);
-
-  // Validate and normalize insight types
-  const validTypes = new Set<InsightType>(['progress', 'contradiction', 'score_change', 'milestone', 'network_alert']);
-  const validSeverities = new Set(['info', 'warning', 'success']);
+  const parsed = parseJsonResponse(aiResult.content, InsightResponseSchema);
 
   return parsed.insights
-    .filter((i) => validTypes.has(i.type) && validSeverities.has(i.severity))
+    .map((i): Insight => ({
+      type: i.type,
+      title: i.title,
+      message: i.message,
+      severity: i.severity,
+      actionUrl: i.action_url ?? undefined,
+    }))
     .slice(0, 10); // Cap at 10 insights
 }
 

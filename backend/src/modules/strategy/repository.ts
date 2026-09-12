@@ -45,9 +45,9 @@ export async function createStrategies(strategies: CreateStrategyInput[]) {
 /**
  * Get all strategies for a user (latest identity version).
  */
-export async function getStrategiesByUser(userId: number, tenantId: number) {
+export async function getStrategiesByUser(userId: number, tenantId: number, identityVersionId?: number) {
   return prisma.strategy.findMany({
-    where: { userId, tenantId },
+    where: { userId, tenantId, ...(identityVersionId !== undefined ? { identityVersionId } : {}) },
     orderBy: [{ createdAt: 'desc' }, { rank: 'asc' }],
   });
 }

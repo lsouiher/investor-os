@@ -8,26 +8,20 @@ import * as simulationRepo from './repository.js';
 
 const MAX_SIMULATIONS_PER_24H = 3;
 
-interface SimulationResult {
-  archetype: string;
-  readinessScore: number;
-  subScores: Record<string, number>;
-  radarData: Record<string, number>;
-  headlineInsight: string;
-  strategyChanges: string[];
-}
 
 /**
  * Zod schema for runtime validation of the AI simulation response.
  */
+// Keys match the simulation prompt template's JSON output format
 const SimulationResultSchema = z.object({
   archetype: z.string().min(1).max(100),
-  readinessScore: z.number().min(0).max(100),
-  subScores: z.record(z.string(), z.number().min(0).max(100)),
-  radarData: z.record(z.string(), z.number().min(0).max(100)),
-  headlineInsight: z.string().min(1).max(2000),
-  strategyChanges: z.array(z.string().max(2000)),
+  readiness_score: z.number().min(0).max(100),
+  sub_scores: z.record(z.string(), z.number().min(0).max(100)).default({}),
+  radar_data: z.record(z.string(), z.number().min(0).max(100)).default({}),
+  headline_insight: z.string().max(2000).default(''),
+  strategy_changes: z.union([z.string().max(2000), z.array(z.string().max(2000))]).default(''),
 });
+type SimulationResult = z.infer<typeof SimulationResultSchema>;
 
 export async function runSimulation(
   userId: number,
@@ -61,11 +55,17 @@ export async function runSimulation(
   // Load prompt template and call AI
   const template = await loadActiveTemplate('simulation');
   const prompt = assemblePrompt(template.templateContent, {
-    archetype: currentIdentity.archetype,
-    readinessScore: String(currentIdentity.readinessScore),
-    subScores: JSON.stringify(currentIdentity.subScores),
-    radarData: JSON.stringify(currentIdentity.radarData),
-    modifiedParameters: JSON.stringify(modifiedParameters),
+    CURRENT_IDENTITY: JSON.stringify(
+      {
+        archetype: currentIdentity.archetype,
+        readiness_score: currentIdentity.readinessScore,
+        sub_scores: currentIdentity.subScores,
+        radar_data: currentIdentity.radarData,
+      },
+      null,
+      2,
+    ),
+    MODIFICATIONS: JSON.stringify(modifiedParameters, null, 2),
   });
 
   const aiResult = await callClaudeWithRetry({
@@ -89,13 +89,13 @@ export async function runSimulation(
     },
     simulated: {
       archetype: parsed.archetype,
-      readinessScore: parsed.readinessScore,
-      subScores: parsed.subScores,
-      radarData: parsed.radarData,
-      headlineInsight: parsed.headlineInsight,
-      strategyChanges: parsed.strategyChanges,
+      readinessScore: parsed.readiness_score,
+      subScores: parsed.sub_scores,
+      radarData: parsed.radar_data,
+      headlineInsight: parsed.headline_insight,
+      strategyChanges: Array.isArray(parsed.strategy_changes) ? parsed.strategy_changes.join(' ') : parsed.strategy_changes,
     },
-    scoreDelta: parsed.readinessScore - currentIdentity.readinessScore,
+    scoreDelta: parsed.readiness_score - currentIdentity.readinessScore,
     archetypeChanged: parsed.archetype !== currentIdentity.archetype,
   };
 

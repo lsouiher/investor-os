@@ -101,11 +101,13 @@ export async function synthesizeIdentity(
     responses: a.responses,
   }));
 
+  // Placeholder names must match the identity_synthesis template exactly (case-sensitive)
   const userContent = assemblePrompt(template.templateContent, {
-    audit_data: JSON.stringify(auditSummary, null, 2),
-    sub_scores: JSON.stringify(subScores),
-    readiness_score: String(readinessScore),
-    radar_data: JSON.stringify(radarData),
+    AUDIT_DATA: JSON.stringify(
+      { audits: auditSummary, sub_scores: subScores, readiness_score: readinessScore, radar_data: radarData },
+      null,
+      2,
+    ),
   });
 
   const aiResult = await callClaudeWithRetry({
@@ -129,7 +131,7 @@ export async function synthesizeIdentity(
     subScores: subScores as unknown as Record<string, number>,
     radarData: radarData as unknown as Record<string, number>,
     headlineInsight: parsed.headline_insight,
-    aiInsights: parsed.insights as unknown as Record<string, unknown>,
+    aiInsights: parsed.ai_insights as unknown as Record<string, unknown>,
     auditSnapshot,
   });
 
@@ -137,6 +139,15 @@ export async function synthesizeIdentity(
     { userId, tenantId, version: identity.version, archetype: parsed.archetype },
     'Identity synthesized',
   );
+
+  // FR-6: strategy generation is chained to synthesis. Isolated so an AI hiccup here
+  // never fails the synthesis itself — GET /strategies self-heals by generating on demand.
+  try {
+    const strategyService = await import('../strategy/service.js');
+    await strategyService.generateStrategies(userId, tenantId);
+  } catch (err) {
+    logger.error({ err, userId }, 'Chained strategy generation failed (non-blocking)');
+  }
 
   // Growth strategy hooks (fire-and-forget)
   try {
