@@ -9,28 +9,31 @@ import BlueprintDownload from "@/components/strategy/blueprint-download";
 import { SkeletonCard } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
 
+// Shapes match GET /api/v1/strategies/:id (snake_case per contracts/api-v1.md)
 interface ActionItem {
   id: string;
   title: string;
-  description: string;
-  completed: boolean;
-  order: number;
+  description: string | null;
+  sort_order: number;
+  is_completed: boolean;
 }
 
 interface Milestone {
   id: string;
   title: string;
-  description: string;
-  target_date: string;
-  completed: boolean;
-  order: number;
+  description: string | null;
+  target_date: string | null;
+  sort_order: number;
+  is_completed: boolean;
 }
 
-interface MicroPlan {
+interface MicroTask {
+  id: string;
   title: string;
-  description: string;
-  deadline: string;
-  steps: string[];
+  description: string | null;
+  estimated_minutes: number | null;
+  sort_order: number;
+  is_completed: boolean;
 }
 
 interface StrategyDetail {
@@ -38,10 +41,11 @@ interface StrategyDetail {
   name: string;
   description: string;
   fit_score: number;
-  status: string;
-  action_plan: ActionItem[];
-  roadmap: Milestone[];
-  micro_plan: MicroPlan | null;
+  is_active: boolean;
+  needs_refresh: boolean;
+  action_plan: { items: ActionItem[] } | null;
+  roadmap: { milestones: Milestone[] } | null;
+  micro_plan: { expires_at: string; tasks: MicroTask[] } | null;
 }
 
 type TabKey = "action-plan" | "roadmap" | "micro-plan";
@@ -49,14 +53,38 @@ type TabKey = "action-plan" | "roadmap" | "micro-plan";
 function getCountdown(deadline: string): string {
   const diff = new Date(deadline).getTime() - Date.now();
   if (diff <= 0) return "Past due";
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days === 0) return "Due today";
-  if (days === 1) return "1 day left";
-  return `${days} days left`;
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  if (hours < 24) return `${hours}h left`;
+  const days = Math.floor(hours / 24);
+  return days === 1 ? "1 day left" : `${days} days left`;
 }
 
 // CUID2 ids are 24-character alphanumeric strings by default
 const VALID_ID_PATTERN = /^[a-z0-9]{20,32}$/;
+
+// Plans are generated asynchronously after activation; poll until they land.
+const PLAN_POLL_MS = 3000;
+const PLAN_POLL_MAX = 30;
+
+function CheckButton({ checked, onClick }: { checked: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      aria-pressed={checked}
+      className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
+        checked
+          ? "border-emerald-500 bg-emerald-500 text-white"
+          : "border-gray-300 hover:border-amber-400"
+      }`}
+    >
+      {checked && (
+        <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      )}
+    </button>
+  );
+}
 
 export default function StrategyDetailPage() {
   const params = useParams();
@@ -72,6 +100,7 @@ export default function StrategyDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabKey>("action-plan");
+  const [activating, setActivating] = useState(false);
 
   const fetchStrategy = useCallback(async () => {
     if (!id) {
@@ -95,20 +124,55 @@ export default function StrategyDetailPage() {
     fetchStrategy();
   }, [fetchStrategy]);
 
-  const toggleActionItem = async (itemId: string) => {
-    if (!strategy) return;
-    const item = strategy.action_plan.find((a) => a.id === itemId);
-    if (!item) return;
+  // While active with no plan yet, poll for the async generation result
+  const planPending = !!strategy?.is_active && !strategy.action_plan;
+  useEffect(() => {
+    if (!planPending || !id) return;
+    let attempts = 0;
+    const timer = setInterval(async () => {
+      attempts += 1;
+      try {
+        const data = await api.get<StrategyDetail>(`/strategies/${id}`);
+        if (data.action_plan) {
+          setStrategy(data);
+          clearInterval(timer);
+        }
+      } catch {
+        // keep polling
+      }
+      if (attempts >= PLAN_POLL_MAX) clearInterval(timer);
+    }, PLAN_POLL_MS);
+    return () => clearInterval(timer);
+  }, [planPending, id]);
 
+  const handleActivate = async () => {
+    if (!strategy) return;
     try {
-      await api.put(`/strategies/${id}/actions/${itemId}`, {
-        completed: !item.completed,
-      });
+      setActivating(true);
+      setError(null);
+      await api.put(`/strategies/${strategy.id}/activate`);
+      setStrategy({ ...strategy, is_active: true });
+    } catch {
+      setError("Failed to activate strategy.");
+    } finally {
+      setActivating(false);
+    }
+  };
+
+  const toggleActionItem = async (itemId: string) => {
+    if (!strategy?.action_plan) return;
+    const item = strategy.action_plan.items.find((a) => a.id === itemId);
+    if (!item) return;
+    const next = !item.is_completed;
+    try {
+      await api.put(`/strategies/action-items/${itemId}`, { is_completed: next });
       setStrategy({
         ...strategy,
-        action_plan: strategy.action_plan.map((a) =>
-          a.id === itemId ? { ...a, completed: !a.completed } : a
-        ),
+        action_plan: {
+          items: strategy.action_plan.items.map((a) =>
+            a.id === itemId ? { ...a, is_completed: next } : a
+          ),
+        },
       });
     } catch {
       setError("Failed to update action item.");
@@ -116,19 +180,40 @@ export default function StrategyDetailPage() {
   };
 
   const handleMilestoneComplete = async (milestoneId: string) => {
-    if (!strategy) return;
+    if (!strategy?.roadmap) return;
     try {
-      await api.put(`/strategies/${id}/milestones/${milestoneId}`, {
-        completed: true,
-      });
+      await api.put(`/strategies/milestones/${milestoneId}`, { is_completed: true });
       setStrategy({
         ...strategy,
-        roadmap: strategy.roadmap.map((m) =>
-          m.id === milestoneId ? { ...m, completed: true } : m
-        ),
+        roadmap: {
+          milestones: strategy.roadmap.milestones.map((m) =>
+            m.id === milestoneId ? { ...m, is_completed: true } : m
+          ),
+        },
       });
     } catch {
       setError("Failed to update milestone.");
+    }
+  };
+
+  const toggleMicroTask = async (taskId: string) => {
+    if (!strategy?.micro_plan) return;
+    const task = strategy.micro_plan.tasks.find((t) => t.id === taskId);
+    if (!task) return;
+    const next = !task.is_completed;
+    try {
+      await api.put(`/strategies/micro-tasks/${taskId}`, { is_completed: next });
+      setStrategy({
+        ...strategy,
+        micro_plan: {
+          ...strategy.micro_plan,
+          tasks: strategy.micro_plan.tasks.map((t) =>
+            t.id === taskId ? { ...t, is_completed: next } : t
+          ),
+        },
+      });
+    } catch {
+      setError("Failed to update micro-task.");
     }
   };
 
@@ -151,8 +236,12 @@ export default function StrategyDetailPage() {
 
   if (!strategy) return null;
 
-  const completedActions = strategy.action_plan.filter((a) => a.completed).length;
-  const totalActions = strategy.action_plan.length;
+  const actionItems = [...(strategy.action_plan?.items ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+  const milestones = [...(strategy.roadmap?.milestones ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+  const microTasks = [...(strategy.micro_plan?.tasks ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+
+  const completedActions = actionItems.filter((a) => a.is_completed).length;
+  const totalActions = actionItems.length;
   const progressPercent = totalActions > 0 ? Math.round((completedActions / totalActions) * 100) : 0;
 
   const tabs: { key: TabKey; label: string }[] = [
@@ -163,7 +252,7 @@ export default function StrategyDetailPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <Link
             href="/strategies"
@@ -171,13 +260,44 @@ export default function StrategyDetailPage() {
           >
             &larr; All Strategies
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">{strategy.name}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-900">{strategy.name}</h1>
+            {strategy.is_active && (
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                Active
+              </span>
+            )}
+          </div>
           <p className="mt-1 text-sm text-gray-500">{strategy.description}</p>
         </div>
-        <BlueprintDownload strategyId={strategy.id} />
+        <div className="flex flex-shrink-0 items-center gap-3">
+          {!strategy.is_active && (
+            <button
+              onClick={handleActivate}
+              disabled={activating}
+              className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+            >
+              {activating ? "Activating…" : "Activate This Strategy"}
+            </button>
+          )}
+          {strategy.is_active && <BlueprintDownload strategyId={strategy.id} />}
+        </div>
       </div>
 
       {error && <AiErrorState severity="low" message={error} />}
+
+      {!strategy.is_active && (
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+          Activate this strategy to generate its action plan, roadmap, and 72-hour micro-plan.
+        </div>
+      )}
+
+      {planPending && (
+        <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
+          Building your personalized plan — this usually takes under a minute.
+        </div>
+      )}
 
       {/* Progress bar */}
       {totalActions > 0 && (
@@ -219,40 +339,27 @@ export default function StrategyDetailPage() {
       {/* Tab content */}
       {activeTab === "action-plan" && (
         <div className="space-y-2">
-          {strategy.action_plan
-            .sort((a, b) => a.order - b.order)
-            .map((item) => (
-              <div
-                key={item.id}
-                className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4"
-              >
-                <button
-                  onClick={() => toggleActionItem(item.id)}
-                  className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
-                    item.completed
-                      ? "border-emerald-500 bg-emerald-500 text-white"
-                      : "border-gray-300 hover:border-amber-400"
+          {actionItems.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4"
+            >
+              <CheckButton checked={item.is_completed} onClick={() => toggleActionItem(item.id)} />
+              <div className="min-w-0 flex-1">
+                <p
+                  className={`text-sm font-medium ${
+                    item.is_completed ? "text-gray-400 line-through" : "text-gray-900"
                   }`}
                 >
-                  {item.completed && (
-                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </button>
-                <div className="min-w-0 flex-1">
-                  <p
-                    className={`text-sm font-medium ${
-                      item.completed ? "text-gray-400 line-through" : "text-gray-900"
-                    }`}
-                  >
-                    {item.title}
-                  </p>
+                  {item.title}
+                </p>
+                {item.description && (
                   <p className="mt-0.5 text-xs text-gray-500">{item.description}</p>
-                </div>
+                )}
               </div>
-            ))}
-          {strategy.action_plan.length === 0 && (
+            </div>
+          ))}
+          {actionItems.length === 0 && !planPending && (
             <p className="py-8 text-center text-sm text-gray-400">
               No action items yet.
             </p>
@@ -261,10 +368,7 @@ export default function StrategyDetailPage() {
       )}
 
       {activeTab === "roadmap" && (
-        <RoadmapTimeline
-          milestones={strategy.roadmap}
-          onComplete={handleMilestoneComplete}
-        />
+        <RoadmapTimeline milestones={milestones} onComplete={handleMilestoneComplete} />
       )}
 
       {activeTab === "micro-plan" && (
@@ -272,33 +376,45 @@ export default function StrategyDetailPage() {
           {strategy.micro_plan ? (
             <div className="rounded-lg border border-gray-200 bg-white p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {strategy.micro_plan.title}
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">72-Hour Micro-Plan</h3>
                 <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-600">
-                  {getCountdown(strategy.micro_plan.deadline)}
+                  {getCountdown(strategy.micro_plan.expires_at)}
                 </span>
               </div>
               <p className="mb-4 text-sm text-gray-600">
-                {strategy.micro_plan.description}
+                Small, concrete tasks to build momentum in the next three days.
               </p>
               <div className="space-y-2">
-                {strategy.micro_plan.steps.map((step, i) => (
+                {microTasks.map((task) => (
                   <div
-                    key={i}
+                    key={task.id}
                     className="flex items-start gap-3 rounded-md bg-gray-50 px-4 py-3"
                   >
-                    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">
-                      {i + 1}
-                    </span>
-                    <p className="text-sm text-gray-700">{step}</p>
+                    <CheckButton checked={task.is_completed} onClick={() => toggleMicroTask(task.id)} />
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className={`text-sm ${
+                          task.is_completed ? "text-gray-400 line-through" : "text-gray-700"
+                        }`}
+                      >
+                        {task.title}
+                      </p>
+                      {task.description && (
+                        <p className="mt-0.5 text-xs text-gray-500">{task.description}</p>
+                      )}
+                    </div>
+                    {task.estimated_minutes != null && (
+                      <span className="flex-shrink-0 text-xs text-gray-400">
+                        ~{task.estimated_minutes} min
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
             </div>
           ) : (
             <p className="py-8 text-center text-sm text-gray-400">
-              No micro-plan available for this strategy.
+              {planPending ? "Your micro-plan is being generated." : "No micro-plan available for this strategy."}
             </p>
           )}
         </div>

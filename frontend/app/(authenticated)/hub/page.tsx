@@ -310,7 +310,7 @@ export default function IdentityHubPage() {
             Your full investor identity is ready for synthesis.
           </p>
           <button
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/identity")}
             className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm"
           >
             View Your Identity Card

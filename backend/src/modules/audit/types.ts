@@ -46,7 +46,7 @@ export interface TimeAuditResponses {
     vacation_days?: number;
     sick_leave_policy?: string;
   };
-  preference?: {
+  preferences?: {
     active_vs_passive?: string;
     management_style?: string;
     time_horizon_comfort?: string;
@@ -108,7 +108,7 @@ export interface RiskAuditResponses {
     vacancy_6_months_response?: string;
     interest_rate_spike_response?: string;
   };
-  financial_safety?: {
+  safety?: {
     emergency_fund_months?: number;
     insurance_coverage?: string;
     income_protection?: string;
@@ -128,7 +128,7 @@ export interface RiskAuditResponses {
 }
 
 export interface HorizonAuditResponses {
-  primary_objective?: {
+  objectives?: {
     goal_ranking?: string[];
   };
   financial_targets?: {
@@ -166,12 +166,12 @@ export type AuditResponses =
 
 export interface AuditSummary {
   id: string;
-  auditType: string;
+  audit_type: string;
   status: string;
   version: number;
-  subScore: number | null;
-  lastSavedAt: string;
-  completedAt: string | null;
+  sub_score: number | null;
+  last_saved_at: string;
+  completed_at: string | null;
 }
 
 export interface AuditDetail extends AuditSummary {

@@ -26,7 +26,16 @@ export async function createContact(
     networkGapFilled?: string;
   },
 ) {
-  const contact = await contactRepo.createContact(tenantId, userId, data);
+  // A new contact fills a network gap when it is the first of an essential role
+  let networkGapFilled = data.networkGapFilled;
+  if (!networkGapFilled && ESSENTIAL_ROLES.includes(data.roleType)) {
+    const existing = await contactRepo.getNetworkScore(userId, tenantId);
+    if (!existing.some((c) => c.roleType === data.roleType)) {
+      networkGapFilled = data.roleType;
+    }
+  }
+
+  const contact = await contactRepo.createContact(tenantId, userId, { ...data, networkGapFilled });
 
   // Fire-and-forget: log contact creation (don't block the response)
   logContactAdded({ tenantId, userId }, data.roleType).catch(() => {});

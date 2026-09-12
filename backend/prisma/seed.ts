@@ -17,9 +17,16 @@ Given the following audit data for an investor:
 {{AUDIT_DATA}}
 </audit_data>
 
-Available archetypes:
+Select exactly one archetype from this curated set (edit this list to expand it):
 <archetypes>
-{{ARCHETYPES}}
+- Cash Flow Hunter — prioritizes monthly income over appreciation
+- Conservative Builder — slow, low-leverage, reserves-first
+- Wealth Architect — long-horizon equity and tax strategy
+- Value-Add Operator — hands-on rehabs and forced appreciation
+- House Hacker — owner-occupied small multifamily to start
+- Passive Capital Partner — deploys capital through others' deals
+- Skilled Trades Investor — leverages construction/contractor expertise
+- Portfolio Scaler — systems-driven acquisition at volume
 </archetypes>
 
 Analyze the investor's profile and provide:
@@ -155,12 +162,18 @@ Given the investor context:
 {{CONTEXT}}
 </context>
 
-Generate relevant insights. Types: progress, contradiction, score_change, milestone, network_alert.
+Generate 2-5 relevant insights. Types: progress, contradiction, score_change, milestone, network_alert.
 
 Respond in JSON format:
 {
   "insights": [
-    {"type": "string", "message": "string", "priority": "high|medium|low"}
+    {
+      "type": "progress|contradiction|score_change|milestone|network_alert",
+      "title": "short headline",
+      "message": "one or two sentences",
+      "severity": "info|warning|success",
+      "action_url": "relative app path such as /contacts, or null"
+    }
   ]
 }`,
       outputSchema: { type: 'object', required: ['insights'] },
@@ -179,6 +192,99 @@ Consider completeness, quality, and consistency of responses.
 Respond in JSON format:
 { "score": number, "breakdown": {} }`,
       outputSchema: { type: 'object', required: ['score'] },
+    },
+    {
+      serviceType: PromptServiceType.growth_path_generation,
+      version: 1,
+      isActive: true,
+      templateContent: `You are an expert real estate growth strategist creating a personalized growth path.
+
+Path type: {{PATH_TYPE}}
+
+Investor identity:
+<identity>
+{{IDENTITY}}
+</identity>
+
+Audit data:
+<audit_data>
+{{AUDIT_DATA}}
+</audit_data>
+
+Active V1 strategy context:
+<strategy>
+{{STRATEGY_CONTEXT}}
+</strategy>
+
+Previously generated paths (for continuity):
+<prior_paths>
+{{PRIOR_PATHS}}
+</prior_paths>
+
+{{PATH_SPECIFIC_INSTRUCTIONS}}
+
+Generate a comprehensive growth path with actionable content and prioritized action items.
+
+Respond in JSON format matching this schema:
+{{OUTPUT_FORMAT}}`,
+      outputSchema: {
+        type: 'object',
+        required: ['content', 'action_items', 'summary'],
+      },
+    },
+    {
+      serviceType: PromptServiceType.cross_path_analysis,
+      version: 1,
+      isActive: true,
+      templateContent: `You are analyzing connections between an investor's growth paths.
+
+Investor identity:
+<identity>
+{{IDENTITY}}
+</identity>
+
+Generated growth paths:
+<paths>
+{{PATHS}}
+</paths>
+
+Identify cross-path connections:
+1. Prerequisites: actions in one path that must complete before another path can progress
+2. Enabling: actions that accelerate progress in another path
+3. Constraints: resource conflicts between paths (time, capital, attention)
+4. Conflicts: direct contradictions requiring resolution
+
+For each conflict, provide a specific resolution recommendation.
+
+Also determine the single "Next Best Action" — the one action item across all paths that would unblock the most cross-path progress.
+
+Respond in JSON format:
+{
+  "links": [
+    {
+      "type": "prerequisite|enabling|constraint|conflict",
+      "source_path_type": "string",
+      "source_item_id": "string",
+      "source_description": "string",
+      "target_path_type": "string",
+      "target_item_id": "string",
+      "target_description": "string",
+      "description": "string",
+      "resolution": "string or null"
+    }
+  ],
+  "next_best_action": {
+    "action_item_id": "string",
+    "path_type": "string",
+    "title": "string",
+    "reason": "string",
+    "cross_path_impact": ["string"]
+  }
+}`,
+      outputSchema: {
+        type: 'object',
+        required: ['links', 'next_best_action'],
+      },
     },
   ];
 

@@ -8,6 +8,7 @@ import { ContactsEmpty } from "@/components/shared/empty-states";
 import { SkeletonCard } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
 
+// Shape of GET /api/v1/contacts items (snake_case per contracts/api-v1.md)
 interface Contact {
   id: string;
   name: string;
@@ -15,8 +16,9 @@ interface Contact {
   phone: string | null;
   role_type: string;
   notes: string | null;
-  network_score: number | null;
-  last_contacted: string | null;
+  strategy_relevance: string | null;
+  network_gap_filled: string | null;
+  last_contacted_at: string | null;
 }
 
 const ROLE_TYPES = [
@@ -24,8 +26,12 @@ const ROLE_TYPES = [
   { key: "agent", label: "Agents" },
   { key: "lender", label: "Lenders" },
   { key: "contractor", label: "Contractors" },
+  { key: "attorney", label: "Attorneys" },
+  { key: "cpa", label: "CPAs" },
   { key: "mentor", label: "Mentors" },
   { key: "partner", label: "Partners" },
+  { key: "seller", label: "Sellers" },
+  { key: "property_manager", label: "Property Managers" },
   { key: "other", label: "Other" },
 ];
 
@@ -202,7 +208,7 @@ function ContactsPageContent() {
       {/* Contact list */}
       <div className="space-y-2">
         {filteredContacts.map((contact) => {
-          const badge = lastContactedBadge(contact.last_contacted);
+          const badge = lastContactedBadge(contact.last_contacted_at);
           return (
             <button
               key={contact.id}
@@ -229,13 +235,11 @@ function ContactsPageContent() {
                 </p>
               </div>
 
-              {/* Network score */}
-              {contact.network_score != null && (
+              {/* Gap filled by this contact */}
+              {contact.network_gap_filled && (
                 <div className="text-right">
-                  <p className="text-sm font-bold text-amber-600">
-                    {contact.network_score}
-                  </p>
-                  <p className="text-xs text-gray-400">Score</p>
+                  <p className="text-xs font-medium text-emerald-600">Fills gap</p>
+                  <p className="text-xs text-gray-400">{contact.network_gap_filled.replace("_", " ")}</p>
                 </div>
               )}
 

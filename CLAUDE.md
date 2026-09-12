@@ -6,9 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 InvestorOS — an identity-centric real estate investment platform. Constructs a multidimensional investor identity through 5 structured audits (Financial, Time, Skills, Risk, Horizon), AI-synthesizes it into an archetype + readiness score, and activates it through personalized strategies, action plans, and an identity-aware CRM.
 
-**Status:** Pre-implementation. Specification and planning artifacts are complete. No application code exists yet.
+**Status:** Implemented and running locally (v0.3.0.0). v0.1 identity platform is on `master`; the
+Growth Strategy Engine (v0.2) plus the integration fixes that make the AI pipeline and every page
+actually work (v0.3) are on `001-growth-strategy-engine` (PR #2). Dark mode (`002-dark-mode`, PR #3)
+and French i18n (`003-french-i18n`, PR #4) are stacked on the *old* 001 and need rebasing.
 
-## Architecture (Planned)
+## Architecture
 
 - **Frontend:** Next.js (App Router, TypeScript) in `frontend/`
 - **Backend:** Express (TypeScript) modular monolith in `backend/`
@@ -17,7 +20,7 @@ InvestorOS — an identity-centric real estate investment platform. Constructs a
 - **Auth:** JWT (jsonwebtoken + bcrypt), centralized middleware, RBAC (investor/admin)
 - **PDF:** Puppeteer (HTML template to PDF for Investment Blueprint)
 
-Backend follows a modular monolith pattern with 10 service modules in `backend/src/modules/` (auth, audit, identity, strategy, simulation, contact, task, blueprint, insight, logging, admin). Each module has: `routes.ts`, `service.ts`, `repository.ts`, `types.ts`. Modules communicate via direct service function calls.
+Backend follows a modular monolith pattern with service modules in `backend/src/modules/` (auth, audit, identity, strategy, simulation, contact, task, blueprint, insight, logging, admin, dashboard, growth). Each module has: `routes.ts`, `service.ts`, `repository.ts`, `types.ts`. Modules communicate via direct service function calls. Growth path generation runs on Bull workers (`backend/src/workers/`) backed by Redis.
 
 ## Constitution
 
@@ -52,32 +55,44 @@ Defined in `Principal_Dev_Framework.md`. The cycle is:
 2. **Challenge** — `/plan-ceo-review`, `/plan-eng-review`, `/plan-design-review`
 3. **Build + Ship** — Per task: implement → `/review` → `/qa` → `/cso` → `/ship` → `/retro`
 
-## Commands (Once Scaffolded)
+## Commands
 
 ```bash
+# Infra (Postgres on host port 5433 — 5432 collides with other projects on this machine — and Redis)
+docker compose up -d
+
 # Backend
 cd backend && npm install
-cp .env.example .env            # DATABASE_URL, JWT_SECRET, AUDIT_ENCRYPTION_KEY, ANTHROPIC_API_KEY
-npx prisma migrate dev          # Apply migrations
-npx prisma db seed              # Seed archetypes + prompt templates
-npm run dev                     # Express on :3001
-npm test                        # Jest + Supertest
+cp .env.example .env            # DATABASE_URL, JWT_SECRET, AUDIT_ENCRYPTION_KEY_V1, ANTHROPIC_API_KEY, REDIS_URL
+npx prisma generate             # Regenerate the client after schema changes (stale client = phantom TS errors)
+npx prisma migrate deploy       # Apply migrations
+npx prisma db seed              # Upsert prompt templates (safe to re-run after editing prisma/seed.ts)
+npm run dev                     # Express on :3001 — GET /api/v1/health probes DB, Redis and the Anthropic key
+npm test                        # Jest (unit + contract tests)
 
 # Frontend
 cd frontend && npm install
-cp .env.local.example .env.local  # NEXT_PUBLIC_API_URL
+cp .env.local.example .env.local  # NEXT_PUBLIC_API_URL includes the /api/v1 prefix
 npm run dev                       # Next.js on :3000
 npm test                          # Jest + React Testing Library
 
-# Database
-docker compose up -d              # PostgreSQL 15 via Docker
-npx prisma studio                 # Visual DB browser
+# Run the whole AI pipeline with no API key / no cost (deterministic canned responses)
+node backend/scripts/mock-anthropic.mjs &                       # :3999
+ANTHROPIC_BASE_URL=http://localhost:3999 ANTHROPIC_API_KEY=sk-ant-mock npm run dev   # from backend/
 ```
+
+The Growth Strategy Engine is gated per tenant: `UPDATE tenants SET feature_flags = '{"growth_strategy_enabled": true}'`.
+
+**WSL note:** the repo lives on `/mnt/c` (OneDrive). File watchers do not get change events there, so
+`tsx watch` and Next.js HMR will serve stale code — restart the dev server after edits, or move the
+checkout to the Linux filesystem. `.gitattributes` enforces LF so OneDrive's CRLF rewrites don't dirty the tree.
 
 ## Key Patterns
 
 - **Error shape:** `{ error: { code, message, details } }` — consistent across all endpoints
 - **Success shape:** `{ data: { ... } }` with optional `pagination` object
+- **Key casing:** every JSON response is snake_case (contract `api-v1.md`). Services may build camelCase objects; `snakeCaseResponse` middleware normalizes at `res.json`. Request bodies are snake_case too — read `req.body.role_type`, never `req.body.roleType`.
+- **Prompt templates are the interface:** placeholder names are case-sensitive (`{{AUDIT_DATA}}`), the JSON output format in the template must match the module's Zod schema (guarded by `shared/ai/schema-contract.test.ts`), and `assemblePrompt` warns on any placeholder left unfilled.
 - **Public IDs:** CUID2 everywhere in URLs/responses; internal integer PKs never exposed
 - **Audit versioning:** Append-only rows. Draft = in_progress status. Completing creates new versioned row.
 - **Identity versioning:** New row per AI synthesis. References audit versions used via `audit_snapshot` JSON.

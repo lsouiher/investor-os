@@ -55,6 +55,9 @@ export async function getIdentityHistory(userId: number, tenantId: number) {
       version: true,
       archetype: true,
       readinessScore: true,
+      subScores: true,
+      radarData: true,
+      headlineInsight: true,
       generatedAt: true,
     },
   });

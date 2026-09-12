@@ -42,16 +42,29 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 // POST /tasks — create a manual task
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { title, description, dueDate, estimatedMinutes } = req.body;
+    // Request keys are snake_case per the API contract
+    const {
+      title,
+      description,
+      due_date: dueDate,
+      estimated_minutes: estimatedMinutes,
+      identity_impact_score: identityImpactScore,
+    } = req.body;
 
     if (!title || typeof title !== 'string') {
       throw new AppError('VALIDATION_ERROR', 'title is required.', 400);
+    }
+    if (
+      identityImpactScore !== undefined &&
+      (typeof identityImpactScore !== 'number' || identityImpactScore < 0 || identityImpactScore > 100)
+    ) {
+      throw new AppError('VALIDATION_ERROR', 'identity_impact_score must be a number 0-100.', 400);
     }
 
     const task = await taskService.createManualTask(
       req.user!.userId,
       req.user!.tenantId,
-      { title, description, dueDate, estimatedMinutes },
+      { title, description, dueDate, estimatedMinutes, identityImpactScore },
     );
     res.status(201).json({ data: task });
   } catch (err) {
@@ -63,7 +76,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 router.put('/:taskId', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const taskId = String(req.params.taskId);
-    const { title, description, dueDate, isCompleted, estimatedMinutes } = req.body;
+    const { title, description, due_date: dueDate, is_completed: isCompleted, estimated_minutes: estimatedMinutes } = req.body;
 
     const task = await taskService.updateTask(
       req.user!.userId,

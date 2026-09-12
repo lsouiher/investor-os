@@ -46,7 +46,8 @@ router.get('/network-score', async (req: Request, res: Response, next: NextFunct
 // POST /contacts — create a new contact
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, email, phone, roleType, notes, strategyRelevance, networkGapFilled } = req.body;
+    // Request keys are snake_case per the API contract
+    const { name, email, phone, role_type: roleType, notes, strategy_relevance: strategyRelevance, network_gap_filled: networkGapFilled } = req.body;
 
     if (!name || typeof name !== 'string') {
       throw new AppError('VALIDATION_ERROR', 'name is required.', 400);
@@ -70,7 +71,13 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 router.put('/:contactId', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const contactId = String(req.params.contactId);
-    const { name, email, phone, roleType, notes, strategyRelevance, networkGapFilled, lastContactedAt } = req.body;
+    const {
+      name, email, phone, notes,
+      role_type: roleType,
+      strategy_relevance: strategyRelevance,
+      network_gap_filled: networkGapFilled,
+      last_contacted_at: lastContactedAt,
+    } = req.body;
 
     if (roleType !== undefined && !VALID_ROLE_TYPES.has(roleType)) {
       throw new AppError('VALIDATION_ERROR', 'Invalid role_type.', 400);

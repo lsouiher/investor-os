@@ -6,15 +6,34 @@ import { TasksEmpty } from "@/components/shared/empty-states";
 import { SkeletonCard } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
 
+// Shape of GET /api/v1/tasks items (snake_case per contracts/api-v1.md)
 interface Task {
   id: string;
   title: string;
   description: string | null;
-  completed: boolean;
-  impact: "high" | "medium" | "low";
-  source: "strategy" | "manual";
+  is_completed: boolean;
+  identity_impact_score: number | null;
+  source: "ai_generated" | "identity_gap" | "manual" | "strategy";
   created_at: string;
+  strategy_id?: string | null;
 }
+
+// Strategy action items are surfaced as tasks; their completion lives on the strategy.
+function completionEndpoint(task: Task): string {
+  return task.source === "strategy" ? `/strategies/action-items/${task.id}` : `/tasks/${task.id}`;
+}
+
+type Impact = "high" | "medium" | "low";
+
+// identity_impact_score is 0-100; the UI shows it as three bands
+function impactOf(task: Task): Impact {
+  const score = task.identity_impact_score ?? 0;
+  if (score >= 70) return "high";
+  if (score >= 40) return "medium";
+  return "low";
+}
+
+const IMPACT_TO_SCORE: Record<Impact, number> = { high: 80, medium: 50, low: 20 };
 
 const IMPACT_STYLES: Record<string, string> = {
   high: "bg-red-50 text-red-700",
@@ -52,10 +71,11 @@ export default function TasksPage() {
     const task = tasks.find((t) => t.id === taskId);
     if (!task) return;
     try {
-      await api.put(`/tasks/${taskId}`, { completed: !task.completed });
+      const next = !task.is_completed;
+      await api.put(completionEndpoint(task), { is_completed: next });
       setTasks((prev) =>
         prev.map((t) =>
-          t.id === taskId ? { ...t, completed: !t.completed } : t
+          t.id === taskId ? { ...t, is_completed: next } : t
         )
       );
     } catch {
@@ -69,8 +89,8 @@ export default function TasksPage() {
     try {
       const created = await api.post<Task>("/tasks", {
         title: newTitle.trim(),
-        description: newDescription.trim() || null,
-        impact: newImpact,
+        description: newDescription.trim() || undefined,
+        identity_impact_score: IMPACT_TO_SCORE[newImpact],
       });
       setTasks((prev) => [created, ...prev]);
       setNewTitle("");
@@ -92,22 +112,14 @@ export default function TasksPage() {
     );
   }
 
-  if (tasks.length === 0 && !error) {
-    return (
-      <div className="mx-auto max-w-5xl">
-        <TasksEmpty />
-      </div>
-    );
-  }
-
   // Sort: incomplete first, then by impact priority
   const impactOrder = { high: 0, medium: 1, low: 2 };
   const sortedTasks = [...tasks].sort((a, b) => {
-    if (a.completed !== b.completed) return a.completed ? 1 : -1;
-    return impactOrder[a.impact] - impactOrder[b.impact];
+    if (a.is_completed !== b.is_completed) return a.is_completed ? 1 : -1;
+    return impactOrder[impactOf(a)] - impactOrder[impactOf(b)];
   });
 
-  const completedCount = tasks.filter((t) => t.completed).length;
+  const completedCount = tasks.filter((t) => t.is_completed).length;
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
@@ -179,6 +191,7 @@ export default function TasksPage() {
       )}
 
       {/* Task list */}
+      {tasks.length === 0 && !showAddForm && <TasksEmpty />}
       <div className="space-y-2">
         {sortedTasks.map((task) => (
           <div
@@ -188,12 +201,12 @@ export default function TasksPage() {
             <button
               onClick={() => toggleTask(task.id)}
               className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
-                task.completed
+                task.is_completed
                   ? "border-emerald-500 bg-emerald-500 text-white"
                   : "border-gray-300 hover:border-amber-400"
               }`}
             >
-              {task.completed && (
+              {task.is_completed && (
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
@@ -203,21 +216,21 @@ export default function TasksPage() {
               <div className="flex items-center gap-2">
                 <p
                   className={`text-sm font-medium ${
-                    task.completed ? "text-gray-400 line-through" : "text-gray-900"
+                    task.is_completed ? "text-gray-400 line-through" : "text-gray-900"
                   }`}
                 >
                   {task.title}
                 </p>
                 <span
                   className={`rounded px-1.5 py-0.5 text-xs font-medium ${
-                    IMPACT_STYLES[task.impact]
+                    IMPACT_STYLES[impactOf(task)]
                   }`}
                 >
-                  {task.impact}
+                  {impactOf(task)}
                 </span>
-                {task.source === "strategy" && (
+                {task.source !== "manual" && (
                   <span className="rounded bg-blue-50 px-1.5 py-0.5 text-xs text-blue-600">
-                    Strategy
+                    {task.source === "strategy" ? "Strategy" : task.source === "identity_gap" ? "Identity gap" : "AI"}
                   </span>
                 )}
               </div>
