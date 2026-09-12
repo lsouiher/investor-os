@@ -95,14 +95,15 @@ export default function PathDetailPage() {
 
   const handleToggleAction = async (itemId: string, isCompleted: boolean) => {
     try {
-      await api.put(`/growth-strategy/paths/${pathType}/action-items/${itemId}`, {
-        is_completed: isCompleted,
-      });
-      // Optimistic update
+      const result = await api.put<{ path_progress: number }>(
+        `/growth-strategy/paths/${pathType}/action-items/${itemId}`,
+        { is_completed: isCompleted },
+      );
       setPath((prev) => {
         if (!prev) return prev;
         return {
           ...prev,
+          progress: result.path_progress ?? prev.progress,
           action_items: prev.action_items.map((item) =>
             item.id === itemId
               ? { ...item, is_completed: isCompleted, completed_at: isCompleted ? new Date().toISOString() : null }

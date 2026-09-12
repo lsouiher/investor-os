@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
 
 interface ExportButtonProps {
   hasExported: boolean;
@@ -37,7 +37,7 @@ export default function ExportButton({
       }
 
       const res = await fetch(
-        `${BASE_URL}/api/v1/growth-strategy/export/markdown`,
+        `${BASE_URL}/growth-strategy/export/markdown`,
         {
           method: "POST",
           headers: {

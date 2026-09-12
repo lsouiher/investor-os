@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ApiError } from "@/lib/api-client";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;

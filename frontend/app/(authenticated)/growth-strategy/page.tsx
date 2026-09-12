@@ -3,6 +3,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { api, ApiError } from "@/lib/api-client";
 import PathCard from "@/components/growth/PathCard";
+import CrossPathInsights from "@/components/growth/CrossPathInsights";
+import ExportButton from "@/components/growth/ExportButton";
+import StalenessAlert from "@/components/growth/StalenessAlert";
+import ManualUnlockDialog from "@/components/growth/ManualUnlockDialog";
+import UnlockCelebration from "@/components/growth/UnlockCelebration";
 import { SkeletonCard } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
 import Link from "next/link";
@@ -28,6 +33,17 @@ interface NextBestAction {
   cross_path_impact: string[];
 }
 
+interface CrossPathLink {
+  id: string;
+  type: "prerequisite" | "enabling" | "constraint" | "conflict";
+  source_path_type: string;
+  source_description: string;
+  target_path_type: string;
+  target_description: string;
+  description: string;
+  resolution: string | null;
+}
+
 interface GrowthStrategy {
   id: string;
   status: string;
@@ -40,7 +56,13 @@ interface GrowthStrategy {
     readiness_score: number;
   };
   paths: PathSummary[];
+  cross_path_insights: CrossPathLink[];
   next_best_action: NextBestAction | null;
+  export_staleness: {
+    is_stale: boolean;
+    last_export_at: string | null;
+    changed_since_export: string[];
+  };
   created_at: string;
 }
 
@@ -70,6 +92,10 @@ export default function GrowthStrategyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showFirstVisitHero, setShowFirstVisitHero] = useState(true);
+  const [hasIdentity, setHasIdentity] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [unlockPrompt, setUnlockPrompt] = useState<{ pathType: string; criteria: string } | null>(null);
+  const [celebratePath, setCelebratePath] = useState<string | null>(null);
 
   const fetchStrategy = useCallback(async () => {
     try {
@@ -79,7 +105,14 @@ export default function GrowthStrategyPage() {
       setStrategy(data);
     } catch (err) {
       if (err instanceof ApiError && err.code === "NOT_FOUND") {
+        // No strategy yet: either no identity, or the identity predates the growth feature
         setStrategy(null);
+        try {
+          await api.get("/identity");
+          setHasIdentity(true);
+        } catch {
+          setHasIdentity(false);
+        }
       } else {
         setError("Failed to load growth strategy.");
       }
@@ -87,6 +120,19 @@ export default function GrowthStrategyPage() {
       setLoading(false);
     }
   }, []);
+
+  const handleCreate = async () => {
+    try {
+      setCreating(true);
+      setError(null);
+      const data = await api.post<GrowthStrategy>("/growth-strategy");
+      setStrategy(data);
+    } catch {
+      setError("Failed to create your growth strategy. Please try again.");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   useEffect(() => {
     fetchStrategy();
@@ -103,17 +149,22 @@ export default function GrowthStrategyPage() {
   }, [strategy, fetchStrategy]);
 
   const handleGenerate = async (pathType: string, confirmEarlyUnlock = false) => {
+    const path = strategy?.paths.find((p) => p.path_type === pathType);
+    // Locked paths need an explicit early-unlock confirmation first
+    if (path?.status === "locked" && !confirmEarlyUnlock) {
+      setUnlockPrompt({ pathType, criteria: path.unlock_criteria ?? "completing earlier paths" });
+      return;
+    }
     try {
+      setError(null);
       await api.post(`/growth-strategy/paths/${pathType}/generate`, {
         confirm_early_unlock: confirmEarlyUnlock,
       });
+      if (confirmEarlyUnlock) setCelebratePath(pathType);
       await fetchStrategy();
     } catch (err) {
       if (err instanceof ApiError && err.code === "VALIDATION_ERROR") {
-        // Locked path without confirmation — ask for early unlock
-        if (confirm(`${(err as ApiError).message}\n\nGenerate anyway?`)) {
-          await handleGenerate(pathType, true);
-        }
+        setUnlockPrompt({ pathType, criteria: path?.unlock_criteria ?? "completing earlier paths" });
       } else {
         setError(`Failed to generate ${PATH_NAMES[pathType] || pathType}.`);
       }
@@ -139,19 +190,36 @@ export default function GrowthStrategyPage() {
     );
   }
 
-  // Empty state — no identity yet
+  // Empty state — no strategy yet
   if (!strategy) {
     return (
       <div className="mx-auto max-w-3xl py-16 text-center">
         <div className="rounded-lg border border-gray-200 bg-white p-12">
-          <h2 className="text-xl font-semibold text-gray-900">Your Growth Strategy unlocks after completing your investor identity.</h2>
-          <p className="mt-2 text-gray-600">Complete all 5 audits and your identity synthesis to get started.</p>
-          <Link
-            href="/hub"
-            className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700"
-          >
-            Go to Identity Hub
-          </Link>
+          {hasIdentity ? (
+            <>
+              <h2 className="text-xl font-semibold text-gray-900">Your investor identity is ready. Build your Growth Strategy.</h2>
+              <p className="mt-2 text-gray-600">Four growth paths, generated from your identity, that unlock as you make progress.</p>
+              {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+              <button
+                onClick={handleCreate}
+                disabled={creating}
+                className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+              >
+                {creating ? "Creating…" : "Create My Growth Strategy"}
+              </button>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold text-gray-900">Your Growth Strategy unlocks after completing your investor identity.</h2>
+              <p className="mt-2 text-gray-600">Complete all 5 audits and your identity synthesis to get started.</p>
+              <Link
+                href="/hub"
+                className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700"
+              >
+                Go to Identity Hub
+              </Link>
+            </>
+          )}
         </div>
       </div>
     );
@@ -185,6 +253,40 @@ export default function GrowthStrategyPage() {
           <div className={`text-xs ${scoreTierColor(strategy.growth_score)}`}>
             {scoreTierLabel(strategy.growth_score)}
           </div>
+        </div>
+      </div>
+
+      {/* Unlock dialog + celebration */}
+      {unlockPrompt && (
+        <ManualUnlockDialog
+          pathType={unlockPrompt.pathType}
+          unlockCriteria={unlockPrompt.criteria}
+          onConfirm={() => {
+            const target = unlockPrompt.pathType;
+            setUnlockPrompt(null);
+            handleGenerate(target, true);
+          }}
+          onCancel={() => setUnlockPrompt(null)}
+        />
+      )}
+      {celebratePath && (
+        <UnlockCelebration pathType={celebratePath} onDismiss={() => setCelebratePath(null)} />
+      )}
+
+      {/* Export */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <StalenessAlert
+          isStale={strategy.export_staleness.is_stale}
+          changedSinceExport={strategy.export_staleness.changed_since_export}
+          onDownloadFresh={() => {
+            document.getElementById("growth-export-button")?.querySelector("button")?.click();
+          }}
+        />
+        <div id="growth-export-button" className="ml-auto">
+          <ExportButton
+            hasExported={!!strategy.export_staleness.last_export_at}
+            isStale={strategy.export_staleness.is_stale}
+          />
         </div>
       </div>
 
@@ -270,6 +372,9 @@ export default function GrowthStrategyPage() {
           </div>
         </details>
       )}
+
+      {/* Cross-path intelligence */}
+      <CrossPathInsights links={strategy.cross_path_insights ?? []} />
 
       {/* Overall progress */}
       <div className="rounded-lg border border-gray-200 bg-white px-5 py-4">
