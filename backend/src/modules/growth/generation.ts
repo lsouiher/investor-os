@@ -19,7 +19,7 @@ const ActionItemSchema = z.object({
   priority_score: z.number().min(0).max(100).optional(),
 });
 
-const PathGenerationResponseSchema = z.object({
+export const PathGenerationResponseSchema = z.object({
   content: z.record(z.string(), z.unknown()),
   action_items: z.array(ActionItemSchema),
   summary: z.string(),
@@ -45,7 +45,7 @@ const NextBestActionSchema = z.object({
   cross_path_impact: z.array(z.string()),
 });
 
-const CrossPathAnalysisResponseSchema = z.object({
+export const CrossPathAnalysisResponseSchema = z.object({
   links: z.array(CrossPathLinkSchema),
   next_best_action: NextBestActionSchema.nullable(),
 });

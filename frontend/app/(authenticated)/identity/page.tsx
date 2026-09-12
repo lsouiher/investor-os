@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { api, ApiError } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
 import IdentityCard from "@/components/identity/identity-card";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";

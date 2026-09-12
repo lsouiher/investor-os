@@ -13,7 +13,7 @@ const MAX_SIMULATIONS_PER_24H = 3;
  * Zod schema for runtime validation of the AI simulation response.
  */
 // Keys match the simulation prompt template's JSON output format
-const SimulationResultSchema = z.object({
+export const SimulationResultSchema = z.object({
   archetype: z.string().min(1).max(100),
   readiness_score: z.number().min(0).max(100),
   sub_scores: z.record(z.string(), z.number().min(0).max(100)).default({}),

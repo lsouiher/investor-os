@@ -18,7 +18,7 @@ export interface Insight {
  * Zod schema for runtime validation of the AI insight response.
  */
 // Keys match the insight prompt template's JSON output format
-const InsightResponseSchema = z.object({
+export const InsightResponseSchema = z.object({
   insights: z.array(
     z.object({
       type: z.enum(['progress', 'contradiction', 'score_change', 'milestone', 'network_alert']),

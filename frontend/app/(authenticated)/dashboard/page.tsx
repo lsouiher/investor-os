@@ -68,12 +68,6 @@ const SEVERITY_STYLES: Record<string, string> = {
   success: "bg-emerald-100 text-emerald-700",
 };
 
-function scoreColorClass(score: number): string {
-  if (score < 40) return "text-red-600";
-  if (score < 70) return "text-amber-600";
-  return "text-emerald-600";
-}
-
 function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
   const strokeWidth = 6;
   const radius = (size - strokeWidth) / 2;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { api, ApiError } from "@/lib/api-client";
+import { api } from "@/lib/api-client";
 import RadarChart, { type RadarData } from "@/components/identity/radar-chart";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
