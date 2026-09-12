@@ -2,6 +2,31 @@
 
 All notable changes to InvestorOS will be documented in this file.
 
+## [0.3.0.0] - 2026-09-12
+
+Integration release: the first version where the AI pipeline and every page work end-to-end. Verified with a full API smoke test (24/24) and a browser walk-through against a local mock of the Anthropic API.
+
+### Fixed
+
+- **AI prompts received no data.** Every v1 service passed lowercase placeholder names to templates that use `{{UPPERCASE}}`, so Claude saw literal `{{AUDIT_DATA}}`. Services now supply the exact placeholder names; `assemblePrompt` warns when any placeholder is left unfilled
+- **Three Zod schemas rejected their own template's output** (identity expected `insights` not `ai_insights`; simulation expected camelCase; insight expected fields the template never asked for). Identity synthesis could never succeed. Schemas now match the templates, guarded by a contract test
+- **Strategies were never generated.** FR-6 chains generation to synthesis; `GET /strategies` also self-heals for the current identity
+- **API responses were camelCase; the frontend (and contract) are snake_case.** A single `res.json` middleware normalizes every response; contact, task and simulation routes read snake_case request keys. Before this, no page past the audits could render data
+- **Frontend called routes that did not exist** (`/simulation/config`, `/simulation/run`, `/identity/feedback`, `GET /strategies/:id`, `POST …/activate`). Pages now use the real endpoints; the backend gained `GET /strategies/:id` and `GET /simulations/config`
+- **Identity dead-end:** when synthesis had not run (or failed), the hub, dashboard and identity page looped the user back to "complete your audits" with no way to synthesize. The identity page now offers a Synthesize button
+- **Growth page never rendered** ExportButton, StalenessAlert, CrossPathInsights, ManualUnlockDialog or UnlockCelebration — export was unreachable and early-unlock used a raw `confirm()`. All wired in; the export URL no longer doubles `/api/v1`; identities that predate the feature flag get a "Create My Growth Strategy" button
+- **Audit scoring ignored three sections** (`preferences`, `safety`, `objectives`) after an earlier rename left `scoring.ts` on the old keys
+- **Deprecated model** `claude-sonnet-4-20250514` replaced by `ANTHROPIC_MODEL` (default `claude-sonnet-5`); AI calls use the SDK timeout instead of a `Promise.race` that left requests running
+- `/health` reported `ai: true` whenever the key was merely set; it now reflects a startup credential probe and logs loudly on an invalid key
+- Dashboard: consumes the real payload, gains the growth-strategy card, sparkline from `score_history`, and priority tasks; the active strategy's action items now appear as tasks on the dashboard and Tasks page
+- Sidebar shows the readiness score; radar chart labels no longer clip; tasks page keeps "Add Task" reachable when empty; contacts expose the full role enum and auto-detect the network gap a new contact fills
+- Postgres moved to host port 5433 (5432 collided with another project); `.gitattributes` enforces LF
+
+### Added
+
+- `backend/scripts/mock-anthropic.mjs` — local mock of the Messages API returning schema-valid JSON per prompt type, for zero-cost development and smoke tests
+- Tests: AI schema/template contracts, prompt assembly, snake_case middleware, growth unlock rules, first frontend tests (jest-dom setup was never registered)
+
 ## [0.2.0.0] - 2026-04-05
 
 Growth Strategy Engine: multi-path growth planning that activates after identity synthesis.

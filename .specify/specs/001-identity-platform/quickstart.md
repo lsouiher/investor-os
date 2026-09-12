@@ -64,16 +64,23 @@ cp .env.local.example .env.local   # Fill in NEXT_PUBLIC_API_URL
 npm run dev                         # Starts Next.js on port 3000
 ```
 
-### 3. Database
+### 3. Database + Redis
 ```bash
-# Local PostgreSQL
-createdb investoros_dev
+# Postgres (host port 5433) and Redis (6379) via the repo's docker-compose.yml
+docker compose up -d
 
-# Or Docker
+# Or Docker by hand
 docker run -d --name investoros-pg \
   -e POSTGRES_DB=investoros_dev \
   -e POSTGRES_PASSWORD=dev \
   -p 5433:5432 postgres:15
+docker run -d --name investoros-redis -p 6379:6379 redis:7-alpine
+```
+
+### 4. Develop without an Anthropic key
+```bash
+node backend/scripts/mock-anthropic.mjs &     # mock Messages API on :3999, schema-valid canned JSON
+cd backend && ANTHROPIC_BASE_URL=http://localhost:3999 ANTHROPIC_API_KEY=sk-ant-mock npm run dev
 ```
 
 ---
@@ -85,8 +92,11 @@ docker run -d --name investoros-pg \
 DATABASE_URL=postgresql://postgres:dev@localhost:5433/investoros_dev
 JWT_SECRET=your-jwt-secret-min-32-chars
 JWT_EXPIRY=24h
-AUDIT_ENCRYPTION_KEY=your-256-bit-hex-key
+AUDIT_ENCRYPTION_KEY_V1=your-256-bit-hex-key
+CURRENT_ENCRYPTION_KEY_VERSION=1
 ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_MODEL=claude-sonnet-5          # optional; claude-opus-5 for higher quality
+REDIS_URL=redis://localhost:6379
 PORT=3001
 NODE_ENV=development
 ```
