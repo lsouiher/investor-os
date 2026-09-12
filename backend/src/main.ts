@@ -7,6 +7,7 @@ import { requestLogger } from './shared/middleware/request-logger.js';
 import { generalLimiter } from './shared/middleware/rate-limiter.js';
 import { authenticate } from './shared/middleware/auth.js';
 import { setTenantContext } from './shared/middleware/tenant-context.js';
+import { snakeCaseResponse } from './shared/middleware/snake-case-response.js';
 import { logger } from './shared/logger.js';
 import { aiCredentialsOk, verifyAiCredentials } from './shared/ai/client.js';
 import authRoutes from './modules/auth/routes.js';
@@ -36,6 +37,8 @@ app.use(cors({
 app.use(express.json({ limit: '50kb' }));
 app.use(requestLogger);
 app.use(generalLimiter);
+// Contract: all JSON responses use snake_case keys (applies to auth + health too)
+app.use('/api/v1', snakeCaseResponse);
 
 // Health check (no auth)
 app.get('/api/v1/health', async (_req, res) => {

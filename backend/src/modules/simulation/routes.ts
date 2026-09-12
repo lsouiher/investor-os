@@ -78,7 +78,7 @@ function validateModifiedParameters(
 // POST /simulations — run a what-if simulation
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const modifiedParameters = validateModifiedParameters(req.body.modifiedParameters);
+    const modifiedParameters = validateModifiedParameters(req.body.modified_parameters);
 
     const result = await simulationService.runSimulation(
       req.user!.userId,
