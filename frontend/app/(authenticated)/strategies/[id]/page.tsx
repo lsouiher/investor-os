@@ -74,7 +74,7 @@ function CheckButton({ checked, onClick }: { checked: boolean; onClick: () => vo
       className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
         checked
           ? "border-emerald-500 bg-emerald-500 text-white"
-          : "border-gray-300 hover:border-amber-400"
+          : "border-border hover:border-amber-400"
       }`}
     >
       {checked && (
@@ -256,19 +256,19 @@ export default function StrategyDetailPage() {
         <div>
           <Link
             href="/strategies"
-            className="mb-2 inline-block text-sm text-amber-600 hover:text-amber-700"
+            className="mb-2 inline-block text-sm text-amber-600 dark:text-amber-400 hover:text-amber-700"
           >
             &larr; All Strategies
           </Link>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">{strategy.name}</h1>
+            <h1 className="text-2xl font-bold text-foreground-strong">{strategy.name}</h1>
             {strategy.is_active && (
-              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+              <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
                 Active
               </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-gray-500">{strategy.description}</p>
+          <p className="mt-1 text-sm text-foreground-muted">{strategy.description}</p>
         </div>
         <div className="flex flex-shrink-0 items-center gap-3">
           {!strategy.is_active && (
@@ -287,13 +287,13 @@ export default function StrategyDetailPage() {
       {error && <AiErrorState severity="low" message={error} />}
 
       {!strategy.is_active && (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+        <div className="rounded-lg border border-border bg-surface-subtle p-4 text-sm text-foreground-secondary">
           Activate this strategy to generate its action plan, roadmap, and 72-hour micro-plan.
         </div>
       )}
 
       {planPending && (
-        <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="flex items-center gap-3 rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4 text-sm text-amber-800 dark:text-amber-200">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
           Building your personalized plan — this usually takes under a minute.
         </div>
@@ -301,14 +301,14 @@ export default function StrategyDetailPage() {
 
       {/* Progress bar */}
       {totalActions > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
+        <div className="rounded-lg border border-border bg-surface-card p-4">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-medium text-gray-700">Action Plan Progress</span>
-            <span className="text-gray-500">
+            <span className="font-medium text-foreground-secondary">Action Plan Progress</span>
+            <span className="text-foreground-muted">
               {completedActions}/{totalActions} completed
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-gray-100">
+          <div className="h-2 overflow-hidden rounded-full bg-surface-subtle">
             <div
               className="h-full rounded-full bg-amber-600 transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
@@ -318,7 +318,7 @@ export default function StrategyDetailPage() {
       )}
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-border">
         <div className="flex gap-6">
           {tabs.map((tab) => (
             <button
@@ -326,8 +326,8 @@ export default function StrategyDetailPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`border-b-2 pb-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? "border-amber-600 text-amber-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  ? "border-amber-600 text-amber-600 dark:text-amber-400"
+                  : "border-transparent text-foreground-muted hover:text-foreground-secondary"
               }`}
             >
               {tab.label}
@@ -342,25 +342,25 @@ export default function StrategyDetailPage() {
           {actionItems.map((item) => (
             <div
               key={item.id}
-              className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4"
+              className="flex items-start gap-3 rounded-lg border border-border bg-surface-card p-4"
             >
               <CheckButton checked={item.is_completed} onClick={() => toggleActionItem(item.id)} />
               <div className="min-w-0 flex-1">
                 <p
                   className={`text-sm font-medium ${
-                    item.is_completed ? "text-gray-400 line-through" : "text-gray-900"
+                    item.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"
                   }`}
                 >
                   {item.title}
                 </p>
                 {item.description && (
-                  <p className="mt-0.5 text-xs text-gray-500">{item.description}</p>
+                  <p className="mt-0.5 text-xs text-foreground-muted">{item.description}</p>
                 )}
               </div>
             </div>
           ))}
           {actionItems.length === 0 && !planPending && (
-            <p className="py-8 text-center text-sm text-gray-400">
+            <p className="py-8 text-center text-sm text-foreground-tertiary">
               No action items yet.
             </p>
           )}
@@ -374,37 +374,37 @@ export default function StrategyDetailPage() {
       {activeTab === "micro-plan" && (
         <div>
           {strategy.micro_plan ? (
-            <div className="rounded-lg border border-gray-200 bg-white p-6">
+            <div className="rounded-lg border border-border bg-surface-card p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">72-Hour Micro-Plan</h3>
-                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-600">
+                <h3 className="text-lg font-semibold text-foreground-strong">72-Hour Micro-Plan</h3>
+                <span className="rounded-full bg-amber-50 dark:bg-amber-950 px-3 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
                   {getCountdown(strategy.micro_plan.expires_at)}
                 </span>
               </div>
-              <p className="mb-4 text-sm text-gray-600">
+              <p className="mb-4 text-sm text-foreground-secondary">
                 Small, concrete tasks to build momentum in the next three days.
               </p>
               <div className="space-y-2">
                 {microTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-start gap-3 rounded-md bg-gray-50 px-4 py-3"
+                    className="flex items-start gap-3 rounded-md bg-surface-subtle px-4 py-3"
                   >
                     <CheckButton checked={task.is_completed} onClick={() => toggleMicroTask(task.id)} />
                     <div className="min-w-0 flex-1">
                       <p
                         className={`text-sm ${
-                          task.is_completed ? "text-gray-400 line-through" : "text-gray-700"
+                          task.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-secondary"
                         }`}
                       >
                         {task.title}
                       </p>
                       {task.description && (
-                        <p className="mt-0.5 text-xs text-gray-500">{task.description}</p>
+                        <p className="mt-0.5 text-xs text-foreground-muted">{task.description}</p>
                       )}
                     </div>
                     {task.estimated_minutes != null && (
-                      <span className="flex-shrink-0 text-xs text-gray-400">
+                      <span className="flex-shrink-0 text-xs text-foreground-tertiary">
                         ~{task.estimated_minutes} min
                       </span>
                     )}
@@ -413,7 +413,7 @@ export default function StrategyDetailPage() {
               </div>
             </div>
           ) : (
-            <p className="py-8 text-center text-sm text-gray-400">
+            <p className="py-8 text-center text-sm text-foreground-tertiary">
               {planPending ? "Your micro-plan is being generated." : "No micro-plan available for this strategy."}
             </p>
           )}

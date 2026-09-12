@@ -44,24 +44,24 @@ export default function UnlockCelebration({ pathType, onDismiss }: UnlockCelebra
     <div
       role="alert"
       aria-live="polite"
-      className={`fixed right-4 top-4 z-50 w-80 rounded-lg border-2 border-amber-300 bg-white p-4 shadow-lg ${
+      className={`fixed right-4 top-4 z-50 w-80 rounded-lg border-2 border-amber-300 dark:border-amber-600 bg-surface-card p-4 shadow-lg ${
         prefersReducedMotion ? "" : "animate-slide-in-right"
       }`}
     >
       <div className="flex items-center gap-3">
         <span className="text-2xl">{icon}</span>
         <div>
-          <div className="font-semibold text-gray-900">
+          <div className="font-semibold text-foreground-strong">
             🎉 You&apos;ve unlocked {name}!
           </div>
-          <div className="mt-0.5 text-sm text-gray-600">
+          <div className="mt-0.5 text-sm text-foreground-secondary">
             A new growth dimension is ready to explore.
           </div>
         </div>
       </div>
       <button
         onClick={() => { setVisible(false); onDismiss(); }}
-        className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
+        className="absolute right-2 top-2 text-foreground-tertiary hover:text-foreground-secondary"
         aria-label="Dismiss"
       >
         ×

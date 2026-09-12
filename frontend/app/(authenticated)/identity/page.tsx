@@ -133,10 +133,10 @@ export default function IdentityPage() {
         {error && (
           <AiErrorState severity="medium" message={error} onRetry={handleSynthesize} />
         )}
-        <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white px-6 py-16 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-border bg-surface-card px-6 py-16 text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-950">
             <svg
-              className="h-7 w-7 text-amber-600"
+              className="h-7 w-7 text-amber-600 dark:text-amber-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -146,12 +146,12 @@ export default function IdentityPage() {
               <path strokeLinecap="round" d="M20 21a8 8 0 0 0-16 0" />
             </svg>
           </div>
-          <h2 className="mb-2 text-lg font-semibold text-gray-900">
+          <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
             Your Identity Card Awaits
           </h2>
           {auditsComplete ? (
             <>
-              <p className="mb-6 max-w-sm text-sm text-gray-500">
+              <p className="mb-6 max-w-sm text-sm text-foreground-muted">
                 All 5 audits are complete. Synthesize your Investor Identity to reveal your archetype and readiness score.
               </p>
               <button
@@ -164,7 +164,7 @@ export default function IdentityPage() {
             </>
           ) : (
             <>
-              <p className="mb-6 max-w-sm text-sm text-gray-500">
+              <p className="mb-6 max-w-sm text-sm text-foreground-muted">
                 Complete all 5 audits to see your Investor Identity Card.
               </p>
               <Link
@@ -186,15 +186,15 @@ export default function IdentityPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Investor Identity</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground-strong">Investor Identity</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
             Your AI-synthesized investor profile
           </p>
         </div>
         <button
           onClick={handleSynthesize}
           disabled={synthesizing}
-          className="rounded-lg border border-amber-600 px-4 py-2 text-sm font-medium text-amber-600 transition-colors hover:bg-amber-50 disabled:opacity-50"
+          className="rounded-lg border border-amber-600 px-4 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950 disabled:opacity-50"
         >
           Re-Synthesize
         </button>
@@ -217,8 +217,8 @@ export default function IdentityPage() {
 
       {/* Feedback prompt */}
       {identity && !feedbackSubmitted && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6 text-center">
-          <p className="mb-3 text-sm font-medium text-gray-700">
+        <div className="rounded-lg border border-border bg-surface-card p-6 text-center">
+          <p className="mb-3 text-sm font-medium text-foreground-secondary">
             How well does this identity reflect you?
           </p>
           <div className="flex items-center justify-center gap-2">
@@ -229,19 +229,19 @@ export default function IdentityPage() {
                 className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-medium transition-colors ${
                   feedbackRating === n
                     ? "border-amber-600 bg-amber-600 text-white"
-                    : "border-gray-300 text-gray-600 hover:border-amber-400 hover:bg-amber-50"
+                    : "border-border text-foreground-secondary hover:border-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950"
                 }`}
               >
                 {n}
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-gray-400">1 = Not at all, 5 = Perfectly</p>
+          <p className="mt-2 text-xs text-foreground-tertiary">1 = Not at all, 5 = Perfectly</p>
         </div>
       )}
 
       {feedbackSubmitted && (
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-sm text-foreground-muted">
           Thanks for your feedback!
         </p>
       )}
@@ -249,7 +249,7 @@ export default function IdentityPage() {
       <div className="flex justify-center">
         <Link
           href="/identity/history"
-          className="text-sm font-medium text-amber-600 hover:text-amber-700"
+          className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
         >
           View Identity History
         </Link>

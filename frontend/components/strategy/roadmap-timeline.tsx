@@ -23,7 +23,7 @@ export default function RoadmapTimeline({
 
   if (sorted.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-gray-400">
+      <p className="py-8 text-center text-sm text-foreground-tertiary">
         No milestones defined yet.
       </p>
     );
@@ -48,8 +48,8 @@ export default function RoadmapTimeline({
                   milestone.is_completed
                     ? "border-emerald-500 bg-emerald-500 text-white"
                     : isPast
-                      ? "border-red-300 bg-white text-red-400 hover:border-red-400"
-                      : "border-gray-300 bg-white text-gray-400 hover:border-amber-400 hover:text-amber-500"
+                      ? "border-red-300 bg-surface-card text-red-400 hover:border-red-400"
+                      : "border-border bg-surface-card text-foreground-tertiary hover:border-amber-400 hover:text-amber-500"
                 }`}
                 title={milestone.is_completed ? "Completed" : "Click to mark complete"}
               >
@@ -64,7 +64,7 @@ export default function RoadmapTimeline({
               {!isLast && (
                 <div
                   className={`w-0.5 flex-1 ${
-                    milestone.is_completed ? "bg-emerald-300" : "bg-gray-200"
+                    milestone.is_completed ? "bg-emerald-300" : "bg-border"
                   }`}
                 />
               )}
@@ -75,24 +75,24 @@ export default function RoadmapTimeline({
               <div className="flex items-center gap-2">
                 <h4
                   className={`text-sm font-semibold ${
-                    milestone.is_completed ? "text-gray-400 line-through" : "text-gray-900"
+                    milestone.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"
                   }`}
                 >
                   {milestone.title}
                 </h4>
                 {milestone.target_date && (
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-foreground-tertiary">
                     {new Date(milestone.target_date).toLocaleDateString()}
                   </span>
                 )}
                 {!milestone.is_completed && isPast && (
-                  <span className="rounded bg-red-50 px-1.5 py-0.5 text-xs font-medium text-red-600">
+                  <span className="rounded bg-red-50 dark:bg-red-950 px-1.5 py-0.5 text-xs font-medium text-red-600 dark:text-red-400">
                     Overdue
                   </span>
                 )}
               </div>
               {milestone.description && (
-                <p className="mt-1 text-sm text-gray-500">{milestone.description}</p>
+                <p className="mt-1 text-sm text-foreground-muted">{milestone.description}</p>
               )}
             </div>
           </div>

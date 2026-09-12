@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-background px-4">
+    <div className="relative flex flex-1 flex-col items-center justify-center bg-background px-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <main className="flex w-full max-w-[var(--max-content)] flex-col items-center gap-12 py-24 text-center">
         {/* Hero */}
         <div className="flex flex-col items-center gap-6">

@@ -187,11 +187,11 @@ export default function SimulationPage() {
   if (!config) {
     return (
       <div className="mx-auto max-w-5xl">
-        <div className="flex flex-col items-center justify-center rounded-lg border border-gray-200 bg-white px-6 py-16 text-center">
-          <h2 className="mb-2 text-lg font-semibold text-gray-900">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-border bg-surface-card px-6 py-16 text-center">
+          <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
             Simulations Unlock After Identity
           </h2>
-          <p className="mb-6 max-w-sm text-sm text-gray-500">
+          <p className="mb-6 max-w-sm text-sm text-foreground-muted">
             Complete all 5 audits and build your identity to run what-if simulations.
           </p>
           <a
@@ -211,13 +211,13 @@ export default function SimulationPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">What-If Simulation</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground-strong">What-If Simulation</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
             Adjust variables and see how your identity would change
           </p>
         </div>
         <div className="text-right">
-          <span className="text-sm text-gray-500">Remaining simulations</span>
+          <span className="text-sm text-foreground-muted">Remaining simulations</span>
           <p className="text-2xl font-bold text-amber-600">
             {config.remaining_simulations}
           </p>
@@ -229,11 +229,11 @@ export default function SimulationPage() {
       {/* Split screen layout */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: Current identity */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+        <div className="rounded-lg border border-border bg-surface-card p-6">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
             Current
           </h3>
-          <p className="mb-1 text-lg font-bold text-gray-900">
+          <p className="mb-1 text-lg font-bold text-foreground-strong">
             {config.current_identity.archetype}
           </p>
           <p className={`mb-4 text-3xl font-bold ${scoreColorClass(config.current_identity.readiness_score)}`}>
@@ -243,15 +243,15 @@ export default function SimulationPage() {
         </div>
 
         {/* Center: Sliders */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+        <div className="rounded-lg border border-border bg-surface-card p-6">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
             Adjust Variables
           </h3>
           <div className="space-y-5">
             {config.variables.map((variable) => (
               <div key={variable.key}>
                 <div className="mb-1 flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-foreground-secondary">
                     {variable.label}
                   </label>
                   <span className="text-sm font-bold text-amber-600">
@@ -269,7 +269,7 @@ export default function SimulationPage() {
                   }
                   className="w-full accent-amber-600"
                 />
-                <div className="flex justify-between text-xs text-gray-400">
+                <div className="flex justify-between text-xs text-foreground-tertiary">
                   <span>{variable.min}</span>
                   <span>{variable.max}</span>
                 </div>
@@ -288,13 +288,13 @@ export default function SimulationPage() {
         </div>
 
         {/* Right: Simulated result */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+        <div className="rounded-lg border border-border bg-surface-card p-6">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
             Simulated
           </h3>
           {result ? (
             <>
-              <p className="mb-1 text-lg font-bold text-gray-900">
+              <p className="mb-1 text-lg font-bold text-foreground-strong">
                 {result.archetype}
               </p>
               <p className={`mb-4 text-3xl font-bold ${scoreColorClass(result.readiness_score)}`}>
@@ -307,14 +307,14 @@ export default function SimulationPage() {
                     key={change.label}
                     className="flex items-center justify-between text-sm"
                   >
-                    <span className="text-gray-600">{change.label}</span>
+                    <span className="text-foreground-secondary">{change.label}</span>
                     <span
                       className={
                         change.delta > 0
                           ? "font-medium text-emerald-600"
                           : change.delta < 0
                             ? "font-medium text-red-600"
-                            : "text-gray-400"
+                            : "text-foreground-tertiary"
                       }
                     >
                       {change.delta > 0 ? "+" : ""}
@@ -323,12 +323,12 @@ export default function SimulationPage() {
                   </div>
                 ))}
               </div>
-              <p className="mt-4 rounded-md bg-amber-50 p-3 text-xs text-amber-800">
+              <p className="mt-4 rounded-md bg-amber-50 dark:bg-amber-950 p-3 text-xs text-amber-800 dark:text-amber-200">
                 {result.insight}
               </p>
             </>
           ) : (
-            <div className="flex h-48 items-center justify-center text-sm text-gray-400">
+            <div className="flex h-48 items-center justify-center text-sm text-foreground-tertiary">
               Run a simulation to see results
             </div>
           )}

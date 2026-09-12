@@ -14,7 +14,7 @@ export default function ScoreSparkline({
   if (scores.length === 0) {
     return (
       <div
-        className="flex items-center justify-center text-xs text-gray-400"
+        className="flex items-center justify-center text-xs text-foreground-tertiary"
         style={{ width, height }}
       >
         --
@@ -25,7 +25,7 @@ export default function ScoreSparkline({
   if (scores.length === 1) {
     return (
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-        <circle cx={width / 2} cy={height / 2} r={3} fill="#D97706" />
+        <circle cx={width / 2} cy={height / 2} r={3} fill="var(--accent)" />
       </svg>
     );
   }
@@ -53,12 +53,12 @@ export default function ScoreSparkline({
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
       {/* Area fill */}
-      <path d={areaPath} fill="#D97706" fillOpacity={0.15} />
+      <path d={areaPath} fill="var(--accent)" fillOpacity={0.15} />
       {/* Line */}
       <polyline
         points={polyline}
         fill="none"
-        stroke="#D97706"
+        stroke="var(--accent)"
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -73,7 +73,7 @@ export default function ScoreSparkline({
             ((scores[scores.length - 1] - min) / range) * chartHeight
           }
           r={3}
-          fill="#D97706"
+          fill="var(--accent)"
         />
       )}
     </svg>

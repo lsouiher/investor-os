@@ -286,9 +286,9 @@ export default function TimeAuditPage() {
     return (
       <div className="max-w-5xl mx-auto py-12">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/3" />
-          <div className="h-2 bg-gray-200 rounded w-full" />
-          <div className="h-64 bg-gray-100 rounded" />
+          <div className="h-8 bg-border rounded w-1/3" />
+          <div className="h-2 bg-border rounded w-full" />
+          <div className="h-64 bg-surface-subtle rounded" />
         </div>
       </div>
     );
@@ -297,7 +297,7 @@ export default function TimeAuditPage() {
   return (
     <div className="py-6">
       {error && (
-        <div className="max-w-5xl mx-auto mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm">
+        <div className="max-w-5xl mx-auto mb-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 text-sm">
           {error}
         </div>
       )}

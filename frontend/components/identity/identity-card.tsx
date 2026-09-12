@@ -17,9 +17,9 @@ interface IdentityCardProps {
 }
 
 function scoreColor(score: number): string {
-  if (score < 40) return "#dc2626"; // red-600
-  if (score < 70) return "#d97706"; // amber-600
-  return "#059669"; // emerald-600
+  if (score < 40) return "var(--score-red)";
+  if (score < 70) return "var(--score-amber)";
+  return "var(--score-emerald)";
 }
 
 function scoreColorClass(score: number): string {
@@ -84,7 +84,7 @@ export default function IdentityCard({
     <div
       className="relative w-full overflow-hidden rounded-xl"
       style={{
-        backgroundColor: "#1A1A2E",
+        backgroundColor: "var(--surface-dark)",
         aspectRatio: "16 / 9",
       }}
     >
@@ -97,7 +97,7 @@ export default function IdentityCard({
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
             Investor Identity
           </p>
-          <h2 className="mt-1 text-2xl font-bold sm:text-3xl" style={{ color: "#D97706" }}>
+          <h2 className="mt-1 text-2xl font-bold sm:text-3xl" style={{ color: "var(--accent)" }}>
             {archetype}
           </h2>
         </div>
@@ -113,7 +113,7 @@ export default function IdentityCard({
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-sm leading-relaxed text-gray-300">{headlineInsight}</p>
+            <p className="text-sm leading-relaxed text-gray-400">{headlineInsight}</p>
           </div>
         </div>
 

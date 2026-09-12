@@ -24,18 +24,18 @@ export default function ManualUnlockDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true">
-      <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <h2 className="text-lg font-semibold text-gray-900">Generate {name} early?</h2>
-        <p className="mt-2 text-sm text-gray-600">
+      <div className="mx-4 w-full max-w-md rounded-lg bg-surface-card p-6 shadow-xl">
+        <h2 className="text-lg font-semibold text-foreground-strong">Generate {name} early?</h2>
+        <p className="mt-2 text-sm text-foreground-secondary">
           This path is designed to unlock after: <strong>{unlockCriteria}</strong>
         </p>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-foreground-muted">
           Generating now means the AI will have less context about your progress, which may result in less personalized recommendations.
         </p>
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+            className="rounded border border-border px-4 py-2 text-sm text-foreground-secondary hover:bg-surface-subtle"
           >
             Cancel
           </button>

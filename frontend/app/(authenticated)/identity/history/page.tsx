@@ -81,14 +81,14 @@ export default function IdentityHistoryPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Identity History</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground-strong">Identity History</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
             Track how your investor identity evolves
           </p>
         </div>
         <Link
           href="/identity"
-          className="text-sm font-medium text-amber-600 hover:text-amber-700"
+          className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
         >
           Back to Identity
         </Link>
@@ -96,15 +96,15 @@ export default function IdentityHistoryPage() {
 
       {/* Score trend */}
       {scoreHistory.length > 1 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-          <h3 className="mb-3 text-sm font-medium text-gray-700">Score Trend</h3>
+        <div className="rounded-lg border border-border bg-surface-card p-6">
+          <h3 className="mb-3 text-sm font-medium text-foreground-secondary">Score Trend</h3>
           <ScoreSparkline scores={scoreHistory} width={400} height={60} />
         </div>
       )}
 
       {/* Version timeline */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-gray-700">Versions</h3>
+        <h3 className="text-sm font-medium text-foreground-secondary">Versions</h3>
         {versions.map((version, idx) => {
           const isSelected = compareA === idx || compareB === idx;
           return (
@@ -126,32 +126,32 @@ export default function IdentityHistoryPage() {
               }}
               className={`flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors ${
                 isSelected
-                  ? "border-amber-400 bg-amber-50"
-                  : "border-gray-200 bg-white hover:border-gray-300"
+                  ? "border-amber-400 bg-amber-50 dark:bg-amber-950"
+                  : "border-border bg-surface-card hover:border-border"
               }`}
             >
               {/* Timeline dot */}
               <div className="flex flex-col items-center">
                 <div
                   className={`h-3 w-3 rounded-full ${
-                    isSelected ? "bg-amber-600" : "bg-gray-300"
+                    isSelected ? "bg-amber-600" : "bg-foreground-tertiary"
                   }`}
                 />
                 {idx < versions.length - 1 && (
-                  <div className="mt-1 h-6 w-px bg-gray-200" />
+                  <div className="mt-1 h-6 w-px bg-border" />
                 )}
               </div>
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-900">
+                  <span className="text-sm font-semibold text-foreground-strong">
                     v{version.version}
                   </span>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-foreground-tertiary">
                     {new Date(version.generated_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">{version.archetype}</p>
+                <p className="text-sm text-foreground-secondary">{version.archetype}</p>
               </div>
 
               <span className={`text-lg font-bold ${scoreColorClass(version.readiness_score)}`}>
@@ -164,15 +164,15 @@ export default function IdentityHistoryPage() {
 
       {/* Side-by-side comparison */}
       {versionA && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-          <h3 className="mb-4 text-sm font-medium text-gray-700">
+        <div className="rounded-lg border border-border bg-surface-card p-6">
+          <h3 className="mb-4 text-sm font-medium text-foreground-secondary">
             Comparison{versionB ? ` (v${versionA.version} vs v${versionB.version})` : ""}
           </h3>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Version A */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                <span className="text-xs font-semibold uppercase tracking-wider text-foreground-tertiary">
                   v{versionA.version}
                 </span>
                 <span className={`text-xl font-bold ${scoreColorClass(versionA.readiness_score)}`}>
@@ -183,14 +183,14 @@ export default function IdentityHistoryPage() {
                 {versionA.archetype}
               </p>
               <RadarChart data={versionA.radar_data} size={200} />
-              <p className="text-xs text-gray-500">{versionA.headline_insight}</p>
+              <p className="text-xs text-foreground-muted">{versionA.headline_insight}</p>
             </div>
 
             {/* Version B */}
             {versionB ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground-tertiary">
                     v{versionB.version}
                   </span>
                   <span className={`text-xl font-bold ${scoreColorClass(versionB.readiness_score)}`}>
@@ -201,10 +201,10 @@ export default function IdentityHistoryPage() {
                   {versionB.archetype}
                 </p>
                 <RadarChart data={versionB.radar_data} size={200} />
-                <p className="text-xs text-gray-500">{versionB.headline_insight}</p>
+                <p className="text-xs text-foreground-muted">{versionB.headline_insight}</p>
               </div>
             ) : (
-              <div className="flex items-center justify-center text-sm text-gray-400">
+              <div className="flex items-center justify-center text-sm text-foreground-tertiary">
                 Select a second version to compare
               </div>
             )}
@@ -213,8 +213,8 @@ export default function IdentityHistoryPage() {
       )}
 
       {versions.length === 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-          <p className="text-sm text-gray-500">
+        <div className="rounded-lg border border-border bg-surface-card p-8 text-center">
+          <p className="text-sm text-foreground-muted">
             No identity versions yet. Complete your audits and synthesize your identity.
           </p>
           <Link

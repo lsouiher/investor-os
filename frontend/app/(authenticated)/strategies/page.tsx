@@ -90,8 +90,8 @@ export default function StrategiesPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Your Strategies</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="text-2xl font-bold text-foreground-strong">Your Strategies</h1>
+        <p className="mt-1 text-sm text-foreground-muted">
           Personalized investment strategies ranked by fit
         </p>
       </div>
@@ -101,20 +101,20 @@ export default function StrategiesPage() {
       )}
 
       {/* Primary strategy -- expanded */}
-      <div className="rounded-lg border border-amber-200 bg-white p-6">
+      <div className="rounded-lg border border-amber-200 dark:border-amber-700 bg-surface-card p-6">
         <div className="mb-4 flex items-start justify-between">
           <div>
             <div className="mb-1 flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-amber-600">
+              <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                 Top Match
               </span>
               {primary.is_active && (
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
                   Active
                 </span>
               )}
             </div>
-            <h2 className="text-xl font-bold text-gray-900">{primary.name}</h2>
+            <h2 className="text-xl font-bold text-foreground-strong">{primary.name}</h2>
           </div>
           <span
             className={`rounded-full px-3 py-1 text-sm font-bold ${scoreColorClass(primary.fit_score)}`}
@@ -123,16 +123,16 @@ export default function StrategiesPage() {
           </span>
         </div>
 
-        <p className="mb-4 text-sm text-gray-600">{primary.description}</p>
+        <p className="mb-4 text-sm text-foreground-secondary">{primary.description}</p>
 
         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-600">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
               Pros
             </h4>
             <ul className="space-y-1">
               {primary.pros.map((pro, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                <li key={i} className="flex items-start gap-2 text-sm text-foreground-secondary">
                   <svg
                     className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500"
                     fill="none"
@@ -148,12 +148,12 @@ export default function StrategiesPage() {
             </ul>
           </div>
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-red-500">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-red-500 dark:text-red-400">
               Cons
             </h4>
             <ul className="space-y-1">
               {primary.cons.map((con, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                <li key={i} className="flex items-start gap-2 text-sm text-foreground-secondary">
                   <svg
                     className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-400"
                     fill="none"
@@ -181,7 +181,7 @@ export default function StrategiesPage() {
           )}
           <Link
             href={`/strategies/${primary.id}`}
-            className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle"
           >
             View Details
           </Link>
@@ -192,21 +192,21 @@ export default function StrategiesPage() {
       {rest.map((strategy, idx) => (
         <div
           key={strategy.id}
-          className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4"
+          className="flex items-center gap-4 rounded-lg border border-border bg-surface-card p-4"
         >
-          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-bold text-gray-500">
+          <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-surface-subtle text-sm font-bold text-foreground-muted">
             #{idx + 2}
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-gray-900">{strategy.name}</h3>
+              <h3 className="font-semibold text-foreground-strong">{strategy.name}</h3>
               {strategy.is_active && (
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
                   Active
                 </span>
               )}
             </div>
-            <p className="mt-0.5 text-sm text-gray-500 line-clamp-1">
+            <p className="mt-0.5 text-sm text-foreground-muted line-clamp-1">
               {strategy.description}
             </p>
           </div>
@@ -217,7 +217,7 @@ export default function StrategiesPage() {
           </span>
           <Link
             href={`/strategies/${strategy.id}`}
-            className="flex-shrink-0 text-sm font-medium text-amber-600 hover:text-amber-700"
+            className="flex-shrink-0 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
           >
             View
           </Link>
