@@ -73,7 +73,7 @@ createdb investoros_dev
 docker run -d --name investoros-pg \
   -e POSTGRES_DB=investoros_dev \
   -e POSTGRES_PASSWORD=dev \
-  -p 5432:5432 postgres:15
+  -p 5433:5432 postgres:15
 ```
 
 ---
@@ -82,7 +82,7 @@ docker run -d --name investoros-pg \
 
 ### Backend (.env)
 ```
-DATABASE_URL=postgresql://postgres:dev@localhost:5432/investoros_dev
+DATABASE_URL=postgresql://postgres:dev@localhost:5433/investoros_dev
 JWT_SECRET=your-jwt-secret-min-32-chars
 JWT_EXPIRY=24h
 AUDIT_ENCRYPTION_KEY=your-256-bit-hex-key

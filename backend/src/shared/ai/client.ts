@@ -7,11 +7,46 @@ import type { PromptServiceType } from '@prisma/client';
 
 let client: Anthropic | null = null;
 
+// Model is env-configurable so it can be upgraded without a deploy.
+export const AI_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
+
 function getClient(): Anthropic {
   if (!client) {
     client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   }
   return client;
+}
+
+let credentialsVerified: boolean | null = null;
+
+/**
+ * One-time startup probe: confirms the API key is valid and the configured model exists.
+ * Cached so the health endpoint can report it without hitting the API on every ping.
+ */
+export async function verifyAiCredentials(): Promise<boolean> {
+  if (credentialsVerified !== null) return credentialsVerified;
+  if (!process.env.ANTHROPIC_API_KEY) {
+    credentialsVerified = false;
+    return false;
+  }
+  try {
+    await getClient().models.retrieve(AI_MODEL, { timeout: 5000 });
+    credentialsVerified = true;
+  } catch (err) {
+    if (err instanceof Anthropic.AuthenticationError) {
+      logger.error('ANTHROPIC_API_KEY is invalid — all AI features will fail');
+    } else if (err instanceof Anthropic.NotFoundError) {
+      logger.error({ model: AI_MODEL }, 'Configured ANTHROPIC_MODEL does not exist');
+    } else {
+      logger.warn({ err }, 'Could not verify Anthropic credentials at startup');
+    }
+    credentialsVerified = false;
+  }
+  return credentialsVerified;
+}
+
+export function aiCredentialsOk(): boolean {
+  return credentialsVerified === true;
 }
 
 export interface AiCallOptions {
@@ -38,17 +73,16 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
   const start = Date.now();
 
   try {
-    const response = await Promise.race([
-      anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
+    // SDK-level timeout aborts the underlying request (a Promise.race would leave it running)
+    const response = await anthropic.messages.create(
+      {
+        model: AI_MODEL,
+        max_tokens: 8192,
         system: options.systemPrompt,
         messages: [{ role: 'user', content: options.userContent }],
-      }),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('AI_TIMEOUT')), timeout),
-      ),
-    ]);
+      },
+      { timeout, maxRetries: 0 },
+    );
 
     const latencyMs = Date.now() - start;
 
@@ -78,7 +112,7 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
         inputHash,
         fullPrompt: encryptField(fullPrompt),
         fullResponse: encryptField(content),
-        model: 'claude-sonnet-4-20250514',
+        model: AI_MODEL,
         tokensUsed,
         latencyMs,
         success: true,
@@ -98,7 +132,7 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
         inputHash,
         fullPrompt: encryptField(fullPrompt),
         fullResponse: '',
-        model: 'claude-sonnet-4-20250514',
+        model: AI_MODEL,
         latencyMs,
         success: false,
         errorMessage: err instanceof Error ? err.message : 'Unknown error',

@@ -8,6 +8,7 @@ import { generalLimiter } from './shared/middleware/rate-limiter.js';
 import { authenticate } from './shared/middleware/auth.js';
 import { setTenantContext } from './shared/middleware/tenant-context.js';
 import { logger } from './shared/logger.js';
+import { aiCredentialsOk, verifyAiCredentials } from './shared/ai/client.js';
 import authRoutes from './modules/auth/routes.js';
 import adminRoutes from './modules/admin/routes.js';
 import auditRoutes from './modules/audit/routes.js';
@@ -45,7 +46,7 @@ app.get('/api/v1/health', async (_req, res) => {
     checks.db = true;
   } catch { /* db unreachable */ }
 
-  checks.ai = !!process.env.ANTHROPIC_API_KEY;
+  checks.ai = aiCredentialsOk();
   checks.encryption = !!process.env.AUDIT_ENCRYPTION_KEY_V1 && !!process.env.CURRENT_ENCRYPTION_KEY_VERSION;
 
   try {
@@ -93,6 +94,9 @@ if (process.env.NODE_ENV !== 'test') {
   import('./workers/growth-path-worker.js').catch((err) => {
     logger.warn({ err }, 'Growth path workers not initialized (Redis may be unavailable)');
   });
+
+  // Probe Anthropic credentials once so /health reflects reality and a bad key is loud in logs
+  verifyAiCredentials().catch(() => {});
 
   app.listen(PORT, () => {
     logger.info(`Server running on port ${PORT}`);
