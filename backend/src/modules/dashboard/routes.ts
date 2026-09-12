@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import * as auditRepo from '../audit/repository.js';
 import * as identityRepo from '../identity/repository.js';
 import * as strategyRepo from '../strategy/repository.js';
-import * as taskRepo from '../task/repository.js';
+import * as taskService from '../task/service.js';
 import { generateInsights } from '../insight/service.js';
 
 const router = Router();
@@ -32,11 +32,11 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
       // Active strategy with progress
       strategyRepo.getActiveStrategy(userId, tenantId),
 
-      // Top 3 incomplete tasks
-      taskRepo.listTasks(userId, tenantId, {
+      // Top incomplete tasks by identity impact (manual + active strategy action items)
+      taskService.listTasks(userId, tenantId, {
         isCompleted: false,
         page: 1,
-        perPage: 3,
+        perPage: 10,
       }),
 
       // Audit completion status
@@ -114,13 +114,14 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
               progress: strategyProgress,
             }
           : null,
-        topTasks: topTasks.tasks.map((t) => ({
-          id: t.publicId,
+        topTasks: topTasks.tasks.slice(0, 3).map((t) => ({
+          id: t.id,
           source: t.source,
           title: t.title,
           description: t.description,
           identityImpactScore: t.identityImpactScore,
-          dueDate: t.dueDate?.toISOString() ?? null,
+          dueDate: t.dueDate,
+          strategyId: t.strategyId ?? null,
         })),
         intelligenceFeed: insights,
         auditCompletion: auditSummaries,

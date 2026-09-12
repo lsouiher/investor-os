@@ -23,12 +23,70 @@ interface SimulationConfig {
   };
 }
 
+// POST /api/v1/simulations response (snake_case per contracts/api-v1.md)
+interface SimulationResponse {
+  id: string;
+  remaining: number;
+  delta: {
+    original: { archetype: string; readiness_score: number; sub_scores: Record<string, number>; radar_data: RadarData };
+    simulated: {
+      archetype: string;
+      readiness_score: number;
+      sub_scores: Record<string, number>;
+      radar_data: RadarData;
+      headline_insight: string;
+      strategy_changes: string;
+    };
+    score_delta: number;
+    archetype_changed: boolean;
+  };
+}
+
+// View model derived from the response
 interface SimulationResult {
   archetype: string;
   readiness_score: number;
   radar_data: RadarData;
   changes: { label: string; from: number; to: number; delta: number }[];
   insight: string;
+}
+
+const SUB_SCORE_LABELS: Record<string, string> = {
+  financial: "Financial",
+  time: "Time",
+  skills: "Skills",
+  risk: "Risk",
+  horizon: "Horizon",
+};
+
+function toResult(res: SimulationResponse): SimulationResult {
+  const { original, simulated } = res.delta;
+  const changes = Object.keys(SUB_SCORE_LABELS)
+    .filter((k) => original.sub_scores?.[k] !== undefined || simulated.sub_scores?.[k] !== undefined)
+    .map((k) => {
+      const from = Number(original.sub_scores?.[k] ?? 0);
+      const to = Number(simulated.sub_scores?.[k] ?? from);
+      return { label: SUB_SCORE_LABELS[k], from, to, delta: to - from };
+    });
+  changes.unshift({
+    label: "Readiness",
+    from: original.readiness_score,
+    to: simulated.readiness_score,
+    delta: res.delta.score_delta,
+  });
+  const insight = [
+    simulated.headline_insight,
+    simulated.strategy_changes ? `Strategies: ${simulated.strategy_changes}` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return {
+    archetype: simulated.archetype,
+    readiness_score: simulated.readiness_score,
+    radar_data: Object.keys(simulated.radar_data ?? {}).length ? simulated.radar_data : original.radar_data,
+    changes,
+    insight,
+  };
 }
 
 function scoreColorClass(score: number): string {
@@ -49,7 +107,7 @@ export default function SimulationPage() {
     try {
       setLoading(true);
       setError(null);
-      const data = await api.get<SimulationConfig>("/simulation/config");
+      const data = await api.get<SimulationConfig>("/simulations/config");
       setConfig(data);
       const initial: Record<string, number> = {};
       data.variables.forEach((v) => {
@@ -81,17 +139,30 @@ export default function SimulationPage() {
     try {
       setSimulating(true);
       setError(null);
-      const data = await api.post<SimulationResult>("/simulation/run", {
-        variables: sliderValues,
+      // Only send sliders the user actually moved
+      const modified: Record<string, number> = {};
+      config.variables.forEach((v) => {
+        const value = sliderValues[v.key];
+        if (value !== undefined && value !== v.current) modified[v.key] = value;
       });
-      setResult(data);
+      if (Object.keys(modified).length === 0) {
+        setError("Move at least one slider to run a simulation.");
+        return;
+      }
+      const data = await api.post<SimulationResponse>("/simulations", {
+        modified_parameters: modified,
+      });
+      setResult(toResult(data));
       setConfig((prev) =>
-        prev
-          ? { ...prev, remaining_simulations: prev.remaining_simulations - 1 }
-          : prev
+        prev ? { ...prev, remaining_simulations: data.remaining } : prev
       );
-    } catch {
-      setError("Simulation failed. Please try again.");
+    } catch (err: unknown) {
+      const apiErr = err as { code?: string; message?: string };
+      setError(
+        apiErr?.code === "RATE_LIMITED"
+          ? apiErr.message ?? "Simulation limit reached for today."
+          : "Simulation failed. Please try again."
+      );
     } finally {
       setSimulating(false);
     }

@@ -117,6 +117,52 @@ export async function runSimulation(
   };
 }
 
+// Sliders the what-if page exposes; keys must be in the route's ALLOWED_PARAMETER_KEYS
+const SLIDER_VARIABLES: Array<{ key: string; label: string; source: 'sub_scores' | 'radar_data' }> = [
+  { key: 'financial', label: 'Financial readiness', source: 'sub_scores' },
+  { key: 'time', label: 'Time availability', source: 'sub_scores' },
+  { key: 'skills', label: 'Skills & experience', source: 'sub_scores' },
+  { key: 'risk', label: 'Risk profile', source: 'sub_scores' },
+  { key: 'horizon', label: 'Goal horizon', source: 'sub_scores' },
+  { key: 'capital', label: 'Capital', source: 'radar_data' },
+  { key: 'network', label: 'Network', source: 'radar_data' },
+];
+
+/**
+ * What-if page bootstrap: remaining runs, slider variables seeded from the current identity,
+ * and the identity snapshot to compare against. Null when no identity exists yet.
+ */
+export async function getSimulationConfig(userId: number, tenantId: number) {
+  const identity = await prisma.identityVersion.findFirst({
+    where: { userId, tenantId },
+    orderBy: { version: 'desc' },
+  });
+  if (!identity) return null;
+
+  const recentCount = await simulationRepo.getSimulationCountLast24h(userId, tenantId);
+  const subScores = (identity.subScores ?? {}) as Record<string, number>;
+  const radarData = (identity.radarData ?? {}) as Record<string, number>;
+
+  return {
+    remainingSimulations: Math.max(0, MAX_SIMULATIONS_PER_24H - recentCount),
+    maxPer24h: MAX_SIMULATIONS_PER_24H,
+    variables: SLIDER_VARIABLES.map((v) => ({
+      key: v.key,
+      label: v.label,
+      min: 0,
+      max: 100,
+      step: 5,
+      current: Math.round(Number((v.source === 'sub_scores' ? subScores : radarData)[v.key] ?? 0)),
+    })),
+    currentIdentity: {
+      archetype: identity.archetype,
+      readinessScore: identity.readinessScore,
+      radarData,
+      subScores,
+    },
+  };
+}
+
 export async function listSimulations(userId: number, tenantId: number) {
   const simulations = await simulationRepo.getUserSimulations(userId, tenantId);
   return simulations.map((s) => ({

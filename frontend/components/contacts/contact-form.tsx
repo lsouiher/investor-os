@@ -23,12 +23,17 @@ interface ContactFormModalProps {
   onClose: () => void;
 }
 
+// Must match the ContactRoleType enum on the backend
 const ROLE_OPTIONS = [
   { value: "agent", label: "Agent" },
   { value: "lender", label: "Lender" },
   { value: "contractor", label: "Contractor" },
+  { value: "attorney", label: "Attorney" },
+  { value: "cpa", label: "CPA" },
   { value: "mentor", label: "Mentor" },
   { value: "partner", label: "Partner" },
+  { value: "seller", label: "Seller" },
+  { value: "property_manager", label: "Property Manager" },
   { value: "other", label: "Other" },
 ];
 

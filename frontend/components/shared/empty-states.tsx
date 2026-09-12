@@ -131,7 +131,7 @@ export function TasksEmpty() {
     <EmptyWrapper
       icon={TasksIcon}
       title="No Tasks Yet"
-      description="Tasks will appear here as you activate strategies. You can also add manual tasks."
+      description="Activate a strategy and its action plan shows up here, or add your own task above."
       actionLabel="View Strategies"
       actionHref="/strategies"
     />

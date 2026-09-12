@@ -75,6 +75,19 @@ function validateModifiedParameters(
   return validated;
 }
 
+// GET /simulations/config — sliders + remaining runs for the what-if page
+router.get('/config', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const config = await simulationService.getSimulationConfig(req.user!.userId, req.user!.tenantId);
+    if (!config) {
+      throw new AppError('NOT_FOUND', 'No identity profile found. Complete your audits first.', 404);
+    }
+    res.json({ data: config });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /simulations — run a what-if simulation
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {

@@ -29,7 +29,8 @@ interface DashboardData {
   } | null;
   top_tasks: {
     id: string;
-    source: "strategy" | "manual";
+    source: "ai_generated" | "identity_gap" | "manual" | "strategy";
+    strategy_id?: string | null;
     title: string;
     description: string | null;
     identity_impact_score: number;
@@ -139,7 +140,9 @@ export default function DashboardPage() {
     if (!task) return;
     const next = !task.completed;
     try {
-      await api.put(`/tasks/${taskId}`, { is_completed: next });
+      // Strategy action items complete through the strategy endpoint (single source of truth)
+      const endpoint = task.source === "strategy" ? `/strategies/action-items/${taskId}` : `/tasks/${taskId}`;
+      await api.put(endpoint, { is_completed: next });
       setData({
         ...data,
         top_tasks: data.top_tasks.map((t) =>
