@@ -27,10 +27,21 @@ export function validatePassword(password: unknown): string {
   return password;
 }
 
-export function validateRegisterInput(body: Record<string, unknown>): { email: string; password: string } {
+// Where the signup came from (utm_source captured by the landing page); optional, short,
+// and restricted to a slug so it can never carry markup or PII into the funnel report.
+export function validateSignupSource(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const slug = value.trim().toLowerCase();
+  return /^[a-z0-9_-]{1,32}$/.test(slug) ? slug : null;
+}
+
+export function validateRegisterInput(
+  body: Record<string, unknown>,
+): { email: string; password: string; signupSource: string | null } {
   return {
     email: validateEmail(body.email),
     password: validatePassword(body.password),
+    signupSource: validateSignupSource(body.signup_source),
   };
 }
 

@@ -39,6 +39,8 @@ export async function createContact(
 
   // Fire-and-forget: log contact creation (don't block the response)
   logContactAdded({ tenantId, userId }, data.roleType).catch(() => {});
+  // A new role in the network changes the "network gap" insights
+  import('../insight/service.js').then((s) => s.invalidateInsights(userId)).catch(() => {});
 
   return {
     id: contact.publicId,

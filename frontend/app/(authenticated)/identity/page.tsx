@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { api } from "@/lib/api-client";
+import { api, poll } from "@/lib/api-client";
 import IdentityCard from "@/components/identity/identity-card";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
@@ -23,6 +23,7 @@ interface IdentityData {
     goal_clarity?: number | null;
   };
   sub_scores: Record<string, number>;
+  user_rating?: number | null;
 }
 
 interface AuditSummary {
@@ -34,6 +35,12 @@ const REQUIRED_AUDITS = 5;
 
 const REVEAL_KEY = "investoros_identity_revealed";
 
+interface SynthesisStatus {
+  generating: boolean;
+  latest_version: number | null;
+  last_error: string | null;
+}
+
 export default function IdentityPage() {
   const { t } = useTranslation();
   const [identity, setIdentity] = useState<IdentityData | null>(null);
@@ -43,7 +50,27 @@ export default function IdentityPage() {
   const [showReveal, setShowReveal] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState<number | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [feedbackText, setFeedbackText] = useState("");
   const [auditsComplete, setAuditsComplete] = useState(false);
+
+  // Synthesis runs server-side for 30–90 s, longer than a phone keeps a request open, so
+  // the page starts it and polls /identity/status until a new version exists (or it fails).
+  const waitForSynthesis = useCallback(async (previousVersion: number | null) => {
+    const status = await poll(
+      () => api.get<SynthesisStatus>("/identity/status"),
+      (s) => !s.generating,
+      { intervalMs: 3000, maxAttempts: 80 }
+    );
+    if (status.last_error || status.latest_version === previousVersion) {
+      throw new Error(status.last_error ?? "no new version");
+    }
+    const data = await api.get<IdentityData>("/identity");
+    setIdentity(data);
+    setShowReveal(true);
+    localStorage.setItem(REVEAL_KEY, "true");
+    setFeedbackRating(null);
+    setFeedbackSubmitted(false);
+  }, []);
 
   const fetchIdentity = useCallback(async () => {
     try {
@@ -51,6 +78,7 @@ export default function IdentityPage() {
       setError(null);
       const data = await api.get<IdentityData | null>("/identity");
       setIdentity(data);
+      if (data?.user_rating) setFeedbackSubmitted(true);
 
       if (data) {
         const wasRevealed = localStorage.getItem(REVEAL_KEY);
@@ -66,6 +94,20 @@ export default function IdentityPage() {
         // offer it here instead of sending the user back to the hub in a loop.
         setIdentity(null);
         try {
+          const status = await api.get<SynthesisStatus>("/identity/status");
+          if (status.generating) {
+            // The fifth audit already started one; show progress and pick up the result.
+            setSynthesizing(true);
+            setLoading(false);
+            try {
+              await waitForSynthesis(status.latest_version);
+            } catch {
+              setError(t("identity.error.synthesis_failed"));
+            } finally {
+              setSynthesizing(false);
+            }
+            return;
+          }
           const audits = await api.get<AuditSummary[]>("/audits");
           setAuditsComplete(audits.filter((a) => a.status === "completed").length >= REQUIRED_AUDITS);
         } catch {
@@ -77,7 +119,7 @@ export default function IdentityPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [waitForSynthesis]);
 
   useEffect(() => {
     fetchIdentity();
@@ -87,12 +129,8 @@ export default function IdentityPage() {
     try {
       setSynthesizing(true);
       setError(null);
-      const data = await api.post<IdentityData>("/identity/synthesize");
-      setIdentity(data);
-      setShowReveal(true);
-      localStorage.setItem(REVEAL_KEY, "true");
-      setFeedbackRating(null);
-      setFeedbackSubmitted(false);
+      const started = await api.post<{ status: string; latest_version: number | null }>("/identity/synthesize");
+      await waitForSynthesis(started.latest_version);
     } catch {
       setError(t("identity.error.synthesis_failed"));
     } finally {
@@ -100,11 +138,12 @@ export default function IdentityPage() {
     }
   };
 
-  const handleFeedback = async (rating: number) => {
-    if (!identity) return;
-    setFeedbackRating(rating);
+  // Rating and free text go together: the rating alone says how close we got, the text says
+  // what to fix. Both are stored on the identity version, so a reload doesn't ask again.
+  const handleFeedback = async () => {
+    if (!identity || feedbackRating === null) return;
     try {
-      await api.put(`/identity/${identity.id}/rate`, { rating });
+      await api.put(`/identity/${identity.id}/rate`, { rating: feedbackRating, feedback: feedbackText || null });
       setFeedbackSubmitted(true);
     } catch {
       // Silent fail for feedback
@@ -227,7 +266,7 @@ export default function IdentityPage() {
             {[1, 2, 3, 4, 5].map((n) => (
               <button
                 key={n}
-                onClick={() => handleFeedback(n)}
+                onClick={() => setFeedbackRating(n)}
                 className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-medium transition-colors ${
                   feedbackRating === n
                     ? "border-amber-600 bg-amber-600 text-white"
@@ -239,6 +278,24 @@ export default function IdentityPage() {
             ))}
           </div>
           <p className="mt-2 text-xs text-foreground-tertiary">{t("identity.feedback_scale")}</p>
+          {feedbackRating !== null && (
+            <div className="mx-auto mt-4 flex max-w-md flex-col gap-2">
+              <textarea
+                id="identity-feedback"
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value.slice(0, 2000))}
+                placeholder={t("identity.feedback_placeholder")}
+                rows={3}
+                className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-amber-500"
+              />
+              <button
+                onClick={handleFeedback}
+                className="self-center rounded bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+              >
+                {t("identity.feedback_submit")}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

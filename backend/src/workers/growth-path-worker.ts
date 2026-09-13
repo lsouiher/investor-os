@@ -37,7 +37,9 @@ export const crossPathAnalysisQueue = new Bull<CrossPathAnalysisJobData>('growth
 
 // --- Path Generation Worker ---
 
-pathGenerationQueue.process(async (job) => {
+// Five paths generate at once: a room of people creating growth strategies in the same hour
+// must not wait behind each other (one job at a time was 3 minutes per person in line).
+pathGenerationQueue.process(5, async (job) => {
   const { tenantId, userId, growthStrategyId, growthPathId, pathType, identityVersionId, strategyId } = job.data;
 
   logger.info({ jobId: job.id, pathType, userId }, 'Processing path generation job');

@@ -61,7 +61,13 @@ describe('validatePassword', () => {
 describe('validateRegisterInput', () => {
   it('validates and returns email + password', () => {
     const result = validateRegisterInput({ email: 'Test@EXAMPLE.com', password: 'password123' });
-    expect(result).toEqual({ email: 'test@example.com', password: 'password123' });
+    expect(result).toEqual({ email: 'test@example.com', password: 'password123', signupSource: null });
+  });
+
+  it('keeps a well-formed signup_source and drops anything else', () => {
+    expect(validateRegisterInput({ email: 'a@b.co', password: 'password123', signup_source: ' BPCON ' }).signupSource).toBe('bpcon');
+    expect(validateRegisterInput({ email: 'a@b.co', password: 'password123', signup_source: '<script>' }).signupSource).toBeNull();
+    expect(validateRegisterInput({ email: 'a@b.co', password: 'password123', signup_source: 'x'.repeat(33) }).signupSource).toBeNull();
   });
 
   it('throws on missing email', () => {

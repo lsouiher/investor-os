@@ -1,22 +1,22 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { authenticate } from '../../shared/middleware/auth.js';
-import { authLimiter, forgotPasswordLimiter, resetPasswordLimiter } from '../../shared/middleware/rate-limiter.js';
+import { registerLimiter, loginLimiter, forgotPasswordLimiter, resetPasswordLimiter } from '../../shared/middleware/rate-limiter.js';
 import { validateRegisterInput, validateLoginInput, validateResetPasswordInput, validateEmail } from './validation.js';
 import * as authService from './service.js';
 
 const router = Router();
 
-router.post('/register', authLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/register', registerLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, password } = validateRegisterInput(req.body);
-    const result = await authService.register(email, password);
+    const { email, password, signupSource } = validateRegisterInput(req.body);
+    const result = await authService.register(email, password, signupSource);
     res.status(201).json({ data: result });
   } catch (err) {
     next(err);
   }
 });
 
-router.post('/login', authLimiter, async (req: Request, res: Response, next: NextFunction) => {
+router.post('/login', loginLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = validateLoginInput(req.body);
     const result = await authService.login(email, password);

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { api } from "@/lib/api-client";
+import { api, poll } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/shared/loading-states";
 import { StrategyEmpty } from "@/components/shared/empty-states";
 import AiErrorState from "@/components/shared/ai-error-state";
@@ -30,18 +30,30 @@ export default function StrategiesPage() {
   const { t } = useTranslation();
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchStrategies = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await api.get<Strategy[]>("/strategies");
+      // Right after synthesis the recommendations are still being generated (a minute or
+      // more against the real model); the API says so and we poll instead of holding a request.
+      const { data } = await poll(
+        async () => {
+          const res = await api.getEnvelope<Strategy[], { generating?: boolean }>("/strategies");
+          setGenerating(!!res.generating);
+          return res;
+        },
+        (res) => !res.generating,
+        { intervalMs: 3000, maxAttempts: 80 }
+      );
       setStrategies([...data].sort((a, b) => a.rank - b.rank));
     } catch {
       setError(t("strategies.error.load_failed"));
     } finally {
       setLoading(false);
+      setGenerating(false);
     }
   }, []);
 
@@ -64,6 +76,11 @@ export default function StrategiesPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl space-y-4">
+        {generating && (
+          <p className="text-sm text-foreground-muted" role="status">
+            {t("strategies.generating")}
+          </p>
+        )}
         <SkeletonCard lines={4} />
         <SkeletonCard lines={2} />
         <SkeletonCard lines={2} />
@@ -96,6 +113,7 @@ export default function StrategiesPage() {
         <p className="mt-1 text-sm text-foreground-muted">
           {t("strategies.subtitle")}
         </p>
+        <p className="mt-2 text-xs text-foreground-tertiary">{t("strategies.disclaimer")}</p>
       </div>
 
       {error && (

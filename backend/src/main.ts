@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import { prisma } from './shared/db.js';
 import { errorHandler } from './shared/middleware/error-handler.js';
 import { requestLogger } from './shared/middleware/request-logger.js';
-import { generalLimiter } from './shared/middleware/rate-limiter.js';
+import { generalLimiter, userLimiter } from './shared/middleware/rate-limiter.js';
 import { authenticate } from './shared/middleware/auth.js';
 import { setTenantContext } from './shared/middleware/tenant-context.js';
 import { snakeCaseResponse } from './shared/middleware/snake-case-response.js';
@@ -75,7 +75,7 @@ app.get('/api/v1/health', async (_req, res) => {
 app.use('/api/v1/auth', authRoutes);
 
 // Authenticated routes — apply auth + tenant context
-app.use('/api/v1', authenticate, setTenantContext);
+app.use('/api/v1', authenticate, userLimiter, setTenantContext);
 
 // Module routes (auth required)
 app.use('/api/v1/admin', adminRoutes);

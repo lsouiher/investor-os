@@ -6,13 +6,23 @@ function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
 }
 
-export async function createUserWithTenant(email: string, passwordHash: string) {
+// Feature flags a brand-new tenant starts with. The Growth Strategy Engine is on for every
+// beta signup when GROWTH_STRATEGY_DEFAULT_ENABLED=true; otherwise it stays per-tenant.
+function defaultFeatureFlags(): Record<string, boolean> {
+  return process.env.GROWTH_STRATEGY_DEFAULT_ENABLED === 'true' ? { growth_strategy_enabled: true } : {};
+}
+
+export async function createUserWithTenant(
+  email: string,
+  passwordHash: string,
+  signupSource: string | null = null,
+) {
   const tenantPublicId = generatePublicId();
   const userPublicId = generatePublicId();
 
   return prisma.$transaction(async (tx) => {
     const tenant = await tx.tenant.create({
-      data: { publicId: tenantPublicId },
+      data: { publicId: tenantPublicId, featureFlags: defaultFeatureFlags() },
     });
 
     const user = await tx.user.create({
@@ -21,6 +31,7 @@ export async function createUserWithTenant(email: string, passwordHash: string) 
         tenantId: tenant.id,
         email,
         passwordHash,
+        signupSource,
       },
     });
 

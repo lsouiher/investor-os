@@ -89,16 +89,30 @@ router.get('/config', async (req: Request, res: Response, next: NextFunction) =>
 });
 
 // POST /simulations — run a what-if simulation
+// POST /simulations — validate now, run the model call as a job; 202 + job id, poll below
 router.post('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const modifiedParameters = validateModifiedParameters(req.body.modified_parameters);
 
-    const result = await simulationService.runSimulation(
+    const { jobId } = await simulationService.startSimulation(
       req.user!.userId,
       req.user!.tenantId,
       modifiedParameters,
     );
-    res.status(201).json({ data: result });
+    res.status(202).json({ data: { job_id: jobId, status: 'running' } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /simulations/jobs/:jobId — running | done (with result) | failed (with error)
+router.get('/jobs/:jobId', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const job = simulationService.getSimulationJob(String(req.params.jobId), req.user!.userId);
+    if (!job) {
+      throw new AppError('NOT_FOUND', 'Simulation not found. Please run it again.', 404);
+    }
+    res.json({ data: { status: job.status, result: job.result ?? null, error: job.error ?? null } });
   } catch (err) {
     next(err);
   }

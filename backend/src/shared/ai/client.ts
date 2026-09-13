@@ -131,7 +131,9 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
           system: options.systemPrompt,
           messages: [{ role: 'user', content: options.userContent }],
         },
-        { signal: controller.signal, maxRetries: 0 },
+        // Rate limits (429) and overload (529) get the SDK's backed-off retries; the
+        // deadline above still bounds the whole attempt, so a retry can't run past it.
+        { signal: controller.signal, maxRetries: 2 },
       )
       .finalMessage()
       .catch((err: unknown) => {

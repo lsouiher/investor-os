@@ -16,6 +16,37 @@ const ALL_AUDIT_TYPES: AuditType[] = ['financial', 'time', 'skills', 'risk', 'ho
 // audit-completion auto-trigger and the explicit POST /identity/synthesize, which a user will hit
 // while the auto-trigger is still running now that a real synthesis takes tens of seconds.
 const synthesisInProgress = new Map<number, Promise<IdentityDetail>>();
+// Last failure per user, so a client polling for a result can tell "still working" from "gave up"
+const lastSynthesisError = new Map<number, string>();
+
+export interface SynthesisStatus {
+  generating: boolean;
+  latestVersion: number | null;
+  lastError: string | null;
+}
+
+/**
+ * Start a synthesis without waiting for it. Real synthesis takes 30–90 s, longer than phones
+ * and proxies keep an idle HTTP request open, so clients call this and poll getSynthesisStatus.
+ */
+export function startSynthesis(userId: number, tenantId: number): void {
+  lastSynthesisError.delete(userId);
+  synthesizeIdentity(userId, tenantId).catch((err: unknown) => {
+    lastSynthesisError.set(
+      userId,
+      err instanceof AppError ? err.message : "We couldn't process your request right now. Please try again.",
+    );
+  });
+}
+
+export async function getSynthesisStatus(userId: number, tenantId: number): Promise<SynthesisStatus> {
+  const latest = await identityRepo.getLatestIdentity(userId, tenantId);
+  return {
+    generating: synthesisInProgress.has(userId),
+    latestVersion: latest?.version ?? null,
+    lastError: lastSynthesisError.get(userId) ?? null,
+  };
+}
 
 /**
  * Get the latest identity version for a user, formatted for API response.
@@ -37,6 +68,7 @@ export async function getLatestIdentity(
     headlineInsight: identity.headlineInsight,
     aiInsights: identity.aiInsights as Record<string, unknown>,
     generatedAt: identity.generatedAt.toISOString(),
+    userRating: identity.userRating ?? null,
   };
 }
 
@@ -172,6 +204,11 @@ async function doSynthesizeIdentity(
       logger.error({ err, userId }, 'Chained strategy generation failed (non-blocking)');
     });
 
+  // Warm the dashboard's insight cache so the first visit after synthesis isn't empty
+  import('../insight/service.js')
+    .then((insightService) => insightService.refreshInsights(userId, tenantId))
+    .catch((err) => logger.error({ err, userId }, 'Insight warm-up failed (non-blocking)'));
+
   // Growth strategy hooks (fire-and-forget)
   try {
     const growthService = await import('../growth/service.js');
@@ -193,6 +230,7 @@ async function doSynthesizeIdentity(
     headlineInsight: identity.headlineInsight,
     aiInsights: identity.aiInsights as Record<string, unknown>,
     generatedAt: identity.generatedAt.toISOString(),
+    userRating: identity.userRating ?? null,
   };
 }
 
@@ -252,9 +290,13 @@ export async function rateIdentity(
   identityPublicId: string,
   tenantId: number,
   rating: number,
+  feedback: string | null = null,
 ): Promise<{ id: string; userRating: number }> {
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
     throw new AppError('VALIDATION_ERROR', 'Rating must be an integer between 1 and 5.', 400);
+  }
+  if (feedback !== null && feedback.length > 2000) {
+    throw new AppError('VALIDATION_ERROR', 'Feedback must be at most 2000 characters.', 400);
   }
 
   const identity = await identityRepo.getIdentityByPublicId(identityPublicId, tenantId);
@@ -262,7 +304,7 @@ export async function rateIdentity(
     throw new AppError('NOT_FOUND', 'Identity version not found.', 404);
   }
 
-  const updated = await identityRepo.updateUserRating(identity.id, rating);
+  const updated = await identityRepo.updateUserRating(identity.id, rating, feedback);
   return {
     id: updated.publicId,
     userRating: updated.userRating!,

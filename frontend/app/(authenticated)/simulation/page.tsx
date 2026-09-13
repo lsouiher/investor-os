@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { api } from "@/lib/api-client";
+import { api, poll } from "@/lib/api-client";
 import RadarChart, { type RadarData } from "@/components/identity/radar-chart";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
@@ -96,6 +96,12 @@ function scoreColorClass(score: number): string {
   return "text-emerald-600";
 }
 
+interface SimulationJob {
+  status: "running" | "done" | "failed";
+  result: SimulationResponse | null;
+  error: { code: string; message: string } | null;
+}
+
 export default function SimulationPage() {
   const { t } = useTranslation();
   const [config, setConfig] = useState<SimulationConfig | null>(null);
@@ -151,9 +157,20 @@ export default function SimulationPage() {
         setError(t("simulation.error.no_change"));
         return;
       }
-      const data = await api.post<SimulationResponse>("/simulations", {
+      // The model call runs as a job: 202 + job id now, result when it's done. Holding
+      // the request open would be cut off on phones after ~60 s.
+      const { job_id } = await api.post<{ job_id: string; status: string }>("/simulations", {
         modified_parameters: modified,
       });
+      const job = await poll(
+        () => api.get<SimulationJob>(`/simulations/jobs/${job_id}`),
+        (j) => j.status !== "running",
+        { intervalMs: 2000, maxAttempts: 90 }
+      );
+      if (job.status === "failed" || !job.result) {
+        throw Object.assign(new Error(job.error?.message ?? "failed"), { code: job.error?.code });
+      }
+      const data = job.result;
       setResult(toResult(data));
       setConfig((prev) =>
         prev ? { ...prev, remaining_simulations: data.remaining } : prev

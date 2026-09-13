@@ -3,6 +3,7 @@ import jwt, { type SignOptions } from 'jsonwebtoken';
 import { randomBytes } from 'crypto';
 import { AppError } from '../../shared/middleware/error-handler.js';
 import * as authRepo from './repository.js';
+import { sendPasswordResetEmail } from '../../shared/email.js';
 import type { AuthResponse, UserProfile } from './types.js';
 
 const SALT_ROUNDS = 12;
@@ -22,14 +23,18 @@ function generateToken(user: { publicId: string; email: string; role: string }):
   return jwt.sign(payload, secret, options);
 }
 
-export async function register(email: string, password: string): Promise<AuthResponse> {
+export async function register(
+  email: string,
+  password: string,
+  signupSource: string | null = null,
+): Promise<AuthResponse> {
   const existing = await authRepo.findUserByEmail(email);
   if (existing) {
     throw new AppError('VALIDATION_ERROR', 'Email already registered.', 400);
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const { user } = await authRepo.createUserWithTenant(email, passwordHash);
+  const { user } = await authRepo.createUserWithTenant(email, passwordHash, signupSource);
   const token = generateToken(user);
 
   return {
@@ -83,11 +88,7 @@ export async function forgotPassword(email: string): Promise<void> {
   const expiresAt = new Date(Date.now() + RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
   await authRepo.createPasswordResetToken(user.id, token, expiresAt);
 
-  // TODO: Send email via Resend with reset link containing token
-  // For now, log the token in development
-  if (process.env.NODE_ENV === 'development') {
-    console.warn(`[DEV] Password reset token for ${email}: ${token}`);
-  }
+  await sendPasswordResetEmail(user.email, token);
 }
 
 export async function resetPassword(token: string, newPassword: string): Promise<void> {

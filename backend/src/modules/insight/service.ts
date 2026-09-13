@@ -3,6 +3,8 @@ import { AppError } from '../../shared/middleware/error-handler.js';
 import { callClaudeWithRetry, parseJsonResponse } from '../../shared/ai/retry.js';
 import { loadActiveTemplate, assemblePrompt } from '../../shared/ai/prompt-loader.js';
 import { prisma } from '../../shared/db.js';
+import { logger } from '../../shared/logger.js';
+import type { Prisma } from '@prisma/client';
 
 export type InsightType = 'progress' | 'contradiction' | 'score_change' | 'milestone' | 'network_alert';
 
@@ -55,19 +57,65 @@ interface InsightContext {
   };
 }
 
+// Insights are cached per user and served stale-while-revalidate: the dashboard never waits
+// on the model, and a user costs at most one insight call per INSIGHTS_TTL_MS (or per
+// invalidation) instead of one per page load.
+const INSIGHTS_TTL_MS = 6 * 60 * 60 * 1000;
+const refreshInProgress = new Set<number>();
+
+export async function getInsights(userId: number, tenantId: number): Promise<Insight[]> {
+  const user = await prisma.user.findFirst({
+    where: { id: userId, tenantId },
+    select: { insightsCache: true, insightsGeneratedAt: true },
+  });
+  const cached = Array.isArray(user?.insightsCache) ? (user!.insightsCache as unknown as Insight[]) : null;
+  const fresh = !!user?.insightsGeneratedAt && Date.now() - user.insightsGeneratedAt.getTime() < INSIGHTS_TTL_MS;
+
+  if (!cached || !fresh) refreshInsights(userId, tenantId);
+  if (cached) return cached;
+
+  // Nothing cached yet: answer without the model. Users without an identity get the nudge
+  // synchronously; the rest see the feed fill in on their next visit.
+  const identity = await prisma.identityVersion.findFirst({ where: { userId, tenantId }, select: { id: true } });
+  return identity ? [] : [getStartedInsight()];
+}
+
+/** Regenerate in the background (deduplicated per user); errors are logged, never surfaced. */
+export function refreshInsights(userId: number, tenantId: number): void {
+  if (refreshInProgress.has(userId)) return;
+  refreshInProgress.add(userId);
+  generateInsights(userId, tenantId)
+    .then((insights) =>
+      prisma.user.update({
+        where: { id: userId },
+        data: { insightsCache: insights as unknown as Prisma.InputJsonValue, insightsGeneratedAt: new Date() },
+      }),
+    )
+    .catch((err) => logger.error({ err, userId }, 'Insight refresh failed (non-blocking)'))
+    .finally(() => refreshInProgress.delete(userId));
+}
+
+/** Mark the cache stale so the next dashboard visit serves it once more and regenerates. */
+export async function invalidateInsights(userId: number): Promise<void> {
+  await prisma.user.update({ where: { id: userId }, data: { insightsGeneratedAt: null } }).catch(() => {});
+}
+
+function getStartedInsight(): Insight {
+  return {
+    type: 'progress',
+    title: 'Get Started',
+    message: 'Complete all 5 audits to unlock your investor identity and personalized insights.',
+    severity: 'info',
+    actionUrl: '/audits',
+  };
+}
+
 export async function generateInsights(userId: number, tenantId: number): Promise<Insight[]> {
   // Gather context
   const context = await gatherInsightContext(userId, tenantId);
 
   if (!context.identity) {
-    // No identity yet — return a simple nudge
-    return [{
-      type: 'progress',
-      title: 'Get Started',
-      message: 'Complete all 5 audits to unlock your investor identity and personalized insights.',
-      severity: 'info',
-      actionUrl: '/audits',
-    }];
+    return [getStartedInsight()];
   }
 
   // Load prompt template and call AI

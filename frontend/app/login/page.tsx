@@ -120,7 +120,13 @@ function LoginForm() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-foreground-muted">
+        <p className="mt-4 text-center text-sm">
+          <Link href="/forgot-password" className="text-foreground-muted underline underline-offset-2 hover:text-accent">
+            {t("auth.login.forgot_link")}
+          </Link>
+        </p>
+
+        <p className="mt-4 text-center text-sm text-foreground-muted">
           {t("auth.login.no_account")}{" "}
           <Link
             href="/register"

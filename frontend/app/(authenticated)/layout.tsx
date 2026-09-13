@@ -9,6 +9,9 @@ import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageToggle } from "@/components/shared/language-toggle";
 import { useTranslation } from "@/lib/i18n";
 
+// Set NEXT_PUBLIC_FEEDBACK_EMAIL to show a "Send feedback" link in the sidebar footer
+const FEEDBACK_EMAIL = process.env.NEXT_PUBLIC_FEEDBACK_EMAIL ?? "";
+
 const NAV_ITEMS = [
   { label: "nav.dashboard", href: "/dashboard", icon: LayoutIcon },
   { label: "nav.hub", href: "/hub", icon: UserIcon },
@@ -127,6 +130,20 @@ function AuthenticatedShell({
             >
               <LogoutIcon className="h-4 w-4" />
             </button>
+          </div>
+          {/* Beta footer: a way to talk to the person behind it, and the terms everyone signed up under */}
+          <div className="mt-3 flex items-center gap-3 text-[11px] text-foreground-tertiary">
+            {FEEDBACK_EMAIL && (
+              <a
+                href={`mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(t("nav.feedback_subject"))}`}
+                className="hover:text-foreground"
+              >
+                {t("nav.feedback")}
+              </a>
+            )}
+            <Link href="/terms" className="hover:text-foreground">
+              {t("nav.terms")}
+            </Link>
           </div>
         </div>
       </aside>
