@@ -6,10 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 InvestorOS — an identity-centric real estate investment platform. Constructs a multidimensional investor identity through 5 structured audits (Financial, Time, Skills, Risk, Horizon), AI-synthesizes it into an archetype + readiness score, and activates it through personalized strategies, action plans, and an identity-aware CRM.
 
-**Status:** Implemented and running locally (v0.3.0.0). v0.1 identity platform is on `master`; the
-Growth Strategy Engine (v0.2) plus the integration fixes that make the AI pipeline and every page
-actually work (v0.3) are on `001-growth-strategy-engine` (PR #2). Dark mode (`002-dark-mode`, PR #3)
-and French i18n (`003-french-i18n`, PR #4) are stacked on the *old* 001 and need rebasing.
+**Status:** Implemented and running locally. `master` is v0.3.2.0: identity platform (v0.1),
+Growth Strategy Engine (v0.2), the integration fixes that make the AI pipeline and every page
+actually work (v0.3.0), dark mode (v0.3.1) and French i18n (v0.3.2) — PRs #1–#4 all merged.
+The AI pipeline is verified end-to-end against the mock server; verification against the real
+Anthropic API is pending an `ANTHROPIC_WORKSPACE_ID` (the configured key is org-level).
 
 ## Architecture
 
@@ -63,7 +64,7 @@ docker compose up -d
 
 # Backend
 cd backend && npm install
-cp .env.example .env            # DATABASE_URL, JWT_SECRET, AUDIT_ENCRYPTION_KEY_V1, ANTHROPIC_API_KEY, REDIS_URL
+cp .env.example .env            # DATABASE_URL, JWT_SECRET, AUDIT_ENCRYPTION_KEY_V1, ANTHROPIC_API_KEY (+ ANTHROPIC_WORKSPACE_ID for org-level keys), REDIS_URL
 npx prisma generate             # Regenerate the client after schema changes (stale client = phantom TS errors)
 npx prisma migrate deploy       # Apply migrations
 npx prisma db seed              # Upsert prompt templates (safe to re-run after editing prisma/seed.ts)
