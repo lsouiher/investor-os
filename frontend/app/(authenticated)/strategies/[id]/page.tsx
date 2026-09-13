@@ -65,7 +65,8 @@ const VALID_ID_PATTERN = /^[a-z0-9]{20,32}$/;
 
 // Plans are generated asynchronously after activation; poll until they land.
 const PLAN_POLL_MS = 3000;
-const PLAN_POLL_MAX = 30;
+// Plan generation is a real model call that can run a couple of minutes — poll for up to 5.
+const PLAN_POLL_MAX = 100;
 
 function CheckButton({ checked, onClick }: { checked: boolean; onClick: () => void }) {
   return (

@@ -9,7 +9,7 @@ import { authenticate } from './shared/middleware/auth.js';
 import { setTenantContext } from './shared/middleware/tenant-context.js';
 import { snakeCaseResponse } from './shared/middleware/snake-case-response.js';
 import { logger } from './shared/logger.js';
-import { aiCredentialsOk, verifyAiCredentials } from './shared/ai/client.js';
+import { verifyAiCredentials } from './shared/ai/client.js';
 import authRoutes from './modules/auth/routes.js';
 import adminRoutes from './modules/admin/routes.js';
 import auditRoutes from './modules/audit/routes.js';
@@ -49,7 +49,7 @@ app.get('/api/v1/health', async (_req, res) => {
     checks.db = true;
   } catch { /* db unreachable */ }
 
-  checks.ai = aiCredentialsOk();
+  checks.ai = await verifyAiCredentials();
   checks.encryption = !!process.env.AUDIT_ENCRYPTION_KEY_V1 && !!process.env.CURRENT_ENCRYPTION_KEY_VERSION;
 
   try {

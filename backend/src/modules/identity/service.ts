@@ -12,8 +12,10 @@ import { AiSynthesisResponseSchema } from './types.js';
 
 const ALL_AUDIT_TYPES: AuditType[] = ['financial', 'time', 'skills', 'risk', 'horizon'];
 
-// In-memory deduplication lock to prevent concurrent synthesis for the same user
-const synthesisInProgress = new Map<number, Promise<IdentityDetail | null>>();
+// In-memory deduplication lock to prevent concurrent synthesis for the same user. Shared by the
+// audit-completion auto-trigger and the explicit POST /identity/synthesize, which a user will hit
+// while the auto-trigger is still running now that a real synthesis takes tens of seconds.
+const synthesisInProgress = new Map<number, Promise<IdentityDetail>>();
 
 /**
  * Get the latest identity version for a user, formatted for API response.
@@ -62,8 +64,26 @@ export async function getIdentityHistory(
  * Synthesize a new identity version from all completed audits.
  * Gathers audit data, computes scores, calls AI for archetype + insights,
  * then creates a new append-only identity version.
+ * Concurrent calls for the same user share one synthesis instead of paying for two.
  */
 export async function synthesizeIdentity(
+  userId: number,
+  tenantId: number,
+): Promise<IdentityDetail> {
+  const existing = synthesisInProgress.get(userId);
+  if (existing) {
+    logger.info({ userId }, 'Synthesis already in progress, joining it');
+    return existing;
+  }
+
+  const promise = doSynthesizeIdentity(userId, tenantId).finally(() => {
+    synthesisInProgress.delete(userId);
+  });
+  synthesisInProgress.set(userId, promise);
+  return promise;
+}
+
+async function doSynthesizeIdentity(
   userId: number,
   tenantId: number,
 ): Promise<IdentityDetail> {
@@ -120,7 +140,7 @@ export async function synthesizeIdentity(
     promptTemplateId: template.id,
     systemPrompt: `You are an expert real estate investment advisor. Analyze the investor's audit data and determine their investor archetype, provide a headline insight, and detailed analysis. Respond with valid JSON only.`,
     userContent,
-    timeoutMs: 30000,
+    timeoutMs: 180_000,
   });
 
   const parsed = parseJsonResponse<AiSynthesisResponse>(aiResult.content, AiSynthesisResponseSchema);
@@ -143,14 +163,14 @@ export async function synthesizeIdentity(
     'Identity synthesized',
   );
 
-  // FR-6: strategy generation is chained to synthesis. Isolated so an AI hiccup here
-  // never fails the synthesis itself — GET /strategies self-heals by generating on demand.
-  try {
-    const strategyService = await import('../strategy/service.js');
-    await strategyService.generateStrategies(userId, tenantId);
-  } catch (err) {
-    logger.error({ err, userId }, 'Chained strategy generation failed (non-blocking)');
-  }
+  // FR-6: strategy generation is chained to synthesis but not awaited — the user gets their
+  // identity as soon as it exists instead of waiting through a second model call. GET /strategies
+  // joins the in-flight generation (or generates on demand if this one failed), so nothing dead-ends.
+  import('../strategy/service.js')
+    .then((strategyService) => strategyService.generateStrategies(userId, tenantId))
+    .catch((err) => {
+      logger.error({ err, userId }, 'Chained strategy generation failed (non-blocking)');
+    });
 
   // Growth strategy hooks (fire-and-forget)
   try {
@@ -185,24 +205,13 @@ export async function autoTriggerSynthesis(
   userId: number,
   tenantId: number,
 ): Promise<IdentityDetail | null> {
-  // Deduplicate: if synthesis is already running for this user, return the same promise
-  const existing = synthesisInProgress.get(userId);
-  if (existing) {
-    logger.debug({ userId }, 'Synthesis already in progress, deduplicating');
-    return existing;
+  // A synthesis already running for this user means the trigger condition is being handled;
+  // synthesizeIdentity() itself joins concurrent callers to that run.
+  if (synthesisInProgress.has(userId)) {
+    logger.debug({ userId }, 'Synthesis already in progress, skipping auto-trigger check');
+    return synthesisInProgress.get(userId)!;
   }
 
-  const promise = doAutoTriggerSynthesis(userId, tenantId).finally(() => {
-    synthesisInProgress.delete(userId);
-  });
-  synthesisInProgress.set(userId, promise);
-  return promise;
-}
-
-async function doAutoTriggerSynthesis(
-  userId: number,
-  tenantId: number,
-): Promise<IdentityDetail | null> {
   const completedAudits = await getCompletedAuditsForSynthesis(userId, tenantId);
 
   // Need all 5 audits completed for auto-trigger

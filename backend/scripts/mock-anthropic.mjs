@@ -157,8 +157,8 @@ const server = http.createServer((req, res) => {
     console.log(`[mock-ai] ${kind ?? 'UNKNOWN'} (${text.length} chars)`);
     if (!kind) console.log('[mock-ai] unrecognized prompt:\n' + text.slice(0, 600));
     const out = typeof json === 'string' ? json : JSON.stringify(json);
-    res.writeHead(200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({
+    const usage = { input_tokens: Math.ceil(text.length / 4), output_tokens: Math.ceil(out.length / 4) };
+    const message = {
       id: `msg_mock_${Date.now()}`,
       type: 'message',
       role: 'assistant',
@@ -166,8 +166,26 @@ const server = http.createServer((req, res) => {
       content: [{ type: 'text', text: out }],
       stop_reason: 'end_turn',
       stop_sequence: null,
-      usage: { input_tokens: Math.ceil(text.length / 4), output_tokens: Math.ceil(out.length / 4) },
-    }));
+      usage,
+    };
+
+    if (payload.stream) {
+      // The backend streams every call; replay the canned text as server-sent events.
+      res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' });
+      const send = (event, data) => res.write(`event: ${event}\ndata: ${JSON.stringify({ type: event, ...data })}\n\n`);
+      send('message_start', { message: { ...message, content: [], stop_reason: null, usage: { ...usage, output_tokens: 0 } } });
+      send('content_block_start', { index: 0, content_block: { type: 'text', text: '' } });
+      for (let i = 0; i < out.length; i += 512) {
+        send('content_block_delta', { index: 0, delta: { type: 'text_delta', text: out.slice(i, i + 512) } });
+      }
+      send('content_block_stop', { index: 0 });
+      send('message_delta', { delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { output_tokens: usage.output_tokens } });
+      send('message_stop', {});
+      return res.end();
+    }
+
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify(message));
   });
 });
 

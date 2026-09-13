@@ -23,13 +23,20 @@ function getClient(): Anthropic {
 }
 
 let credentialsVerified: boolean | null = null;
+let credentialsProbe: Promise<boolean> | null = null;
 
 /**
  * One-time startup probe: confirms the API key is valid and the configured model exists.
- * Cached so the health endpoint can report it without hitting the API on every ping.
+ * Cached so the health endpoint can report it without hitting the API on every ping; a real
+ * call later overrides the verdict (see noteAiOutcome) — the model list is readable even when
+ * the account can no longer pay for messages.
  */
-export async function verifyAiCredentials(): Promise<boolean> {
-  if (credentialsVerified !== null) return credentialsVerified;
+export function verifyAiCredentials(): Promise<boolean> {
+  if (!credentialsProbe) credentialsProbe = probeCredentials();
+  return credentialsProbe;
+}
+
+async function probeCredentials(): Promise<boolean> {
   if (!process.env.ANTHROPIC_API_KEY) {
     credentialsVerified = false;
     return false;
@@ -54,9 +61,36 @@ export async function verifyAiCredentials(): Promise<boolean> {
   return credentialsVerified;
 }
 
-export function aiCredentialsOk(): boolean {
-  return credentialsVerified === true;
+/**
+ * Feed the health check from real traffic: an account-level refusal (bad key, no credits)
+ * fails every call the same way, so say so once, loudly, and flip `ai` to false until a call
+ * succeeds again — nobody should have to read request logs to learn the account needs funding.
+ */
+function noteAiOutcome(err?: unknown): void {
+  if (err === undefined) {
+    if (credentialsVerified !== true) credentialsProbe = Promise.resolve(true);
+    credentialsVerified = true;
+    return;
+  }
+  let reason: string | null = null;
+  if (err instanceof Anthropic.AuthenticationError) {
+    reason = 'ANTHROPIC_API_KEY was rejected — all AI features will fail';
+  } else if (err instanceof Anthropic.PermissionDeniedError) {
+    reason = 'ANTHROPIC_API_KEY is not allowed to use this model/workspace';
+  } else if (err instanceof Anthropic.BadRequestError && /credit balance/i.test(err.message)) {
+    reason = 'Anthropic account has no credits — add funds at console.anthropic.com → Plans & Billing';
+  }
+  if (reason) {
+    logger.error({ model: AI_MODEL }, reason);
+    credentialsVerified = false;
+    credentialsProbe = Promise.resolve(false);
+  }
 }
+
+// Real generation of a few thousand JSON tokens takes tens of seconds; the mock server answers
+// instantly, so keep every per-call budget generous enough for production, not for the mock.
+const DEFAULT_TIMEOUT_MS = 120_000;
+const MAX_OUTPUT_TOKENS = 8192;
 
 export interface AiCallOptions {
   tenantId: number;
@@ -76,24 +110,48 @@ export interface AiCallResult {
 
 export async function callClaude(options: AiCallOptions): Promise<AiCallResult> {
   const anthropic = getClient();
-  const timeout = options.timeoutMs || 15000;
+  const timeout = options.timeoutMs || DEFAULT_TIMEOUT_MS;
   const fullPrompt = `${options.systemPrompt}\n\n${options.userContent}`;
   const inputHash = createHash('sha256').update(fullPrompt).digest('hex');
   const start = Date.now();
 
+  // Stream so the connection stays active while the model generates (a non-streaming request
+  // sits idle until the whole response exists). The SDK's `timeout` only covers the time to the
+  // first byte of a stream, so the total budget is enforced with our own abort signal — aborting
+  // tears down the request instead of leaving it running the way a Promise.race would.
+  const controller = new AbortController();
+  const deadline = setTimeout(() => controller.abort(), timeout);
+
   try {
-    // SDK-level timeout aborts the underlying request (a Promise.race would leave it running)
-    const response = await anthropic.messages.create(
-      {
-        model: AI_MODEL,
-        max_tokens: 8192,
-        system: options.systemPrompt,
-        messages: [{ role: 'user', content: options.userContent }],
-      },
-      { timeout, maxRetries: 0 },
-    );
+    const response = await anthropic.messages
+      .stream(
+        {
+          model: AI_MODEL,
+          max_tokens: MAX_OUTPUT_TOKENS,
+          system: options.systemPrompt,
+          messages: [{ role: 'user', content: options.userContent }],
+        },
+        { signal: controller.signal, maxRetries: 0 },
+      )
+      .finalMessage()
+      .catch((err: unknown) => {
+        if (controller.signal.aborted) {
+          throw new Anthropic.APIConnectionTimeoutError({
+            message: `Request timed out after ${timeout}ms (${options.serviceType}).`,
+          });
+        }
+        throw err;
+      });
 
     const latencyMs = Date.now() - start;
+
+    if (response.stop_reason === 'max_tokens') {
+      // The JSON is almost certainly cut off — the parse step will fail, but say why here.
+      logger.warn(
+        { serviceType: options.serviceType, maxTokens: MAX_OUTPUT_TOKENS },
+        'AI response hit max_tokens and is likely truncated',
+      );
+    }
 
     // Concatenate all text blocks; warn on non-text blocks
     const textParts: string[] = [];
@@ -110,6 +168,18 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
     const content = textParts.join('');
 
     const tokensUsed = (response.usage?.input_tokens ?? 0) + (response.usage?.output_tokens ?? 0);
+
+    logger.info(
+      {
+        serviceType: options.serviceType,
+        latencyMs,
+        inputTokens: response.usage?.input_tokens,
+        outputTokens: response.usage?.output_tokens,
+        stopReason: response.stop_reason,
+      },
+      'AI call completed',
+    );
+    noteAiOutcome();
 
     // Log the AI call (encrypt prompt/response — may contain decrypted financial data)
     await prisma.aiCallLog.create({
@@ -131,6 +201,7 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
     return { content, tokensUsed, latencyMs };
   } catch (err) {
     const latencyMs = Date.now() - start;
+    noteAiOutcome(err);
 
     await prisma.aiCallLog.create({
       data: {
@@ -149,5 +220,7 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
     }).catch((logErr) => logger.error({ logErr }, 'Failed to log AI call error'));
 
     throw err;
+  } finally {
+    clearTimeout(deadline);
   }
 }

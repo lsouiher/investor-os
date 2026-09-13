@@ -17,7 +17,7 @@ export const pathGenerationQueue = new Bull<PathGenerationJobData>('growth-path-
     attempts: 1, // No auto-retry — we handle failure explicitly
     removeOnComplete: 100, // Keep last 100 completed jobs
     removeOnFail: 200, // Keep last 200 failed jobs
-    timeout: 45000, // 45s job timeout (30s AI + buffer)
+    timeout: 300_000, // 5 min job timeout (240s AI budget + buffer)
   },
 });
 
@@ -31,7 +31,7 @@ export const crossPathAnalysisQueue = new Bull<CrossPathAnalysisJobData>('growth
     attempts: 1,
     removeOnComplete: 100,
     removeOnFail: 200,
-    timeout: 30000, // 30s
+    timeout: 150_000, // 120s AI budget + buffer
   },
 });
 

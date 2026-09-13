@@ -452,7 +452,7 @@ export async function generateExportSummary(
       promptTemplateId: template.id,
       systemPrompt,
       userContent,
-      timeoutMs: 10000,
+      timeoutMs: 90_000,
     });
 
     return result.content.trim();

@@ -97,7 +97,7 @@
   "identity.empty.title": "Votre carte d’identité vous attend",
   "identity.empty.description": "Complétez les 5 audits pour voir votre carte d’identité investisseur.",
   "identity.goto_hub": "Aller au Hub Identité",
-  "identity.synthesizing": "Synthèse de votre identité en cours...",
+  "identity.synthesizing": "Synthèse de votre identité en cours... cela prend généralement environ une minute.",
   "identity.error.load_failed": "Échec du chargement des données d’identité.",
   "identity.error.synthesis_failed": "Échec de la synthèse. Veuillez réessayer.",
   "identity.feedback_prompt": "Cette identité vous correspond-elle ?",

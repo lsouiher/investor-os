@@ -97,7 +97,7 @@
   "identity.empty.title": "Your Identity Card Awaits",
   "identity.empty.description": "Complete all 5 audits to see your Investor Identity Card.",
   "identity.goto_hub": "Go to Identity Hub",
-  "identity.synthesizing": "Synthesizing your identity...",
+  "identity.synthesizing": "Synthesizing your identity... this usually takes about a minute.",
   "identity.error.load_failed": "Failed to load identity data.",
   "identity.error.synthesis_failed": "Synthesis failed. Please try again.",
   "identity.feedback_prompt": "How well does this identity reflect you?",

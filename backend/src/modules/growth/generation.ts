@@ -215,7 +215,7 @@ export async function generatePath(data: PathGenerationJobData): Promise<void> {
     promptTemplateId: template.id,
     systemPrompt: 'You are an expert real estate growth strategist. Generate a comprehensive, personalized growth path based on the investor\'s identity and context. Respond with valid JSON only.',
     userContent,
-    timeoutMs: 30000,
+    timeoutMs: 240_000,
   });
 
   // 7. Parse response
@@ -293,7 +293,7 @@ export async function generateCrossPathAnalysis(data: CrossPathAnalysisJobData):
     promptTemplateId: template.id,
     systemPrompt: 'You are analyzing connections between an investor\'s growth paths. Identify cross-path dependencies, conflicts, and the single most impactful next action. Respond with valid JSON only.',
     userContent,
-    timeoutMs: 15000,
+    timeoutMs: 120_000,
   });
 
   const parsed = parseJsonResponse(aiResult.content, CrossPathAnalysisResponseSchema);
