@@ -3,6 +3,7 @@ import jwt, { type SignOptions } from 'jsonwebtoken';
 import { randomBytes } from 'crypto';
 import { AppError } from '../../shared/middleware/error-handler.js';
 import * as authRepo from './repository.js';
+import { sendPasswordResetEmail } from '../../shared/email.js';
 import type { AuthResponse, UserProfile } from './types.js';
 
 const SALT_ROUNDS = 12;
@@ -87,11 +88,7 @@ export async function forgotPassword(email: string): Promise<void> {
   const expiresAt = new Date(Date.now() + RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000);
   await authRepo.createPasswordResetToken(user.id, token, expiresAt);
 
-  // TODO: Send email via Resend with reset link containing token
-  // For now, log the token in development
-  if (process.env.NODE_ENV === 'development') {
-    console.warn(`[DEV] Password reset token for ${email}: ${token}`);
-  }
+  await sendPasswordResetEmail(user.email, token);
 }
 
 export async function resetPassword(token: string, newPassword: string): Promise<void> {
