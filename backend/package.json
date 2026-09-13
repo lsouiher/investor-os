@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsc",
+    "build": "tsc && cp src/modules/blueprint/template.html dist/modules/blueprint/",
     "start": "node dist/main.js",
     "test": "jest",
     "lint": "eslint src/",
