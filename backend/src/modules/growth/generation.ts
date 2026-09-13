@@ -25,24 +25,28 @@ export const PathGenerationResponseSchema = z.object({
   summary: z.string(),
 });
 
+// The model links items by id when it can and sends null when a link is between paths as a
+// whole; the real API did exactly that, so ids are nullable, never required.
+const optionalId = z.string().nullable().optional().transform((v) => v ?? '');
+
 const CrossPathLinkSchema = z.object({
   type: z.enum(['prerequisite', 'enabling', 'constraint', 'conflict']),
   source_path_type: z.string(),
-  source_item_id: z.string().optional().default(''),
+  source_item_id: optionalId,
   source_description: z.string(),
   target_path_type: z.string(),
-  target_item_id: z.string().optional().default(''),
+  target_item_id: optionalId,
   target_description: z.string(),
   description: z.string(),
   resolution: z.string().nullable().default(null),
 });
 
 const NextBestActionSchema = z.object({
-  action_item_id: z.string().optional().default(''),
+  action_item_id: optionalId,
   path_type: z.string(),
   title: z.string(),
   reason: z.string(),
-  cross_path_impact: z.array(z.string()),
+  cross_path_impact: z.array(z.string()).default([]),
 });
 
 export const CrossPathAnalysisResponseSchema = z.object({
