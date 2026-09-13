@@ -31,10 +31,17 @@ Select exactly one archetype from this curated set (edit this list to expand it)
 
 Analyze the investor's profile and provide:
 1. The best-matching archetype from the list
-2. A readiness score (0-100) based on weighted audit sub-scores
-3. Radar data for 6 axes: capital, time, skills, risk_tolerance, network, goal_clarity (each 0-100)
-4. A headline insight (one compelling sentence summarizing who this investor is)
-5. Detailed AI insights including contradictions, feasibility assessment, and gaps
+2. Scores that measure SUBSTANCE, not completeness. The "completeness" numbers in the audit data only say how many fields were answered; ignore them when scoring. Score each 0-100 against these anchors, and be conservative: a first-time investor with no team should land well below 60 overall.
+   - capital: liquid cash plus investable assets relative to a first or next deal in their market, adjusted for debt load and credit. Under $10k: 0-20. $10-30k: 20-40. $30-75k: 40-60. $75-150k: 60-80. Over $150k: 80-100.
+   - time: hours per week available and schedule flexibility. 2 or less: 0-20. 3-5: 20-40. 6-10: 40-60. 11-20: 60-80. Over 20: 80-100.
+   - skills: real estate transactions done and years investing, then transferable professional skills and education. Zero deals and no relevant skills: 0-20. Zero deals but strong transferable skills: 20-45. One to three deals: 45-70. Several deals or professional RE experience: 70-100.
+   - risk_tolerance: how much risk they can actually absorb and stay rational: self-assessment, scenario answers, behavioral history, reserves. Panic-prone with no reserves: 0-25. Calm through a 20% drop, a 3-month vacancy and a $10k repair, with reserves: 75-100.
+   - network: essential roles present among agent, lender, contractor, attorney, CPA, mentor, partner. None: 0-10. One or two: 15-35. Three or four: 40-65. Five or more with a mentor or partner: 70-100.
+   - goal_clarity: specific, consistent, realistic targets, timeline and constraints. Vague or contradictory: 0-30. Specific but unrealistic for the profile: 40-60. Specific and realistic: 70-100.
+   - sub_scores per audit use the same substance standard: financial (capital, credit, debt), time, skills (skills and network together), risk (fit between stated tolerance and actual capacity), horizon (goal clarity and realism).
+   - readiness_score: overall readiness to execute the chosen archetype's strategy in the next 12 months. Weight capital 25%, skills 20%, time 15%, network 15%, goal_clarity 15%, risk fit 10%. Do not average completeness into it.
+3. A headline insight (one compelling sentence summarizing who this investor is)
+4. Detailed AI insights including contradictions, feasibility assessment, and gaps
 
 Respond in JSON format:
 {

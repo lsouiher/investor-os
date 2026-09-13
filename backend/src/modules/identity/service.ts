@@ -12,6 +12,12 @@ import { AiSynthesisResponseSchema } from './types.js';
 
 const ALL_AUDIT_TYPES: AuditType[] = ['financial', 'time', 'skills', 'risk', 'horizon'];
 
+/** Drop undefined entries so a partial object can be spread over defaults. */
+function compact<T extends object>(obj: T | undefined): Partial<T> {
+  if (!obj) return {};
+  return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as Partial<T>;
+}
+
 // In-memory deduplication lock to prevent concurrent synthesis for the same user. Shared by the
 // audit-completion auto-trigger and the explicit POST /identity/synthesize, which a user will hit
 // while the auto-trigger is still running now that a real synthesis takes tens of seconds.
@@ -159,7 +165,12 @@ async function doSynthesizeIdentity(
   // Placeholder names must match the identity_synthesis template exactly (case-sensitive)
   const userContent = assemblePrompt(template.templateContent, {
     AUDIT_DATA: JSON.stringify(
-      { audits: auditSummary, sub_scores: subScores, readiness_score: readinessScore, radar_data: radarData },
+      {
+        audits: auditSummary,
+        // Completeness only (share of fields answered), labelled as such so the model doesn't
+        // mistake it for readiness; it produces the real scores against the rubric.
+        completeness: { by_audit: subScores, overall: readinessScore, by_dimension: radarData },
+      },
       null,
       2,
     ),
@@ -177,14 +188,21 @@ async function doSynthesizeIdentity(
 
   const parsed = parseJsonResponse<AiSynthesisResponse>(aiResult.content, AiSynthesisResponseSchema);
 
+  // The model scores substance (how much capital, how many hours, who's in the network);
+  // the deterministic numbers only measure how many fields were filled in. Use the model's
+  // judgment wherever it gave one, keep the fallback for anything it left out.
+  const finalSubScores = { ...subScores, ...compact(parsed.sub_scores) };
+  const finalRadar = { ...radarData, ...compact(parsed.radar_data) };
+  const finalReadiness = parsed.readiness_score ?? calculateReadinessScore(finalSubScores);
+
   // 6. Create the identity version (append-only)
   const identity = await identityRepo.createIdentityVersion({
     tenantId,
     userId,
     archetype: parsed.archetype,
-    readinessScore,
-    subScores: subScores as unknown as Record<string, number>,
-    radarData: radarData as unknown as Record<string, number>,
+    readinessScore: finalReadiness,
+    subScores: finalSubScores as unknown as Record<string, number>,
+    radarData: finalRadar as unknown as Record<string, number>,
     headlineInsight: parsed.headline_insight,
     aiInsights: parsed.ai_insights as unknown as Record<string, unknown>,
     auditSnapshot,
@@ -215,7 +233,7 @@ async function doSynthesizeIdentity(
     // Auto-create if feature flag is on and no strategy exists
     await growthService.maybeCreateGrowthStrategy(userId, tenantId, identity.id);
     // Check if score delta warrants regeneration suggestion
-    await growthService.checkRegenerationSuggestion(userId, tenantId, readinessScore);
+    await growthService.checkRegenerationSuggestion(userId, tenantId, finalReadiness);
   } catch (err) {
     logger.error({ err, userId }, 'Failed to run growth strategy hooks (non-blocking)');
   }
