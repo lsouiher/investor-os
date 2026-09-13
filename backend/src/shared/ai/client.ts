@@ -160,7 +160,9 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
     for (const block of response.content) {
       if (block.type === 'text') {
         textParts.push(block.text);
-      } else {
+      } else if (block.type !== 'thinking' && block.type !== 'redacted_thinking') {
+        // Thinking blocks are expected from Claude 5 models and carry nothing we store;
+        // anything else non-text is worth a look.
         logger.warn(
           { blockType: block.type },
           'Non-text content block in AI response — skipping',
