@@ -6,11 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 InvestorOS — an identity-centric real estate investment platform. Constructs a multidimensional investor identity through 5 structured audits (Financial, Time, Skills, Risk, Horizon), AI-synthesizes it into an archetype + readiness score, and activates it through personalized strategies, action plans, and an identity-aware CRM.
 
-**Status:** Implemented and running locally. `master` is v0.3.2.0: identity platform (v0.1),
+**Status:** Implemented and running locally. `master` is v0.3.3.0: identity platform (v0.1),
 Growth Strategy Engine (v0.2), the integration fixes that make the AI pipeline and every page
-actually work (v0.3.0), dark mode (v0.3.1) and French i18n (v0.3.2) — PRs #1–#4 all merged.
-The AI pipeline is verified end-to-end against the mock server; verification against the real
-Anthropic API is pending an `ANTHROPIC_WORKSPACE_ID` (the configured key is org-level).
+actually work (v0.3.0), dark mode (v0.3.1), French i18n (v0.3.2) and real-API hardening —
+streaming calls with production-sized timeouts (v0.3.3). The AI pipeline is verified end-to-end
+against the mock server; the configured workspace key authenticates, but the Anthropic account
+has no credits, so the real-API run is still pending (`/health` reports `ai:false` with the reason
+in the backend log once a call is refused).
 
 ## Architecture
 
@@ -97,7 +99,7 @@ checkout to the Linux filesystem. `.gitattributes` enforces LF so OneDrive's CRL
 - **Public IDs:** CUID2 everywhere in URLs/responses; internal integer PKs never exposed
 - **Audit versioning:** Append-only rows. Draft = in_progress status. Completing creates new versioned row.
 - **Identity versioning:** New row per AI synthesis. References audit versions used via `audit_snapshot` JSON.
-- **AI pipeline:** Prompt templates stored in DB (versioned, hot-swappable). Assembly: system prompt + identity context + service block + output format. Retry with stricter format on parse failure; friendly error with retry button on sustained failure.
+- **AI pipeline:** Prompt templates stored in DB (versioned, hot-swappable). Assembly: system prompt + identity context + service block + output format. Retry with stricter format on parse failure; friendly error with retry button on sustained failure. Every call streams and `callClaude` enforces the total budget itself; per-call `timeoutMs` values are sized for real generation (2–4 min) — the mock answers instantly, so never tune them against it. Concurrent synthesis/strategy generation for one user joins the in-flight call.
 - **Tenant isolation:** Prisma middleware auto-injects `tenant_id` filter. PostgreSQL RLS as defense-in-depth.
 
 ## spec-kit + gstack

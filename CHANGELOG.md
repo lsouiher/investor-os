@@ -2,6 +2,24 @@
 
 All notable changes to InvestorOS will be documented in this file.
 
+## [0.3.3.0] - 2026-09-12
+
+First contact with the real Anthropic API. Every timeout in the pipeline had been sized for the instant mock server; a real synthesis call was cut off at 30s. Nothing here changes what the AI produces, only whether the call survives long enough to produce it.
+
+### Changed
+
+- **AI client streams every call** (`messages.stream()` + `finalMessage()`) and enforces the total budget with its own abort signal — the SDK's `timeout` only covers time-to-first-byte on a stream
+- **Real-world call budgets:** identity synthesis and strategy generation 3 min, activation and growth-path generation 4 min, cross-path analysis 2 min, default 2 min; Bull job timeouts raised to match
+- **Concurrent synthesis is shared:** the audit-completion auto-trigger and the "Synthesize My Identity" button now join one in-flight call instead of paying for two; strategy generation has the same guard
+- **Synthesize responds as soon as the identity exists** — chained strategy generation runs in the background and `GET /strategies` joins it
+- **`/health` `ai` reflects real traffic:** an account-level refusal (no credits, rejected key) logs a specific fix-it line and flips the check to false until a call succeeds; the endpoint awaits the startup probe instead of reporting false during boot
+- Mock Anthropic server answers `stream: true` requests as server-sent events
+- Strategy detail polls for the generated plan for up to 5 minutes (was 90s); the synthesizing overlay says it takes about a minute
+
+### Added
+
+- `shared/ai/client.test.ts` — streamed text is assembled with usage, and a stalled stream is aborted at the deadline
+
 ## [0.3.2.0] - 2026-09-12
 
 French language support with instant toggle, no page reload required. (Originally built as 0.2.2.0 in April; rebased onto the v0.3 pages.)

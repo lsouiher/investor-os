@@ -18,6 +18,10 @@ import type {
 } from './types.js';
 import { AiStrategyResponseSchema, AiActivationResponseSchema } from './types.js';
 
+// One generation per user at a time: the synthesis chain and a GET /strategies that arrives
+// while it is still running must share the result rather than store two sets of recommendations.
+const generationInProgress = new Map<number, Promise<StrategySummary[]>>();
+
 /**
  * Get all strategies for the current user, formatted for API response.
  */
@@ -83,6 +87,23 @@ export async function generateStrategies(
   userId: number,
   tenantId: number,
 ): Promise<StrategySummary[]> {
+  const existing = generationInProgress.get(userId);
+  if (existing) {
+    logger.info({ userId }, 'Strategy generation already in progress, joining it');
+    return existing;
+  }
+
+  const promise = doGenerateStrategies(userId, tenantId).finally(() => {
+    generationInProgress.delete(userId);
+  });
+  generationInProgress.set(userId, promise);
+  return promise;
+}
+
+async function doGenerateStrategies(
+  userId: number,
+  tenantId: number,
+): Promise<StrategySummary[]> {
   // Get latest identity
   const identity = await identityRepo.getLatestIdentity(userId, tenantId);
   if (!identity) {
@@ -118,7 +139,7 @@ export async function generateStrategies(
     promptTemplateId: template.id,
     systemPrompt: `You are an expert real estate investment strategist. Based on the investor's identity profile, recommend exactly 3 investment strategies ranked by fit. Respond with valid JSON only.`,
     userContent,
-    timeoutMs: 30000,
+    timeoutMs: 180_000,
   });
 
   const parsed = parseJsonResponse<AiStrategyResponse>(aiResult.content, AiStrategyResponseSchema);
@@ -221,7 +242,7 @@ async function generateDetailedPlans(
     promptTemplateId: template.id,
     systemPrompt: `You are an expert real estate investment strategist. Generate a detailed action plan, roadmap with milestones, and a 72-hour micro-plan for this specific strategy. Respond with valid JSON only.`,
     userContent,
-    timeoutMs: 45000,
+    timeoutMs: 240_000,
   });
 
   const parsed = parseJsonResponse<AiActivationResponse>(aiResult.content, AiActivationResponseSchema);
