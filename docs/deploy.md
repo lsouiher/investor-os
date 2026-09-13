@@ -6,7 +6,36 @@ Railway Redis. One account, one bill. Both services build from the Dockerfiles i
 `frontend/` and `backend/`; `railway.json` in each folder carries the health check and
 restart policy.
 
-## One-time setup
+## Current deployment (2026-09-13)
+
+Project `investoros` in Leo's Railway workspace, environment `production`:
+
+- api: https://api-production-bfde.up.railway.app (health: `/api/v1/health`)
+- web: https://web-production-ac6fc.up.railway.app
+- Postgres and Redis: Railway-managed, referenced as `${{Postgres.DATABASE_URL}}` / `${{Redis.REDIS_URL}}`
+
+Custom domains come next (see "Custom domain" below). The account is on the trial
+("30 days or $5.00 left"); upgrade to Hobby before Email 1 or the services stop.
+
+## Deploying a change
+
+Deploy from a clone on the Linux filesystem, never from `/mnt/c`: the Railway CLI's upload
+from the OneDrive folder produced corrupted snapshots (buildkit "non-printable ASCII" in
+exclude patterns, `TS1127 Invalid character` in untouched files). The clone lives at
+`~/investoros-deploy`; each subfolder is linked to its service.
+
+```bash
+cd ~/investoros-deploy && git pull origin master
+cd backend  && railway up --detach     # api
+cd ../frontend && railway up --detach  # web (rebuilds with the NEXT_PUBLIC_* variables)
+railway deployment list --service api --json | head -c 300   # status
+railway logs --service api --deployment --lines 100          # runtime logs
+```
+
+`railway up` uploads the linked folder and builds its Dockerfile on Railway; migrations and
+the prompt seed run when the container starts. A deploy takes 3–5 minutes.
+
+## One-time setup (done; kept for a rebuild)
 
 1. **Accounts (you):** railway.com (Hobby plan), a domain (Cloudflare Registrar or
    Namecheap), resend.com (Pro for the launch month; the free tier caps at 100 emails a day),
@@ -63,6 +92,17 @@ safe every time), then the server. `GET /api/v1/health` must report
 `{"status":"ok","checks":{"db":true,"ai":true,"encryption":true,"redis":true}}`; `ai` flips to
 `false` if the Anthropic account refuses a call (no credits, bad key), with the reason in the
 logs.
+
+## Custom domain (when the domain exists)
+
+```bash
+cd ~/investoros-deploy/frontend && railway domain app.yourdomain.com --service web
+cd ../backend && railway domain api.yourdomain.com --service api
+```
+
+Each command prints the DNS record to add at the registrar (a CNAME to Railway). Then update
+`APP_URL` and `CORS_ORIGIN` on `api`, `NEXT_PUBLIC_API_URL` on `web`, redeploy `web` (the URL
+is baked in at build time), and verify the domain in Resend.
 
 ## After the first deploy
 
