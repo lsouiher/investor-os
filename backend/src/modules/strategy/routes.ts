@@ -7,8 +7,8 @@ const router = Router();
 // GET /strategies — list all strategies
 router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const strategies = await strategyService.getStrategies(req.user!.userId, req.user!.tenantId);
-    res.json({ data: strategies });
+    const { strategies, generating } = await strategyService.getStrategies(req.user!.userId, req.user!.tenantId);
+    res.json({ data: strategies, generating });
   } catch (err) {
     next(err);
   }

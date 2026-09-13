@@ -16,6 +16,37 @@ const ALL_AUDIT_TYPES: AuditType[] = ['financial', 'time', 'skills', 'risk', 'ho
 // audit-completion auto-trigger and the explicit POST /identity/synthesize, which a user will hit
 // while the auto-trigger is still running now that a real synthesis takes tens of seconds.
 const synthesisInProgress = new Map<number, Promise<IdentityDetail>>();
+// Last failure per user, so a client polling for a result can tell "still working" from "gave up"
+const lastSynthesisError = new Map<number, string>();
+
+export interface SynthesisStatus {
+  generating: boolean;
+  latestVersion: number | null;
+  lastError: string | null;
+}
+
+/**
+ * Start a synthesis without waiting for it. Real synthesis takes 30–90 s, longer than phones
+ * and proxies keep an idle HTTP request open, so clients call this and poll getSynthesisStatus.
+ */
+export function startSynthesis(userId: number, tenantId: number): void {
+  lastSynthesisError.delete(userId);
+  synthesizeIdentity(userId, tenantId).catch((err: unknown) => {
+    lastSynthesisError.set(
+      userId,
+      err instanceof AppError ? err.message : "We couldn't process your request right now. Please try again.",
+    );
+  });
+}
+
+export async function getSynthesisStatus(userId: number, tenantId: number): Promise<SynthesisStatus> {
+  const latest = await identityRepo.getLatestIdentity(userId, tenantId);
+  return {
+    generating: synthesisInProgress.has(userId),
+    latestVersion: latest?.version ?? null,
+    lastError: lastSynthesisError.get(userId) ?? null,
+  };
+}
 
 /**
  * Get the latest identity version for a user, formatted for API response.

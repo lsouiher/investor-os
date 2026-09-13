@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
+import { generatePublicId } from '../../shared/utils/id.js';
 import { AppError } from '../../shared/middleware/error-handler.js';
 import { callClaudeWithRetry, parseJsonResponse } from '../../shared/ai/retry.js';
 import { loadActiveTemplate, assemblePrompt } from '../../shared/ai/prompt-loader.js';
@@ -23,12 +24,55 @@ export const SimulationResultSchema = z.object({
 });
 type SimulationResult = z.infer<typeof SimulationResultSchema>;
 
-export async function runSimulation(
+// A simulation is a real model call (tens of seconds), longer than a phone keeps an idle
+// request open. The route validates synchronously, then runs the call as a job the client
+// polls. Jobs live in memory: one API process, and a lost job just means "run it again".
+type SimulationOutcome = Awaited<ReturnType<typeof runSimulation>>;
+interface SimulationJob {
+  userId: number;
+  status: 'running' | 'done' | 'failed';
+  result?: SimulationOutcome;
+  error?: { code: string; message: string };
+  createdAt: number;
+}
+const simulationJobs = new Map<string, SimulationJob>();
+const JOB_TTL_MS = 30 * 60 * 1000;
+
+export async function startSimulation(
   userId: number,
   tenantId: number,
   modifiedParameters: Record<string, unknown>,
-) {
-  // Check rate limit
+): Promise<{ jobId: string }> {
+  await precheckSimulation(userId, tenantId);
+
+  for (const [id, job] of simulationJobs) {
+    if (Date.now() - job.createdAt > JOB_TTL_MS) simulationJobs.delete(id);
+  }
+
+  const jobId = generatePublicId();
+  const job: SimulationJob = { userId, status: 'running', createdAt: Date.now() };
+  simulationJobs.set(jobId, job);
+  runSimulation(userId, tenantId, modifiedParameters)
+    .then((result) => {
+      job.status = 'done';
+      job.result = result;
+    })
+    .catch((err: unknown) => {
+      job.status = 'failed';
+      job.error =
+        err instanceof AppError
+          ? { code: err.code, message: err.message }
+          : { code: 'AI_SERVICE_ERROR', message: "We couldn't process your request right now. Please try again." };
+    });
+  return { jobId };
+}
+
+export function getSimulationJob(jobId: string, userId: number): SimulationJob | null {
+  const job = simulationJobs.get(jobId);
+  return job && job.userId === userId ? job : null;
+}
+
+async function precheckSimulation(userId: number, tenantId: number) {
   const recentCount = await simulationRepo.getSimulationCountLast24h(userId, tenantId);
   if (recentCount >= MAX_SIMULATIONS_PER_24H) {
     throw new AppError(
@@ -38,12 +82,10 @@ export async function runSimulation(
     );
   }
 
-  // Get current identity version
   const currentIdentity = await prisma.identityVersion.findFirst({
     where: { userId, tenantId },
     orderBy: { version: 'desc' },
   });
-
   if (!currentIdentity) {
     throw new AppError(
       'VALIDATION_ERROR',
@@ -51,6 +93,15 @@ export async function runSimulation(
       400,
     );
   }
+  return { recentCount, currentIdentity };
+}
+
+export async function runSimulation(
+  userId: number,
+  tenantId: number,
+  modifiedParameters: Record<string, unknown>,
+) {
+  const { recentCount, currentIdentity } = await precheckSimulation(userId, tenantId);
 
   // Load prompt template and call AI
   const template = await loadActiveTemplate('simulation');

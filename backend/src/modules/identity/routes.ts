@@ -27,11 +27,24 @@ router.get('/history', async (req: Request, res: Response, next: NextFunction) =
   }
 });
 
-// POST /identity/synthesize — trigger synthesis
+// GET /identity/status — is a synthesis running, what's the latest version, did the last one fail
+router.get('/status', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const status = await identityService.getSynthesisStatus(req.user!.userId, req.user!.tenantId);
+    res.json({ data: status });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /identity/synthesize — start a synthesis; 202 straight away, poll GET /identity/status
 router.post('/synthesize', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const identity = await identityService.synthesizeIdentity(req.user!.userId, req.user!.tenantId);
-    res.json({ data: identity });
+    const before = await identityService.getSynthesisStatus(req.user!.userId, req.user!.tenantId);
+    if (!before.generating) {
+      identityService.startSynthesis(req.user!.userId, req.user!.tenantId);
+    }
+    res.status(202).json({ data: { status: 'generating', latest_version: before.latestVersion } });
   } catch (err) {
     next(err);
   }

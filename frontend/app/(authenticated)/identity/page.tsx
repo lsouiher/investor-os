@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { api } from "@/lib/api-client";
+import { api, poll } from "@/lib/api-client";
 import IdentityCard from "@/components/identity/identity-card";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
@@ -34,6 +34,12 @@ const REQUIRED_AUDITS = 5;
 
 const REVEAL_KEY = "investoros_identity_revealed";
 
+interface SynthesisStatus {
+  generating: boolean;
+  latest_version: number | null;
+  last_error: string | null;
+}
+
 export default function IdentityPage() {
   const { t } = useTranslation();
   const [identity, setIdentity] = useState<IdentityData | null>(null);
@@ -44,6 +50,25 @@ export default function IdentityPage() {
   const [feedbackRating, setFeedbackRating] = useState<number | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [auditsComplete, setAuditsComplete] = useState(false);
+
+  // Synthesis runs server-side for 30–90 s, longer than a phone keeps a request open, so
+  // the page starts it and polls /identity/status until a new version exists (or it fails).
+  const waitForSynthesis = useCallback(async (previousVersion: number | null) => {
+    const status = await poll(
+      () => api.get<SynthesisStatus>("/identity/status"),
+      (s) => !s.generating,
+      { intervalMs: 3000, maxAttempts: 80 }
+    );
+    if (status.last_error || status.latest_version === previousVersion) {
+      throw new Error(status.last_error ?? "no new version");
+    }
+    const data = await api.get<IdentityData>("/identity");
+    setIdentity(data);
+    setShowReveal(true);
+    localStorage.setItem(REVEAL_KEY, "true");
+    setFeedbackRating(null);
+    setFeedbackSubmitted(false);
+  }, []);
 
   const fetchIdentity = useCallback(async () => {
     try {
@@ -66,6 +91,20 @@ export default function IdentityPage() {
         // offer it here instead of sending the user back to the hub in a loop.
         setIdentity(null);
         try {
+          const status = await api.get<SynthesisStatus>("/identity/status");
+          if (status.generating) {
+            // The fifth audit already started one; show progress and pick up the result.
+            setSynthesizing(true);
+            setLoading(false);
+            try {
+              await waitForSynthesis(status.latest_version);
+            } catch {
+              setError(t("identity.error.synthesis_failed"));
+            } finally {
+              setSynthesizing(false);
+            }
+            return;
+          }
           const audits = await api.get<AuditSummary[]>("/audits");
           setAuditsComplete(audits.filter((a) => a.status === "completed").length >= REQUIRED_AUDITS);
         } catch {
@@ -77,7 +116,7 @@ export default function IdentityPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [waitForSynthesis]);
 
   useEffect(() => {
     fetchIdentity();
@@ -87,12 +126,8 @@ export default function IdentityPage() {
     try {
       setSynthesizing(true);
       setError(null);
-      const data = await api.post<IdentityData>("/identity/synthesize");
-      setIdentity(data);
-      setShowReveal(true);
-      localStorage.setItem(REVEAL_KEY, "true");
-      setFeedbackRating(null);
-      setFeedbackSubmitted(false);
+      const started = await api.post<{ status: string; latest_version: number | null }>("/identity/synthesize");
+      await waitForSynthesis(started.latest_version);
     } catch {
       setError(t("identity.error.synthesis_failed"));
     } finally {

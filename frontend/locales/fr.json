@@ -119,6 +119,7 @@
   "strategies.title": "Vos stratégies",
   "strategies.subtitle": "Stratégies d’investissement personnalisées classées par adéquation",
   "strategies.error.load_failed": "Échec du chargement des stratégies.",
+  "strategies.generating": "Sélection des stratégies adaptées à votre identité — cela prend généralement environ une minute.",
   "strategies.top_match": "Meilleure correspondance",
   "strategies.active": "Active",
   "strategies.fit_score": "{{score}} % de correspondance",

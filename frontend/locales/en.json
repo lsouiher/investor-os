@@ -119,6 +119,7 @@
   "strategies.title": "Your Strategies",
   "strategies.subtitle": "Personalized investment strategies ranked by fit",
   "strategies.error.load_failed": "Failed to load strategies.",
+  "strategies.generating": "Matching strategies to your identity — this usually takes about a minute.",
   "strategies.top_match": "Top Match",
   "strategies.active": "Active",
   "strategies.fit_score": "{{score}}% Fit",

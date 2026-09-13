@@ -63,20 +63,30 @@ function formatStrategy(s: StrategyRow): StrategySummary {
   };
 }
 
+export interface StrategyList {
+  strategies: StrategySummary[];
+  /** True while recommendations for the current identity are still being generated; poll. */
+  generating: boolean;
+}
+
 export async function getStrategies(
   userId: number,
   tenantId: number,
-): Promise<StrategySummary[]> {
+): Promise<StrategyList> {
   // Recommendations belong to the current identity version. If none exist yet (first synthesis,
-  // or the chained generation failed), generate them now so the page never dead-ends.
+  // or the chained generation failed), start generating them in the background and say so:
+  // a real generation runs a minute or more, longer than a phone keeps a request open.
   const identity = await identityRepo.getLatestIdentity(userId, tenantId);
-  if (!identity) return [];
+  if (!identity) return { strategies: [], generating: false };
 
   const strategies = await strategyRepo.getStrategiesByUser(userId, tenantId, identity.id);
   if (strategies.length === 0) {
-    return generateStrategies(userId, tenantId);
+    generateStrategies(userId, tenantId).catch((err) => {
+      logger.error({ err, userId }, 'On-demand strategy generation failed (non-blocking)');
+    });
+    return { strategies: [], generating: true };
   }
-  return strategies.map(formatStrategy);
+  return { strategies: strategies.map(formatStrategy), generating: false };
 }
 
 /**
