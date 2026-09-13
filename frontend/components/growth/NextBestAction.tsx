@@ -1,13 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n";
 
-const PATH_NAMES: Record<string, string> = {
-  portfolio: "Portfolio Growth",
-  income_capital: "Income & Capital",
-  skills_knowledge: "Skills & Knowledge",
-  time_operations: "Time & Operations",
-};
+function usePathNames() {
+  const { t } = useTranslation();
+  return {
+    portfolio: t("growth.path.portfolio"),
+    income_capital: t("growth.path.income_capital"),
+    skills_knowledge: t("growth.path.skills_knowledge"),
+    time_operations: t("growth.path.time_operations"),
+  } as Record<string, string>;
+}
 
 interface NextBestActionProps {
   actionItemId: string;
@@ -23,12 +27,14 @@ export default function NextBestAction({
   reason,
   crossPathImpact,
 }: NextBestActionProps) {
+  const { t } = useTranslation();
+  const PATH_NAMES = usePathNames();
   return (
     <Link
       href={`/growth-strategy/${pathType}`}
       className="block rounded-lg border-2 border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-5 py-4 transition-shadow hover:shadow-sm"
     >
-      <div className="text-xs font-medium uppercase text-amber-700 dark:text-amber-300">Next Best Action</div>
+      <div className="text-xs font-medium uppercase text-amber-700 dark:text-amber-300">{t("growth.next_best_action")}</div>
       <div className="mt-1 font-medium text-foreground-strong">{title}</div>
       <div className="mt-1 text-sm text-foreground-secondary">{reason}</div>
       {crossPathImpact.length > 0 && (

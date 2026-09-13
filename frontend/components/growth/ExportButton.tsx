@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
 
@@ -20,6 +21,7 @@ export default function ExportButton({
   isStale,
   className = "",
 }: ExportButtonProps) {
+  const { t } = useTranslation();
   const [showConsent, setShowConsent] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +33,7 @@ export default function ExportButton({
     try {
       const token = getToken();
       if (!token) {
-        setError("Please log in to export your strategy.");
+        setError(t("export.error.not_logged_in"));
         setIsDownloading(false);
         return;
       }
@@ -73,7 +75,7 @@ export default function ExportButton({
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Export failed");
+      setError(err instanceof Error ? err.message : t("export.error.failed"));
     } finally {
       setIsDownloading(false);
     }
@@ -112,7 +114,7 @@ export default function ExportButton({
         {isDownloading ? (
           <>
             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            Generating...
+            {t("export.downloading")}
           </>
         ) : (
           <>
@@ -129,7 +131,7 @@ export default function ExportButton({
                 d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
               />
             </svg>
-            {isStale ? "Download Fresh Export" : "Export Strategy"}
+            {isStale ? t("export.download_fresh") : t("export.download")}
           </>
         )}
       </button>
@@ -146,18 +148,14 @@ export default function ExportButton({
         >
           <div className="mx-4 w-full max-w-md rounded-lg bg-surface-card p-6 shadow-xl">
             <h2 className="text-lg font-semibold text-foreground-strong">
-              Export Growth Strategy
+              {t("export.dialog_title")}
             </h2>
             <p className="mt-2 text-sm text-foreground-secondary">
-              Your export will include your investor identity profile, growth
-              strategy, and action plans as markdown files in a zip archive.
+              {t("export.description")}
             </p>
             <div className="mt-3 rounded-md bg-amber-50 dark:bg-amber-950 p-3">
               <p className="text-sm text-amber-800 dark:text-amber-200">
-                <strong>Sensitive data notice:</strong> This export may include
-                financial data such as income figures, capital targets, and
-                funding channel details. Store the downloaded file securely and
-                do not share it publicly.
+                <strong>{t("export.sensitive_title")}</strong> {t("export.sensitive_text")}
               </p>
             </div>
             <div className="mt-6 flex justify-end gap-3">
@@ -165,13 +163,13 @@ export default function ExportButton({
                 onClick={handleConsentCancel}
                 className="rounded border border-border px-4 py-2 text-sm text-foreground-secondary hover:bg-surface-subtle"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 onClick={handleConsentConfirm}
                 className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
               >
-                I Understand, Export
+                {t("export.confirm")}
               </button>
             </div>
           </div>

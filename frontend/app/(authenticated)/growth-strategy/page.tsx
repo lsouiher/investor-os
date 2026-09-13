@@ -9,6 +9,7 @@ import StalenessAlert from "@/components/growth/StalenessAlert";
 import ManualUnlockDialog from "@/components/growth/ManualUnlockDialog";
 import UnlockCelebration from "@/components/growth/UnlockCelebration";
 import { SkeletonCard } from "@/components/shared/loading-states";
+import { useTranslation } from "@/lib/i18n";
 import AiErrorState from "@/components/shared/ai-error-state";
 import Link from "next/link";
 
@@ -68,17 +69,23 @@ interface GrowthStrategy {
 
 const STUB_PATHS = new Set(["skills_knowledge", "time_operations"]);
 
-const PATH_NAMES: Record<string, string> = {
-  portfolio: "Portfolio Growth",
-  income_capital: "Income & Capital",
-  skills_knowledge: "Skills & Knowledge",
-  time_operations: "Time & Operations",
-};
+function usePathNames() {
+  const { t } = useTranslation();
+  return {
+    portfolio: t("growth.path.portfolio"),
+    income_capital: t("growth.path.income_capital"),
+    skills_knowledge: t("growth.path.skills_knowledge"),
+    time_operations: t("growth.path.time_operations"),
+  } as Record<string, string>;
+}
 
-function scoreTierLabel(score: number): string {
-  if (score < 40) return "Needs work";
-  if (score < 70) return "Developing";
-  return "Strong";
+function useScoreTierLabel() {
+  const { t } = useTranslation();
+  return (score: number): string => {
+    if (score < 40) return t("growth.tier.needs_work");
+    if (score < 70) return t("growth.tier.developing");
+    return t("growth.tier.strong");
+  };
 }
 
 function scoreTierColor(score: number): string {
@@ -88,6 +95,9 @@ function scoreTierColor(score: number): string {
 }
 
 export default function GrowthStrategyPage() {
+  const { t } = useTranslation();
+  const PATH_NAMES = usePathNames();
+  const scoreTierLabel = useScoreTierLabel();
   const [strategy, setStrategy] = useState<GrowthStrategy | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -114,7 +124,7 @@ export default function GrowthStrategyPage() {
           setHasIdentity(false);
         }
       } else {
-        setError("Failed to load growth strategy.");
+        setError(t("growth.error.load_failed"));
       }
     } finally {
       setLoading(false);
@@ -128,7 +138,7 @@ export default function GrowthStrategyPage() {
       const data = await api.post<GrowthStrategy>("/growth-strategy");
       setStrategy(data);
     } catch {
-      setError("Failed to create your growth strategy. Please try again.");
+      setError(t("growth.error.create_failed"));
     } finally {
       setCreating(false);
     }
@@ -166,7 +176,7 @@ export default function GrowthStrategyPage() {
       if (err instanceof ApiError && err.code === "VALIDATION_ERROR") {
         setUnlockPrompt({ pathType, criteria: path?.unlock_criteria ?? "completing earlier paths" });
       } else {
-        setError(`Failed to generate ${PATH_NAMES[pathType] || pathType}.`);
+        setError(t("growth.error.generate_failed", { path: PATH_NAMES[pathType] || pathType }));
       }
     }
   };
@@ -197,26 +207,26 @@ export default function GrowthStrategyPage() {
         <div className="rounded-lg border border-border bg-surface-card p-12">
           {hasIdentity ? (
             <>
-              <h2 className="text-xl font-semibold text-foreground-strong">Your investor identity is ready. Build your Growth Strategy.</h2>
-              <p className="mt-2 text-foreground-secondary">Four growth paths, generated from your identity, that unlock as you make progress.</p>
+              <h2 className="text-xl font-semibold text-foreground-strong">{t("growth.create.title")}</h2>
+              <p className="mt-2 text-foreground-secondary">{t("growth.create.description")}</p>
               {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
               <button
                 onClick={handleCreate}
                 disabled={creating}
                 className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700 disabled:opacity-50"
               >
-                {creating ? "Creating…" : "Create My Growth Strategy"}
+                {creating ? t("growth.create.creating") : t("growth.create.action")}
               </button>
             </>
           ) : (
             <>
-              <h2 className="text-xl font-semibold text-foreground-strong">Your Growth Strategy unlocks after completing your investor identity.</h2>
-              <p className="mt-2 text-foreground-secondary">Complete all 5 audits and your identity synthesis to get started.</p>
+              <h2 className="text-xl font-semibold text-foreground-strong">{t("growth.empty.title")}</h2>
+              <p className="mt-2 text-foreground-secondary">{t("growth.empty.description")}</p>
               <Link
                 href="/hub"
                 className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700"
               >
-                Go to Identity Hub
+                {t("growth.goto_hub")}
               </Link>
             </>
           )}
@@ -234,9 +244,9 @@ export default function GrowthStrategyPage() {
       {/* Header: Growth Score + Archetype */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground-strong">Growth Strategy</h1>
+          <h1 className="text-2xl font-bold text-foreground-strong">{t("growth.title")}</h1>
           <p className="mt-1 text-sm text-foreground-muted">
-            {strategy.identity_version.archetype} · Readiness {strategy.identity_version.readiness_score}/100
+            {strategy.identity_version.archetype} · {t("growth.readiness", { score: strategy.identity_version.readiness_score })}
           </p>
         </div>
         <div className="text-right">
@@ -246,7 +256,7 @@ export default function GrowthStrategyPage() {
             aria-valuenow={strategy.growth_score}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label={`Growth Score: ${strategy.growth_score} out of 100, ${scoreTierLabel(strategy.growth_score)}`}
+            aria-label={t("growth.score_aria", { score: String(strategy.growth_score), tier: scoreTierLabel(strategy.growth_score) })}
           >
             {strategy.growth_score}
           </div>
@@ -293,7 +303,7 @@ export default function GrowthStrategyPage() {
       {/* Next Best Action */}
       {strategy.next_best_action && (
         <div className="rounded-lg border-2 border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-5 py-4">
-          <div className="text-xs font-medium uppercase text-amber-700 dark:text-amber-300">Next Best Action</div>
+          <div className="text-xs font-medium uppercase text-amber-700 dark:text-amber-300">{t("growth.next_best_action")}</div>
           <div className="mt-1 font-medium text-foreground-strong">{strategy.next_best_action.title}</div>
           <div className="mt-1 text-sm text-foreground-secondary">{strategy.next_best_action.reason}</div>
           {strategy.next_best_action.cross_path_impact.length > 0 && (
@@ -312,13 +322,13 @@ export default function GrowthStrategyPage() {
       {showFirstVisitHero && !hasCompletedAnyAction && (
         <div className="rounded-lg border border-border bg-surface-subtle px-5 py-4">
           <p className="text-sm text-foreground-secondary">
-            Your Growth Strategy starts here. Complete tasks to unlock new growth dimensions.
+            {t("growth.first_visit")}
           </p>
           <button
             onClick={() => setShowFirstVisitHero(false)}
             className="mt-1 text-xs text-foreground-tertiary hover:text-foreground-secondary"
           >
-            Dismiss
+            {t("common.dismiss")}
           </button>
         </div>
       )}
@@ -352,7 +362,7 @@ export default function GrowthStrategyPage() {
       {stubPaths.length > 0 && (
         <details className="group">
           <summary className="cursor-pointer text-sm font-medium text-foreground-muted hover:text-foreground-secondary">
-            Future Growth Paths
+            {t("growth.future_paths")}
             <span className="ml-1 transition-transform group-open:rotate-90">›</span>
           </summary>
           <div className="mt-3 space-y-3">
@@ -379,7 +389,7 @@ export default function GrowthStrategyPage() {
       {/* Overall progress */}
       <div className="rounded-lg border border-border bg-surface-card px-5 py-4">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-foreground-secondary">Overall Progress</span>
+          <span className="text-foreground-secondary">{t("growth.overall_progress")}</span>
           <span className="font-medium">{strategy.overall_progress}%</span>
         </div>
         <div className="mt-2 h-2 w-full rounded-full bg-surface-subtle">

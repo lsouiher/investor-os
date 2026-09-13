@@ -1,11 +1,13 @@
 "use client";
 
 import { useTheme } from "@/lib/theme";
+import { useTranslation } from "@/lib/i18n";
 
 const CYCLE: Array<"light" | "dark" | "system"> = ["light", "dark", "system"];
 
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation();
 
   const next = () => {
     const idx = CYCLE.indexOf(theme);
@@ -14,10 +16,10 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   const label =
     theme === "light"
-      ? "Switch to dark mode"
+      ? t("theme.switch_dark")
       : theme === "dark"
-        ? "Switch to system mode"
-        : "Switch to light mode";
+        ? t("theme.switch_system")
+        : t("theme.switch_light");
 
   return (
     <button

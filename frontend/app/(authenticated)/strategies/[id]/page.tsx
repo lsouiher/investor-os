@@ -8,6 +8,7 @@ import RoadmapTimeline from "@/components/strategy/roadmap-timeline";
 import BlueprintDownload from "@/components/strategy/blueprint-download";
 import { SkeletonCard } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
+import { useTranslation } from "@/lib/i18n";
 
 // Shapes match GET /api/v1/strategies/:id (snake_case per contracts/api-v1.md)
 interface ActionItem {
@@ -50,13 +51,13 @@ interface StrategyDetail {
 
 type TabKey = "action-plan" | "roadmap" | "micro-plan";
 
-function getCountdown(deadline: string): string {
+function getCountdown(deadline: string, t: (key: string, params?: Record<string, string | number>) => string): string {
   const diff = new Date(deadline).getTime() - Date.now();
-  if (diff <= 0) return "Past due";
+  if (diff <= 0) return t("strategy.countdown.past_due");
   const hours = Math.floor(diff / (1000 * 60 * 60));
-  if (hours < 24) return `${hours}h left`;
+  if (hours < 24) return t("strategy.countdown.hours", { hours });
   const days = Math.floor(hours / 24);
-  return days === 1 ? "1 day left" : `${days} days left`;
+  return days === 1 ? t("strategy.countdown.one_day") : t("strategy.countdown.days", { days });
 }
 
 // CUID2 ids are 24-character alphanumeric strings by default
@@ -96,6 +97,7 @@ export default function StrategyDetailPage() {
     VALID_ID_PATTERN.test(rawId);
   const id = isValidId ? rawId : "";
 
+  const { t } = useTranslation();
   const [strategy, setStrategy] = useState<StrategyDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +106,7 @@ export default function StrategyDetailPage() {
 
   const fetchStrategy = useCallback(async () => {
     if (!id) {
-      setError("Invalid strategy ID.");
+      setError(t("strategy.error.invalid_id"));
       setLoading(false);
       return;
     }
@@ -114,7 +116,7 @@ export default function StrategyDetailPage() {
       const data = await api.get<StrategyDetail>(`/strategies/${id}`);
       setStrategy(data);
     } catch {
-      setError("Failed to load strategy details.");
+      setError(t("strategy.error.load_failed"));
     } finally {
       setLoading(false);
     }
@@ -153,7 +155,7 @@ export default function StrategyDetailPage() {
       await api.put(`/strategies/${strategy.id}/activate`);
       setStrategy({ ...strategy, is_active: true });
     } catch {
-      setError("Failed to activate strategy.");
+      setError(t("strategies.error.activate_failed"));
     } finally {
       setActivating(false);
     }
@@ -175,7 +177,7 @@ export default function StrategyDetailPage() {
         },
       });
     } catch {
-      setError("Failed to update action item.");
+      setError(t("strategy.error.update_action"));
     }
   };
 
@@ -192,7 +194,7 @@ export default function StrategyDetailPage() {
         },
       });
     } catch {
-      setError("Failed to update milestone.");
+      setError(t("strategy.error.update_milestone"));
     }
   };
 
@@ -213,7 +215,7 @@ export default function StrategyDetailPage() {
         },
       });
     } catch {
-      setError("Failed to update micro-task.");
+      setError(t("strategy.error.update_micro_task"));
     }
   };
 
@@ -245,9 +247,9 @@ export default function StrategyDetailPage() {
   const progressPercent = totalActions > 0 ? Math.round((completedActions / totalActions) * 100) : 0;
 
   const tabs: { key: TabKey; label: string }[] = [
-    { key: "action-plan", label: "Action Plan" },
-    { key: "roadmap", label: "Roadmap" },
-    { key: "micro-plan", label: "Micro-Plan" },
+    { key: "action-plan", label: t("strategy.tabs.action_plan") },
+    { key: "roadmap", label: t("strategy.tabs.roadmap") },
+    { key: "micro-plan", label: t("strategy.tabs.micro_plan") },
   ];
 
   return (
@@ -258,13 +260,13 @@ export default function StrategyDetailPage() {
             href="/strategies"
             className="mb-2 inline-block text-sm text-amber-600 dark:text-amber-400 hover:text-amber-700"
           >
-            &larr; All Strategies
+            &larr; {t("strategy.all_strategies")}
           </Link>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-foreground-strong">{strategy.name}</h1>
             {strategy.is_active && (
               <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
-                Active
+                {t("strategies.active")}
               </span>
             )}
           </div>
@@ -277,7 +279,7 @@ export default function StrategyDetailPage() {
               disabled={activating}
               className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
             >
-              {activating ? "Activating…" : "Activate This Strategy"}
+              {activating ? t("strategy.activating") : t("strategies.activate")}
             </button>
           )}
           {strategy.is_active && <BlueprintDownload strategyId={strategy.id} />}
@@ -288,14 +290,14 @@ export default function StrategyDetailPage() {
 
       {!strategy.is_active && (
         <div className="rounded-lg border border-border bg-surface-subtle p-4 text-sm text-foreground-secondary">
-          Activate this strategy to generate its action plan, roadmap, and 72-hour micro-plan.
+          {t("strategy.inactive_hint")}
         </div>
       )}
 
       {planPending && (
         <div className="flex items-center gap-3 rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4 text-sm text-amber-800 dark:text-amber-200">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
-          Building your personalized plan — this usually takes under a minute.
+          {t("strategy.plan_pending")}
         </div>
       )}
 
@@ -303,9 +305,9 @@ export default function StrategyDetailPage() {
       {totalActions > 0 && (
         <div className="rounded-lg border border-border bg-surface-card p-4">
           <div className="mb-2 flex items-center justify-between text-sm">
-            <span className="font-medium text-foreground-secondary">Action Plan Progress</span>
+            <span className="font-medium text-foreground-secondary">{t("strategy.progress")}</span>
             <span className="text-foreground-muted">
-              {completedActions}/{totalActions} completed
+              {t("strategy.progress_count", { completed: String(completedActions), total: String(totalActions) })}
             </span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-surface-subtle">
@@ -361,7 +363,7 @@ export default function StrategyDetailPage() {
           ))}
           {actionItems.length === 0 && !planPending && (
             <p className="py-8 text-center text-sm text-foreground-tertiary">
-              No action items yet.
+              {t("strategy.empty.actions")}
             </p>
           )}
         </div>
@@ -376,13 +378,13 @@ export default function StrategyDetailPage() {
           {strategy.micro_plan ? (
             <div className="rounded-lg border border-border bg-surface-card p-6">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-foreground-strong">72-Hour Micro-Plan</h3>
+                <h3 className="text-lg font-semibold text-foreground-strong">{t("strategy.micro_plan.title")}</h3>
                 <span className="rounded-full bg-amber-50 dark:bg-amber-950 px-3 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
-                  {getCountdown(strategy.micro_plan.expires_at)}
+                  {getCountdown(strategy.micro_plan.expires_at, t)}
                 </span>
               </div>
               <p className="mb-4 text-sm text-foreground-secondary">
-                Small, concrete tasks to build momentum in the next three days.
+                {t("strategy.micro_plan.subtitle")}
               </p>
               <div className="space-y-2">
                 {microTasks.map((task) => (
@@ -414,7 +416,7 @@ export default function StrategyDetailPage() {
             </div>
           ) : (
             <p className="py-8 text-center text-sm text-foreground-tertiary">
-              {planPending ? "Your micro-plan is being generated." : "No micro-plan available for this strategy."}
+              {planPending ? t("strategy.micro_plan.pending") : t("strategy.empty.micro_plan")}
             </p>
           )}
         </div>

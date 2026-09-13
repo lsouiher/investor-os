@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 import RadarChart, { type RadarData } from "./radar-chart";
 
 interface SubScore {
@@ -29,6 +30,7 @@ function scoreColorClass(score: number): string {
 }
 
 function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
+  const { t } = useTranslation();
   const [animatedScore, setAnimatedScore] = useState(0);
   const strokeWidth = 8;
   const radius = (size - strokeWidth) / 2;
@@ -67,7 +69,7 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="text-3xl font-bold text-white">{animatedScore}</span>
-        <span className="text-xs text-gray-400">Readiness</span>
+        <span className="text-xs text-gray-400">{t("identity_card.readiness")}</span>
       </div>
     </div>
   );
@@ -80,6 +82,7 @@ export default function IdentityCard({
   headlineInsight,
   subScores,
 }: IdentityCardProps) {
+  const { t } = useTranslation();
   return (
     <div
       className="relative w-full overflow-hidden rounded-xl"
@@ -95,7 +98,7 @@ export default function IdentityCard({
         {/* Top: archetype title */}
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
-            Investor Identity
+            {t("identity_card.label")}
           </p>
           <h2 className="mt-1 text-2xl font-bold sm:text-3xl" style={{ color: "var(--accent)" }}>
             {archetype}

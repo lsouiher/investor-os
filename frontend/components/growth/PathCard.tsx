@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n";
 
 type PathStatus = "locked" | "unlocked" | "generating" | "generated";
 
@@ -18,12 +19,15 @@ interface PathCardProps {
   isStub?: boolean;
 }
 
-const PATH_NAMES: Record<string, string> = {
-  portfolio: "Portfolio Growth",
-  income_capital: "Income & Capital",
-  skills_knowledge: "Skills & Knowledge",
-  time_operations: "Time & Operations",
-};
+function usePathNames() {
+  const { t } = useTranslation();
+  return {
+    portfolio: t("growth.path.portfolio"),
+    income_capital: t("growth.path.income_capital"),
+    skills_knowledge: t("growth.path.skills_knowledge"),
+    time_operations: t("growth.path.time_operations"),
+  } as Record<string, string>;
+}
 
 const PATH_COLORS: Record<string, string> = {
   portfolio: "border-l-amber-500",
@@ -57,6 +61,8 @@ export default function PathCard({
   onGenerate,
   isStub,
 }: PathCardProps) {
+  const { t } = useTranslation();
+  const PATH_NAMES = usePathNames();
   const name = PATH_NAMES[pathType] || pathType;
   const accentColor = PATH_COLORS[pathType] || "border-l-gray-400";
   const icon = PATH_ICONS[pathType] || "📌";
@@ -75,7 +81,7 @@ export default function PathCard({
             <span className="font-medium text-foreground-secondary">{name}</span>
           </div>
           <span className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
-            Coming Soon
+            {t("growth.path.coming_soon")}
           </span>
         </div>
       </div>
@@ -101,7 +107,7 @@ export default function PathCard({
               {progress}%
             </span>
             <span className="text-sm text-foreground-muted">
-              {completedActionItems}/{actionItemCount} actions
+              {completedActionItems}/{actionItemCount} {t("growth_path.action_items")}
             </span>
             <span className="text-foreground-tertiary">→</span>
           </div>
@@ -133,7 +139,7 @@ export default function PathCard({
             <span className="text-lg">{icon}</span>
             <span className="font-semibold text-foreground-strong">{name}</span>
           </div>
-          <span className="text-sm text-amber-600">Generating your plan...</span>
+          <span className="text-sm text-amber-600">{t("growth.path.generating")}</span>
         </div>
         {/* Shimmer animation */}
         <div className="mt-3 h-8 w-full animate-pulse rounded bg-gradient-to-r from-surface-subtle via-border-muted to-surface-subtle" />
@@ -158,7 +164,7 @@ export default function PathCard({
             onClick={onGenerate}
             className="rounded bg-amber-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
           >
-            Generate
+            {t("growth.path.generate")}
           </button>
         </div>
       </div>
@@ -182,7 +188,7 @@ export default function PathCard({
             onClick={onGenerate}
             className="rounded border border-border px-3 py-1 text-xs text-foreground-muted hover:border-foreground-tertiary"
           >
-            Generate Now
+            {t("growth.path.generate_now")}
           </button>
         )}
       </div>

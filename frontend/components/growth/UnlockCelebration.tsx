@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 const PATH_NAMES: Record<string, string> = {
   portfolio: "Portfolio Growth",
@@ -22,6 +23,7 @@ interface UnlockCelebrationProps {
 }
 
 export default function UnlockCelebration({ pathType, onDismiss }: UnlockCelebrationProps) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(true);
   const prefersReducedMotion =
     typeof window !== "undefined" &&
@@ -52,17 +54,17 @@ export default function UnlockCelebration({ pathType, onDismiss }: UnlockCelebra
         <span className="text-2xl">{icon}</span>
         <div>
           <div className="font-semibold text-foreground-strong">
-            🎉 You&apos;ve unlocked {name}!
+            {t("growth.celebration.unlocked", { name })}
           </div>
           <div className="mt-0.5 text-sm text-foreground-secondary">
-            A new growth dimension is ready to explore.
+            {t("growth.celebration.description")}
           </div>
         </div>
       </div>
       <button
         onClick={() => { setVisible(false); onDismiss(); }}
         className="absolute right-2 top-2 text-foreground-tertiary hover:text-foreground-secondary"
-        aria-label="Dismiss"
+        aria-label={t("common.dismiss")}
       >
         ×
       </button>

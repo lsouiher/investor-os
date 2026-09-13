@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n";
+
 interface AiErrorStateProps {
   severity: "critical" | "medium" | "low";
   onRetry?: () => void;
@@ -11,6 +13,7 @@ export default function AiErrorState({
   onRetry,
   message,
 }: AiErrorStateProps) {
+  const { t } = useTranslation();
   if (severity === "critical") {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
@@ -30,18 +33,17 @@ export default function AiErrorState({
           </svg>
         </div>
         <h2 className="mb-2 text-xl font-semibold text-foreground-strong">
-          Something went wrong
+          {t("error.critical.title")}
         </h2>
         <p className="mb-6 max-w-md text-sm text-foreground-secondary">
-          {message ||
-            "Our AI service is temporarily unavailable. Your data is safe and we are working to restore service. Please try again shortly."}
+          {message || t("error.critical.description")}
         </p>
         {onRetry && (
           <button
             onClick={onRetry}
             className="rounded-lg bg-amber-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
           >
-            Try Again
+            {t("error.critical.retry")}
           </button>
         )}
       </div>
@@ -65,14 +67,14 @@ export default function AiErrorState({
           />
         </svg>
         <p className="flex-1 text-sm text-amber-800 dark:text-amber-200">
-          {message || "AI analysis could not be completed. Please try again."}
+          {message || t("error.medium.message")}
         </p>
         {onRetry && (
           <button
             onClick={onRetry}
             className="flex-shrink-0 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700"
           >
-            Retry
+            {t("common.retry")}
           </button>
         )}
       </div>
@@ -95,13 +97,13 @@ export default function AiErrorState({
           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
-      <span>{message || "Some AI features are temporarily limited."}</span>
+      <span>{message || t("error.low.message")}</span>
       {onRetry && (
         <button
           onClick={onRetry}
           className="font-medium text-amber-600 underline hover:text-amber-700"
         >
-          Retry
+          {t("common.retry")}
         </button>
       )}
     </div>

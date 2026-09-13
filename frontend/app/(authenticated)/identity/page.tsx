@@ -7,6 +7,7 @@ import IdentityCard from "@/components/identity/identity-card";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
 import { toSubScoreList } from "@/lib/identity";
+import { useTranslation } from "@/lib/i18n";
 
 interface IdentityData {
   id: string;
@@ -34,6 +35,7 @@ const REQUIRED_AUDITS = 5;
 const REVEAL_KEY = "investoros_identity_revealed";
 
 export default function IdentityPage() {
+  const { t } = useTranslation();
   const [identity, setIdentity] = useState<IdentityData | null>(null);
   const [loading, setLoading] = useState(true);
   const [synthesizing, setSynthesizing] = useState(false);
@@ -70,7 +72,7 @@ export default function IdentityPage() {
           setAuditsComplete(false);
         }
       } else {
-        setError("Failed to load identity data.");
+        setError(t("identity.error.load_failed"));
       }
     } finally {
       setLoading(false);
@@ -92,7 +94,7 @@ export default function IdentityPage() {
       setFeedbackRating(null);
       setFeedbackSubmitted(false);
     } catch {
-      setError("Synthesis failed. Please try again.");
+      setError(t("identity.error.synthesis_failed"));
     } finally {
       setSynthesizing(false);
     }
@@ -129,7 +131,7 @@ export default function IdentityPage() {
   if (!identity) {
     return (
       <div className="mx-auto max-w-5xl space-y-4">
-        {synthesizing && <SpinnerOverlay label="Synthesizing your identity..." />}
+        {synthesizing && <SpinnerOverlay label={t("identity.synthesizing")} />}
         {error && (
           <AiErrorState severity="medium" message={error} onRetry={handleSynthesize} />
         )}
@@ -147,31 +149,31 @@ export default function IdentityPage() {
             </svg>
           </div>
           <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
-            Your Identity Card Awaits
+            {t("identity.empty.title")}
           </h2>
           {auditsComplete ? (
             <>
               <p className="mb-6 max-w-sm text-sm text-foreground-muted">
-                All 5 audits are complete. Synthesize your Investor Identity to reveal your archetype and readiness score.
+                {t("identity.ready.description")}
               </p>
               <button
                 onClick={handleSynthesize}
                 disabled={synthesizing}
                 className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
               >
-                Synthesize My Identity
+                {t("identity.ready.action")}
               </button>
             </>
           ) : (
             <>
               <p className="mb-6 max-w-sm text-sm text-foreground-muted">
-                Complete all 5 audits to see your Investor Identity Card.
+                {t("identity.empty.description")}
               </p>
               <Link
                 href="/hub"
                 className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
               >
-                Go to Identity Hub
+                {t("identity.goto_hub")}
               </Link>
             </>
           )}
@@ -182,13 +184,13 @@ export default function IdentityPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      {synthesizing && <SpinnerOverlay label="Synthesizing your identity..." />}
+      {synthesizing && <SpinnerOverlay label={t("identity.synthesizing")} />}
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground-strong">Investor Identity</h1>
+          <h1 className="text-2xl font-bold text-foreground-strong">{t("identity.title")}</h1>
           <p className="mt-1 text-sm text-foreground-muted">
-            Your AI-synthesized investor profile
+            {t("identity.subtitle")}
           </p>
         </div>
         <button
@@ -196,7 +198,7 @@ export default function IdentityPage() {
           disabled={synthesizing}
           className="rounded-lg border border-amber-600 px-4 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950 disabled:opacity-50"
         >
-          Re-Synthesize
+          {t("identity.resynthesize")}
         </button>
       </div>
 
@@ -219,7 +221,7 @@ export default function IdentityPage() {
       {identity && !feedbackSubmitted && (
         <div className="rounded-lg border border-border bg-surface-card p-6 text-center">
           <p className="mb-3 text-sm font-medium text-foreground-secondary">
-            How well does this identity reflect you?
+            {t("identity.feedback_prompt")}
           </p>
           <div className="flex items-center justify-center gap-2">
             {[1, 2, 3, 4, 5].map((n) => (
@@ -236,13 +238,13 @@ export default function IdentityPage() {
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-foreground-tertiary">1 = Not at all, 5 = Perfectly</p>
+          <p className="mt-2 text-xs text-foreground-tertiary">{t("identity.feedback_scale")}</p>
         </div>
       )}
 
       {feedbackSubmitted && (
         <p className="text-center text-sm text-foreground-muted">
-          Thanks for your feedback!
+          {t("identity.feedback_thanks")}
         </p>
       )}
 
@@ -251,7 +253,7 @@ export default function IdentityPage() {
           href="/identity/history"
           className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
         >
-          View Identity History
+          {t("identity.view_history")}
         </Link>
       </div>
 

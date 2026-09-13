@@ -6,6 +6,7 @@ import { api } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/shared/loading-states";
 import { StrategyEmpty } from "@/components/shared/empty-states";
 import AiErrorState from "@/components/shared/ai-error-state";
+import { useTranslation } from "@/lib/i18n";
 
 // Shape of GET /api/v1/strategies items (snake_case per contracts/api-v1.md)
 interface Strategy {
@@ -26,6 +27,7 @@ function scoreColorClass(score: number): string {
 }
 
 export default function StrategiesPage() {
+  const { t } = useTranslation();
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ export default function StrategiesPage() {
       const data = await api.get<Strategy[]>("/strategies");
       setStrategies([...data].sort((a, b) => a.rank - b.rank));
     } catch {
-      setError("Failed to load strategies.");
+      setError(t("strategies.error.load_failed"));
     } finally {
       setLoading(false);
     }
@@ -55,7 +57,7 @@ export default function StrategiesPage() {
         prev.map((s) => ({ ...s, is_active: s.id === id }))
       );
     } catch {
-      setError("Failed to activate strategy.");
+      setError(t("strategies.error.activate_failed"));
     }
   };
 
@@ -90,9 +92,9 @@ export default function StrategiesPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground-strong">Your Strategies</h1>
+        <h1 className="text-2xl font-bold text-foreground-strong">{t("strategies.title")}</h1>
         <p className="mt-1 text-sm text-foreground-muted">
-          Personalized investment strategies ranked by fit
+          {t("strategies.subtitle")}
         </p>
       </div>
 
@@ -106,11 +108,11 @@ export default function StrategiesPage() {
           <div>
             <div className="mb-1 flex items-center gap-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                Top Match
+                {t("strategies.top_match")}
               </span>
               {primary.is_active && (
                 <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
-                  Active
+                  {t("strategies.active")}
                 </span>
               )}
             </div>
@@ -119,7 +121,7 @@ export default function StrategiesPage() {
           <span
             className={`rounded-full px-3 py-1 text-sm font-bold ${scoreColorClass(primary.fit_score)}`}
           >
-            {primary.fit_score}% Fit
+            {t("strategies.fit_score", { score: String(primary.fit_score) })}
           </span>
         </div>
 
@@ -128,7 +130,7 @@ export default function StrategiesPage() {
         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-              Pros
+              {t("strategies.pros")}
             </h4>
             <ul className="space-y-1">
               {primary.pros.map((pro, i) => (
@@ -149,7 +151,7 @@ export default function StrategiesPage() {
           </div>
           <div>
             <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-red-500 dark:text-red-400">
-              Cons
+              {t("strategies.cons")}
             </h4>
             <ul className="space-y-1">
               {primary.cons.map((con, i) => (
@@ -176,14 +178,14 @@ export default function StrategiesPage() {
               onClick={() => handleActivate(primary.id)}
               className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
             >
-              Activate This Strategy
+              {t("strategies.activate")}
             </button>
           )}
           <Link
             href={`/strategies/${primary.id}`}
             className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle"
           >
-            View Details
+            {t("strategies.view_details")}
           </Link>
         </div>
       </div>
@@ -202,7 +204,7 @@ export default function StrategiesPage() {
               <h3 className="font-semibold text-foreground-strong">{strategy.name}</h3>
               {strategy.is_active && (
                 <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
-                  Active
+                  {t("strategies.active")}
                 </span>
               )}
             </div>
@@ -219,7 +221,7 @@ export default function StrategiesPage() {
             href={`/strategies/${strategy.id}`}
             className="flex-shrink-0 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
           >
-            View
+            {t("common.view")}
           </Link>
         </div>
       ))}

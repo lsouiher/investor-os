@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
+import { useTranslation } from "@/lib/i18n";
 import { getDisclosureMessage } from "@/components/hub/disclosure-messages";
 
 interface AuditSummary {
@@ -20,32 +21,32 @@ interface AuditSummary {
 const AUDIT_ORDER = [
   {
     type: "time",
-    name: "Time Audit",
-    description: "How much time can you dedicate to real estate? This shapes which strategies fit your life.",
+    nameKey: "audit.time.name",
+    descriptionKey: "audit.time.description",
     estimatedMinutes: 3,
   },
   {
     type: "skills",
-    name: "Skills & Experience",
-    description: "Your professional background, RE experience, and transferable skills determine your readiness.",
+    nameKey: "audit.skills.name",
+    descriptionKey: "audit.skills.description",
     estimatedMinutes: 4,
   },
   {
     type: "horizon",
-    name: "Horizon & Goals",
-    description: "Define your investment timeline, financial targets, and lifestyle preferences.",
+    nameKey: "audit.horizon.name",
+    descriptionKey: "audit.horizon.description",
     estimatedMinutes: 3,
   },
   {
     type: "risk",
-    name: "Risk Profile",
-    description: "Understand your true risk tolerance through scenario-based questions.",
+    nameKey: "audit.risk.name",
+    descriptionKey: "audit.risk.description",
     estimatedMinutes: 4,
   },
   {
     type: "financial",
-    name: "Financial Audit",
-    description: "Income, assets, liabilities, credit, and tax situation. The most sensitive, so we save it for when you're comfortable.",
+    nameKey: "audit.financial.name",
+    descriptionKey: "audit.financial.description",
     estimatedMinutes: 4,
   },
 ] as const;
@@ -85,6 +86,7 @@ function StepIcon({ status }: { status: "completed" | "current" | "not_started" 
 export default function IdentityHubPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useTranslation();
   const [audits, setAudits] = useState<AuditSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -112,7 +114,7 @@ export default function IdentityHubPage() {
   ).length;
 
   const progressPercent = (completedCount / 5) * 100;
-  const disclosureMessage = getDisclosureMessage(completedCount);
+  const disclosureMessage = getDisclosureMessage(completedCount, t);
 
   // Find the first non-completed audit in order -- that's the "recommended next"
   const recommendedIndex = AUDIT_ORDER.findIndex(
@@ -148,12 +150,12 @@ export default function IdentityHubPage() {
   if (!user) {
     return (
       <div className="max-w-5xl mx-auto py-12 text-center">
-        <p className="text-sm text-foreground-muted">Unable to load user data. Please log in again.</p>
+        <p className="text-sm text-foreground-muted">{t("hub.auth_error")}</p>
         <button
           onClick={() => router.push("/login")}
           className="mt-3 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
         >
-          Go to Login
+          {t("hub.goto_login")}
         </button>
       </div>
     );
@@ -163,9 +165,9 @@ export default function IdentityHubPage() {
     <div className="max-w-5xl mx-auto py-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground-strong">Identity Hub</h1>
+        <h1 className="text-2xl font-bold text-foreground-strong">{t("hub.title")}</h1>
         <p className="mt-1 text-sm text-foreground-muted">
-          Complete your 5 audits to build your investor identity.
+          {t("hub.subtitle")}
         </p>
       </div>
 
@@ -173,7 +175,7 @@ export default function IdentityHubPage() {
       <div className="bg-surface-card rounded-lg border border-border p-6 mb-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-foreground-secondary">
-            {completedCount} of 5 complete
+            {t("hub.progress", { count: String(completedCount) })}
           </span>
           <span className="text-sm text-foreground-muted">{disclosureMessage}</span>
         </div>
@@ -219,14 +221,14 @@ export default function IdentityHubPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <h3 className="font-semibold text-foreground-strong">
-                        {auditDef.name}
+                        {t(auditDef.nameKey)}
                       </h3>
                       {status === "completed" && audit?.sub_score != null && (
                         <ScoreBadge score={audit.sub_score} />
                       )}
                       {audit?.status === "in_progress" && (
                         <span className="text-xs bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 px-2 py-0.5 border border-amber-200 dark:border-amber-700">
-                          In progress
+                          {t("audit.status.in_progress")}
                         </span>
                       )}
                     </div>
@@ -236,7 +238,7 @@ export default function IdentityHubPage() {
                         onClick={() => router.push(`/audits/${auditDef.type}`)}
                         className="text-sm text-foreground-muted hover:text-foreground-secondary underline"
                       >
-                        Update
+                        {t("audit.action.update")}
                       </button>
                     )}
                   </div>
@@ -245,7 +247,7 @@ export default function IdentityHubPage() {
                   {isRecommended && status !== "completed" && (
                     <div className="mt-3">
                       <p className="text-sm text-foreground-secondary mb-4">
-                        {auditDef.description}
+                        {t(auditDef.descriptionKey)}
                       </p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-foreground-tertiary">
@@ -255,7 +257,7 @@ export default function IdentityHubPage() {
                           onClick={() => router.push(`/audits/${auditDef.type}`)}
                           className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm"
                         >
-                          {audit?.status === "in_progress" ? "Continue" : "Start"}
+                          {audit?.status === "in_progress" ? t("audit.action.continue") : t("audit.action.start")}
                         </button>
                       </div>
                     </div>
@@ -272,13 +274,13 @@ export default function IdentityHubPage() {
                   {!isRecommended && audit?.status === "in_progress" && (
                     <div className="mt-3 flex items-center justify-between">
                       <p className="text-sm text-foreground-muted">
-                        You have saved progress.
+                        {t("audit.saved_progress")}
                       </p>
                       <button
                         onClick={() => router.push(`/audits/${auditDef.type}`)}
                         className="text-sm text-amber-600 hover:text-amber-700 font-medium underline"
                       >
-                        Continue
+                        {t("audit.action.continue")}
                       </button>
                     </div>
                   )}
@@ -293,7 +295,7 @@ export default function IdentityHubPage() {
       {completedCount < 5 && (
         <div className="mt-8 text-center">
           <p className="text-sm text-foreground-tertiary">
-            Complete all 5 to unlock your Identity Card
+            {t("hub.complete_all")}
           </p>
         </div>
       )}
@@ -304,16 +306,16 @@ export default function IdentityHubPage() {
             <svg className="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="font-semibold text-emerald-700 dark:text-emerald-300">All audits complete</span>
+            <span className="font-semibold text-emerald-700 dark:text-emerald-300">{t("hub.all_complete")}</span>
           </div>
           <p className="text-sm text-foreground-secondary mb-4">
-            Your full investor identity is ready for synthesis.
+            {t("hub.synthesis_ready")}
           </p>
           <button
             onClick={() => router.push("/identity")}
             className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm"
           >
-            View Your Identity Card
+            {t("hub.view_identity")}
           </button>
         </div>
       )}

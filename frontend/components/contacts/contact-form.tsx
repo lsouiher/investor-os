@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n";
 import { useState, useEffect, useRef } from "react";
 
 interface Contact {
@@ -24,24 +25,20 @@ interface ContactFormModalProps {
 }
 
 // Must match the ContactRoleType enum on the backend
-const ROLE_OPTIONS = [
-  { value: "agent", label: "Agent" },
-  { value: "lender", label: "Lender" },
-  { value: "contractor", label: "Contractor" },
-  { value: "attorney", label: "Attorney" },
-  { value: "cpa", label: "CPA" },
-  { value: "mentor", label: "Mentor" },
-  { value: "partner", label: "Partner" },
-  { value: "seller", label: "Seller" },
-  { value: "property_manager", label: "Property Manager" },
-  { value: "other", label: "Other" },
-];
+const ROLE_VALUES = ["agent", "lender", "contractor", "attorney", "cpa", "mentor", "partner", "seller", "property_manager", "other"];
+
+function useRoleOptions() {
+  const { t } = useTranslation();
+  return ROLE_VALUES.map((value) => ({ value, label: t(`contacts.role.${value}`) }));
+}
 
 export default function ContactFormModal({
   contact,
   onSave,
   onClose,
 }: ContactFormModalProps) {
+  const { t } = useTranslation();
+  const ROLE_OPTIONS = useRoleOptions();
   const [name, setName] = useState(contact?.name ?? "");
   const [email, setEmail] = useState(contact?.email ?? "");
   const [phone, setPhone] = useState(contact?.phone ?? "");
@@ -72,7 +69,7 @@ export default function ContactFormModal({
       await onSave({ name: name.trim(), email, phone, role_type: roleType, notes });
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to save contact. Please try again."
+        err instanceof Error ? err.message : t("contacts.error.save_failed")
       );
     } finally {
       setSaving(false);
@@ -88,7 +85,7 @@ export default function ContactFormModal({
       <div className="w-full max-w-md rounded-lg border border-border bg-surface-card p-6 shadow-xl">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground-strong">
-            {contact ? "Edit Contact" : "Add Contact"}
+            {contact ? t("contacts.form.edit_title") : t("contacts.form.add_title")}
           </h2>
           <button
             onClick={onClose}
@@ -108,7 +105,7 @@ export default function ContactFormModal({
           )}
           <div>
             <label className="mb-1 block text-sm font-medium text-foreground-secondary">
-              Name *
+              {t("contacts.form.name_label")}
             </label>
             <input
               type="text"
@@ -116,39 +113,39 @@ export default function ContactFormModal({
               onChange={(e) => setName(e.target.value)}
               required
               className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-              placeholder="Full name"
+              placeholder={t("contacts.form.name_placeholder")}
             />
           </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium text-foreground-secondary">
-              Email
+              {t("contacts.form.email_label")}
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-              placeholder="email@example.com"
+              placeholder={t("contacts.form.email_placeholder")}
             />
           </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium text-foreground-secondary">
-              Phone
+              {t("contacts.form.phone_label")}
             </label>
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-              placeholder="(555) 123-4567"
+              placeholder={t("contacts.form.phone_placeholder")}
             />
           </div>
 
           <div>
             <label className="mb-1 block text-sm font-medium text-foreground-secondary">
-              Role Type
+              {t("contacts.form.role_label")}
             </label>
             <select
               value={roleType}
@@ -165,14 +162,14 @@ export default function ContactFormModal({
 
           <div>
             <label className="mb-1 block text-sm font-medium text-foreground-secondary">
-              Notes
+              {t("contacts.form.notes_label")}
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-              placeholder="Any notes about this contact..."
+              placeholder={t("contacts.form.notes_placeholder")}
             />
           </div>
 
@@ -182,14 +179,14 @@ export default function ContactFormModal({
               disabled={saving || !name.trim()}
               className="flex-1 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
             >
-              {saving ? "Saving..." : contact ? "Update Contact" : "Add Contact"}
+              {saving ? t("contacts.form.saving") : contact ? t("contacts.form.update") : t("contacts.form.submit")}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
           </div>
         </form>

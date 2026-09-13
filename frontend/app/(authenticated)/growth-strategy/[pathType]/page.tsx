@@ -6,6 +6,7 @@ import Link from "next/link";
 import { api, ApiError } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
+import { useTranslation } from "@/lib/i18n";
 
 interface ActionItem {
   id: string;
@@ -51,12 +52,15 @@ interface PathDetail {
   generation_cooldown_until: string | null;
 }
 
-const PATH_NAMES: Record<string, string> = {
-  portfolio: "Portfolio Growth",
-  income_capital: "Income & Capital",
-  skills_knowledge: "Skills & Knowledge",
-  time_operations: "Time & Operations",
-};
+function usePathNames() {
+  const { t } = useTranslation();
+  return {
+    portfolio: t("growth.path.portfolio"),
+    income_capital: t("growth.path.income_capital"),
+    skills_knowledge: t("growth.path.skills_knowledge"),
+    time_operations: t("growth.path.time_operations"),
+  } as Record<string, string>;
+}
 
 function scoreTierClass(score: number): string {
   if (score < 40) return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
@@ -65,6 +69,8 @@ function scoreTierClass(score: number): string {
 }
 
 export default function PathDetailPage() {
+  const { t } = useTranslation();
+  const PATH_NAMES = usePathNames();
   const params = useParams();
   const pathType = params?.pathType as string;
   const [path, setPath] = useState<PathDetail | null>(null);
@@ -82,7 +88,7 @@ export default function PathDetailPage() {
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        setError("Failed to load path details.");
+        setError(t("growth_path.error.load_failed"));
       }
     } finally {
       setLoading(false);
@@ -112,7 +118,7 @@ export default function PathDetailPage() {
         };
       });
     } catch {
-      setError("Failed to update action item.");
+      setError(t("growth_path.error.update_action"));
       fetchPath();
     }
   };
@@ -146,12 +152,12 @@ export default function PathDetailPage() {
       {/* Header */}
       <div>
         <Link href="/growth-strategy" className="text-sm text-foreground-muted hover:text-foreground-secondary">
-          ← Growth Strategy
+          &larr; {t("growth_path.back")}
         </Link>
         <div className="mt-2 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground-strong">{name}</h1>
           <span className={`rounded px-3 py-1 text-sm font-medium ${scoreTierClass(path.progress)}`}>
-            {path.progress}% complete
+            {path.progress}{t("growth_path.complete")}
           </span>
         </div>
         {path.summary && (
@@ -170,7 +176,7 @@ export default function PathDetailPage() {
       {/* V1 Strategy Reference (Portfolio only) */}
       {path.strategy && (
         <div className="rounded-lg border border-border bg-surface-card p-5">
-          <h2 className="text-sm font-semibold uppercase text-foreground-muted">Active Strategy</h2>
+          <h2 className="text-sm font-semibold uppercase text-foreground-muted">{t("growth_path.active_strategy")}</h2>
           <div className="mt-2 flex items-center justify-between">
             <span className="font-medium text-foreground-strong">{path.strategy.name}</span>
             <span className={`rounded px-2 py-0.5 text-xs font-medium ${scoreTierClass(path.strategy.fit_score)}`}>
@@ -180,15 +186,15 @@ export default function PathDetailPage() {
           <div className="mt-3 grid grid-cols-3 gap-4 text-center text-sm">
             <div>
               <div className="font-medium">{path.strategy.action_plan.completed_count}/{path.strategy.action_plan.item_count}</div>
-              <div className="text-foreground-muted">Action Items</div>
+              <div className="text-foreground-muted">{t("growth_path.action_items")}</div>
             </div>
             <div>
               <div className="font-medium">{path.strategy.roadmap.completed_count}/{path.strategy.roadmap.milestone_count}</div>
-              <div className="text-foreground-muted">Milestones</div>
+              <div className="text-foreground-muted">{t("growth_path.milestones")}</div>
             </div>
             <div>
               <div className="font-medium">{path.strategy.micro_plan.completed_count}/{path.strategy.micro_plan.task_count}</div>
-              <div className="text-foreground-muted">Micro Tasks</div>
+              <div className="text-foreground-muted">{t("growth_path.micro_tasks")}</div>
             </div>
           </div>
         </div>
@@ -197,7 +203,7 @@ export default function PathDetailPage() {
       {/* Scaling Plan (Portfolio path) */}
       {scalingPlan && (
         <div className="rounded-lg border border-border bg-surface-card p-5">
-          <h2 className="text-sm font-semibold uppercase text-foreground-muted">Scaling Vision</h2>
+          <h2 className="text-sm font-semibold uppercase text-foreground-muted">{t("growth_path.scaling_vision")}</h2>
           <div className="mt-3 space-y-3">
             {[
               { label: "Year 1", value: scalingPlan.year_1_vision },
@@ -217,7 +223,7 @@ export default function PathDetailPage() {
       {/* Content sections (generic rendering for non-Portfolio paths) */}
       {!scalingPlan && Object.keys(content).length > 0 && (
         <div className="rounded-lg border border-border bg-surface-card p-5">
-          <h2 className="text-sm font-semibold uppercase text-foreground-muted">Path Content</h2>
+          <h2 className="text-sm font-semibold uppercase text-foreground-muted">{t("growth_path.content")}</h2>
           <div className="mt-3 space-y-4">
             {Object.entries(content).map(([key, value]) => {
               if (typeof value === "string") {
@@ -256,7 +262,7 @@ export default function PathDetailPage() {
       {sortedActions.length > 0 && (
         <div className="rounded-lg border border-border bg-surface-card p-5">
           <h2 className="text-sm font-semibold uppercase text-foreground-muted">
-            Action Items ({path.action_items.filter((a) => a.is_completed).length}/{path.action_items.length})
+            {t("growth_path.action_items")} ({path.action_items.filter((a) => a.is_completed).length}/{path.action_items.length})
           </h2>
           <div className="mt-3 space-y-2">
             {sortedActions.map((item) => (
@@ -282,7 +288,7 @@ export default function PathDetailPage() {
                   <div className="mt-1 flex gap-2">
                     <span className="text-xs text-foreground-tertiary">{item.timeframe}</span>
                     <span className={`rounded px-1.5 py-0.5 text-xs ${scoreTierClass(item.priority_score)}`}>
-                      Priority {item.priority_score}
+                      {t("growth_path.priority", { score: String(item.priority_score) })}
                     </span>
                   </div>
                 </div>
@@ -295,9 +301,9 @@ export default function PathDetailPage() {
       {/* Metadata */}
       {path.generated_at && (
         <div className="text-xs text-foreground-tertiary">
-          Generated {new Date(path.generated_at).toLocaleDateString()} · Version {path.version}
+          {t("growth_path.generated_at", { date: new Date(path.generated_at).toLocaleDateString(), version: String(path.version) })}
           {path.generation_cooldown_until && new Date(path.generation_cooldown_until) > new Date() && (
-            <span> · Regeneration available after {new Date(path.generation_cooldown_until).toLocaleTimeString()}</span>
+            <span> · {t("growth_path.regeneration_after", { time: new Date(path.generation_cooldown_until).toLocaleTimeString() })}</span>
           )}
         </div>
       )}

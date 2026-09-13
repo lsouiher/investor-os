@@ -6,13 +6,15 @@ import Link from "next/link";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
 import { api } from "@/lib/api-client";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { LanguageToggle } from "@/components/shared/language-toggle";
+import { useTranslation } from "@/lib/i18n";
 
 const NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutIcon },
-  { label: "Identity Hub", href: "/hub", icon: UserIcon },
-  { label: "Strategy", href: "/strategies", icon: TargetIcon },
-  { label: "Contacts", href: "/contacts", icon: UsersIcon },
-  { label: "Tasks", href: "/tasks", icon: CheckIcon },
+  { label: "nav.dashboard", href: "/dashboard", icon: LayoutIcon },
+  { label: "nav.hub", href: "/hub", icon: UserIcon },
+  { label: "nav.strategy", href: "/strategies", icon: TargetIcon },
+  { label: "nav.contacts", href: "/contacts", icon: UsersIcon },
+  { label: "nav.tasks", href: "/tasks", icon: CheckIcon },
 ];
 
 export default function AuthenticatedLayout({
@@ -33,6 +35,7 @@ function AuthenticatedShell({
   children: React.ReactNode;
 }) {
   const { token, user, loading, logout } = useAuth();
+  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const [score, setScore] = useState<number | null>(null);
@@ -55,7 +58,7 @@ function AuthenticatedShell({
   if (loading) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <p className="text-sm text-foreground-muted">Loading...</p>
+        <p className="text-sm text-foreground-muted">{t("common.loading")}</p>
       </div>
     );
   }
@@ -74,7 +77,7 @@ function AuthenticatedShell({
         <div>
           <div className="px-6 py-6">
             <p className="text-sm font-semibold tracking-widest uppercase text-accent">
-              InvestorOS
+              {t("nav.brand")}
             </p>
           </div>
 
@@ -93,7 +96,7 @@ function AuthenticatedShell({
                   style={{ borderRadius: "var(--radius-default)" }}
                 >
                   <item.icon className="h-4 w-4" />
-                  {item.label}
+                  {t(item.label)}
                 </Link>
               );
             })}
@@ -111,15 +114,16 @@ function AuthenticatedShell({
             </div>
             <div className="flex-1 min-w-0">
               <p className="truncate text-xs font-medium text-foreground">
-                {user?.email ?? "Investor"}
+                {user?.email ?? t("nav.default_user")}
               </p>
-              <p className="text-xs text-foreground-muted">Score: {score ?? "--"}</p>
+              <p className="text-xs text-foreground-muted">{t("nav.score", { score: score ?? "--" })}</p>
             </div>
+            <LanguageToggle />
             <ThemeToggle />
             <button
               onClick={logout}
               className="text-xs text-foreground-muted hover:text-foreground"
-              title="Log out"
+              title={t("nav.logout")}
             >
               <LogoutIcon className="h-4 w-4" />
             </button>
@@ -150,7 +154,7 @@ function AuthenticatedShell({
               }`}
             >
               <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
+              <span>{t(item.label)}</span>
             </Link>
           );
         })}
