@@ -22,14 +22,18 @@ function generateToken(user: { publicId: string; email: string; role: string }):
   return jwt.sign(payload, secret, options);
 }
 
-export async function register(email: string, password: string): Promise<AuthResponse> {
+export async function register(
+  email: string,
+  password: string,
+  signupSource: string | null = null,
+): Promise<AuthResponse> {
   const existing = await authRepo.findUserByEmail(email);
   if (existing) {
     throw new AppError('VALIDATION_ERROR', 'Email already registered.', 400);
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const { user } = await authRepo.createUserWithTenant(email, passwordHash);
+  const { user } = await authRepo.createUserWithTenant(email, passwordHash, signupSource);
   const token = generateToken(user);
 
   return {

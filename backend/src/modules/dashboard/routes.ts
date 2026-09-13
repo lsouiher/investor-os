@@ -3,7 +3,7 @@ import * as auditRepo from '../audit/repository.js';
 import * as identityRepo from '../identity/repository.js';
 import * as strategyRepo from '../strategy/repository.js';
 import * as taskService from '../task/service.js';
-import { generateInsights } from '../insight/service.js';
+import { getInsights } from '../insight/service.js';
 
 const router = Router();
 
@@ -43,7 +43,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
       getAuditCompletion(userId, tenantId),
 
       // Intelligence feed
-      generateInsights(userId, tenantId).catch(() => []),
+      getInsights(userId, tenantId).catch(() => []),
     ]);
 
     // Calculate strategy progress

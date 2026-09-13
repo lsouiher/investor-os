@@ -201,6 +201,9 @@ export async function activateStrategy(
     logger.error({ err, strategyId: strategy.id }, 'Failed to generate detailed plans');
   });
 
+  // The intelligence feed reasons about the active strategy; let it regenerate on the next visit
+  import('../insight/service.js').then((s) => s.invalidateInsights(userId)).catch(() => {});
+
   return {
     id: activated.publicId,
     isActive: activated.isActive,

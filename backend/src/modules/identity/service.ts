@@ -172,6 +172,11 @@ async function doSynthesizeIdentity(
       logger.error({ err, userId }, 'Chained strategy generation failed (non-blocking)');
     });
 
+  // Warm the dashboard's insight cache so the first visit after synthesis isn't empty
+  import('../insight/service.js')
+    .then((insightService) => insightService.refreshInsights(userId, tenantId))
+    .catch((err) => logger.error({ err, userId }, 'Insight warm-up failed (non-blocking)'));
+
   // Growth strategy hooks (fire-and-forget)
   try {
     const growthService = await import('../growth/service.js');

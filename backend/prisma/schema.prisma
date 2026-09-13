@@ -123,6 +123,9 @@ model User {
   role                  UserRole  @default(investor)
   identityRevealSeenAt  DateTime? @map("identity_reveal_seen_at") // Set on first identity card reveal
   lastLoginAt           DateTime? @map("last_login_at")
+  signupSource          String?   @map("signup_source") // utm_source at registration (bpcon, qr, ...)
+  insightsCache         Json?     @map("insights_cache") // Last generated dashboard insights
+  insightsGeneratedAt   DateTime? @map("insights_generated_at")
   createdAt             DateTime  @default(now()) @map("created_at")
   updatedAt             DateTime  @updatedAt @map("updated_at")
   deletedAt             DateTime? @map("deleted_at") // Soft delete
@@ -183,6 +186,7 @@ model IdentityVersion {
   aiInsights      Json     @map("ai_insights") // Full AI synthesis output
   auditSnapshot   Json     @map("audit_snapshot") // References to audit versions used
   userRating      Int?     @map("user_rating") // 1-5 post-synthesis feedback
+  userFeedback    String?  @map("user_feedback") // Free text: what the synthesis got wrong or missed
   generatedAt     DateTime @default(now()) @map("generated_at")
   createdAt       DateTime @default(now()) @map("created_at")
 
@@ -396,7 +400,9 @@ model GrowthStrategy {
   identityVersion IdentityVersion @relation(fields: [identityVersionId], references: [id])
   paths           GrowthPath[]
 
-  @@unique([userId, tenantId, status], name: "growth_strategies_one_active_per_user")
+  // "One active strategy per user" is enforced in maybeCreateGrowthStrategy, not as a
+  // constraint: a (user, tenant, status) unique was declared here but never migrated, and it
+  // would also cap a user at one *superseded* strategy.
   @@index([tenantId])
   @@index([tenantId, userId])
   @@index([tenantId, userId, status])
