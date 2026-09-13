@@ -334,5 +334,6 @@
   "contacts.filter.lender": "Lenders",
   "contacts.filter.contractor": "Contractors",
   "contacts.filter.mentor": "Mentors",
-  "contacts.filter.partner": "Partners"
+  "contacts.filter.partner": "Partners",
+  "growth.readiness": "Readiness {{score}}/100"
 }

@@ -228,7 +228,7 @@ export default function TasksPage() {
                     IMPACT_STYLES[impactOf(task)]
                   }`}
                 >
-                  {impactOf(task)}
+                  {t(`tasks.impact.${impactOf(task)}`)}
                 </span>
                 {task.source !== "manual" && (
                   <span className="rounded bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">

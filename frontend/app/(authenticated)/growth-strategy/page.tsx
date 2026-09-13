@@ -246,7 +246,7 @@ export default function GrowthStrategyPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground-strong">{t("growth.title")}</h1>
           <p className="mt-1 text-sm text-foreground-muted">
-            {strategy.identity_version.archetype} · Readiness {strategy.identity_version.readiness_score}/100
+            {strategy.identity_version.archetype} · {t("growth.readiness", { score: strategy.identity_version.readiness_score })}
           </p>
         </div>
         <div className="text-right">
