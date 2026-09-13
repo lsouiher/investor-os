@@ -2,6 +2,29 @@
 
 All notable changes to InvestorOS will be documented in this file.
 
+## [0.4.0.0] - 2026-09-13
+
+Beta-launch readiness for BPCON (October 2–4): everything a stranger on a phone at a conference needs, and everything the operator needs to run a free beta for a few hundred people. Plan and rationale: `docs/designs/bpcon-beta-launch.md`; deployment: `docs/deploy.md`.
+
+### Added
+
+- **Landing page** for a cold reader: example identity card, the one-sentence hook, three paths (zero doors / 1–3 / 4+), how it works, built-by, FAQ, not-advice line (EN + FR)
+- **Password reset that sends email** (Resend) with `/forgot-password` and `/reset-password` pages and a link from sign-in; without `RESEND_API_KEY` the link is logged
+- **Beta terms & privacy page** (`/terms`), linked from the landing page and the app footer; not-advice line on the strategies page
+- **Feedback loop:** free-text feedback with the identity rating (stored, remembered on reload) and a "Send feedback" mailto link in the app footer (`NEXT_PUBLIC_FEEDBACK_EMAIL`)
+- **Signup source:** `?utm_source=` on the landing page is recorded at registration (`users.signup_source`)
+- **Ops scripts:** `npm run funnel [days]` (registered → five audits → identity → activated → growth → returned, per source, plus ratings and feedback) and `npm run delete-user -- <email>` (erase answers, generated content, contacts, AI logs; deactivate)
+- **Docker images** for the API (Debian Chromium for the Blueprint PDF; migrations and prompt seed on start) and the web app (Next standalone), with `railway.json` for both
+- `GROWTH_STRATEGY_DEFAULT_ENABLED=true` turns the Growth Strategy Engine on for every new tenant
+
+### Changed
+
+- **Accept-and-poll for every long model call.** `POST /identity/synthesize` returns 202 and clients poll `GET /identity/status`; `GET /strategies` reports `generating: true` while recommendations are made; `POST /simulations` returns a job polled at `GET /simulations/jobs/:id`. Phones and proxies drop idle requests at ~60 s; real calls run 30–180 s.
+- **Rate limits sized for a room on one Wi-Fi:** global IP brake 600/min and a per-user brake 120/min after auth; register 100 per 15 min per IP; login and forgot-password keyed by IP + email
+- **Dashboard insights are cached per user** (stale-while-revalidate, 6 h, warmed after synthesis, invalidated on activation and new contacts) instead of one model call per page load
+- Growth-path worker runs five jobs at once; the AI client lets the SDK retry 429/529 inside the deadline
+- Schema: dropped the never-migrated `(user, tenant, status)` unique on `growth_strategies` so migrations and schema agree
+
 ## [0.3.3.0] - 2026-09-12
 
 First contact with the real Anthropic API. Every timeout in the pipeline had been sized for the instant mock server; a real synthesis call was cut off at 30s. Nothing here changes what the AI produces, only whether the call survives long enough to produce it.

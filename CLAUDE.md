@@ -6,13 +6,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 InvestorOS — an identity-centric real estate investment platform. Constructs a multidimensional investor identity through 5 structured audits (Financial, Time, Skills, Risk, Horizon), AI-synthesizes it into an archetype + readiness score, and activates it through personalized strategies, action plans, and an identity-aware CRM.
 
-**Status:** Implemented and running locally. `master` is v0.3.3.0: identity platform (v0.1),
-Growth Strategy Engine (v0.2), the integration fixes that make the AI pipeline and every page
-actually work (v0.3.0), dark mode (v0.3.1), French i18n (v0.3.2) and real-API hardening —
-streaming calls with production-sized timeouts (v0.3.3). The AI pipeline is verified end-to-end
-against the mock server; the configured workspace key authenticates, but the Anthropic account
-has no credits, so the real-API run is still pending (`/health` reports `ai:false` with the reason
-in the backend log once a call is refused).
+**Status:** Implemented and running locally; being prepared for a free beta launch at BPCON
+(October 2–4, 2026). `master` is v0.4.0.0: identity platform (v0.1), Growth Strategy Engine
+(v0.2), integration fixes (v0.3.0), dark mode (v0.3.1), French (v0.3.2), real-API hardening
+(v0.3.3) and launch readiness (v0.4.0: landing page, password reset email, terms, feedback,
+accept-and-poll AI calls, room-sized rate limits, Docker + Railway). The AI pipeline is verified
+end-to-end against the mock server; the real-API run is pending Anthropic credits landing on the
+account. Launch plan: `docs/designs/bpcon-beta-launch.md`; deployment: `docs/deploy.md`.
 
 ## Architecture
 
@@ -84,7 +84,12 @@ node backend/scripts/mock-anthropic.mjs &                       # :3999
 ANTHROPIC_BASE_URL=http://localhost:3999 ANTHROPIC_API_KEY=sk-ant-mock npm run dev   # from backend/
 ```
 
-The Growth Strategy Engine is gated per tenant: `UPDATE tenants SET feature_flags = '{"growth_strategy_enabled": true}'`.
+The Growth Strategy Engine is gated per tenant: `GROWTH_STRATEGY_DEFAULT_ENABLED=true` turns it on for
+new signups; for an existing tenant, `UPDATE tenants SET feature_flags = '{"growth_strategy_enabled": true}'`.
+
+Ops: `npm run funnel -- 7` (beta funnel per signup source) and `npm run delete-user -- <email>`
+(erase + deactivate) from `backend/`. Production images: `backend/Dockerfile`, `frontend/Dockerfile`
+(see `docs/deploy.md`).
 
 **WSL note:** the repo lives on `/mnt/c` (OneDrive). File watchers do not get change events there, so
 `tsx watch` and Next.js HMR will serve stale code — restart the dev server after edits, or move the
@@ -99,7 +104,8 @@ checkout to the Linux filesystem. `.gitattributes` enforces LF so OneDrive's CRL
 - **Public IDs:** CUID2 everywhere in URLs/responses; internal integer PKs never exposed
 - **Audit versioning:** Append-only rows. Draft = in_progress status. Completing creates new versioned row.
 - **Identity versioning:** New row per AI synthesis. References audit versions used via `audit_snapshot` JSON.
-- **AI pipeline:** Prompt templates stored in DB (versioned, hot-swappable). Assembly: system prompt + identity context + service block + output format. Retry with stricter format on parse failure; friendly error with retry button on sustained failure. Every call streams and `callClaude` enforces the total budget itself; per-call `timeoutMs` values are sized for real generation (2–4 min) — the mock answers instantly, so never tune them against it. Concurrent synthesis/strategy generation for one user joins the in-flight call.
+- **AI pipeline:** Prompt templates stored in DB (versioned, hot-swappable). Assembly: system prompt + identity context + service block + output format. Retry with stricter format on parse failure; friendly error with retry button on sustained failure. Every call streams and `callClaude` enforces the total budget itself; per-call `timeoutMs` values are sized for real generation (2–4 min) — the mock answers instantly, so never tune them against it. Concurrent synthesis/strategy generation for one user joins the in-flight call. **No HTTP request waits on a model call:** synthesis, strategies and simulations are accept-and-poll (`GET /identity/status`, `generating` on `GET /strategies`, `GET /simulations/jobs/:id`); plan generation and growth paths already ran in the background. Dashboard insights are cached per user.
+- **Rate limits** are keyed for a room of people on one IP: register per IP (100/15 min), login and forgot-password per IP + email, a global IP brake (600/min) before auth and a per-user brake (120/min) after.
 - **Tenant isolation:** Prisma middleware auto-injects `tenant_id` filter. PostgreSQL RLS as defense-in-depth.
 
 ## spec-kit + gstack
