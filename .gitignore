@@ -33,6 +33,6 @@ backend/prisma/*.db
 *.tmp
 *.swp
 
-# Claude Code skills (vendored/generated — each dev runs setup locally)
+# Claude Code skills (vendored/generated - each dev runs setup locally)
 .claude/skills/
 .gstack/
