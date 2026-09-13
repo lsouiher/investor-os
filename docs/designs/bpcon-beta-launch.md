@@ -50,9 +50,8 @@ hook in the email.
 - Free during beta; no payment, no pricing page.
 - Audience is cold-to-warm: a conference contact list, not friends. The page must work
   for a stranger in ten seconds, on a phone.
-- Today is 2026-09-13. BPCON has run in early October in recent years; Leo confirms the
-  2026 dates. If it is early October, "T-3 weeks" is this week and the schedule has no
-  slack (see Schedule).
+- Today is 2026-09-13. BPCON 2026 is October 2–4 (day 1 is a Friday): 19 days out, so
+  "T-3 weeks" is now and the schedule has no slack (see Schedule).
 - Solo builder; Claude Code does the build, Leo does the copy, the sending, and the
   watching.
 - Real users means real income and net-worth figures in the database, and a mostly US
@@ -92,17 +91,20 @@ are far smaller (see Success Criteria); the venue hour is the spike.
 
 Verified against the code on 2026-09-13; none of them is optional for real users.
 
-1. **Anthropic credits, then the real-API pass.** The configured key already authenticates
-   (workspace-scoped); the account has no credits, so every model call is refused. Fund it
-   (console → Plans & Billing), set a monthly spend limit, then run section R of the
-   walkthrough (Leo's private checklist page, https://claude.ai/code/artifact/a02c6c7e-674e-421b-b4c5-0ca3cd3f80d1)
+1. **Anthropic credits, then the real-API pass.** Done 2026-09-13: $15 funded; enough for
+   the real-API pass and roughly 30 full test runs, not for the campaign. Top up before
+   Email 1 once the first ten real users show the per-user cost; set a monthly spend
+   limit. Then run section R of the walkthrough (Leo's private checklist page, https://claude.ai/code/artifact/a02c6c7e-674e-421b-b4c5-0ca3cd3f80d1)
    **on the deployed host, not the laptop** (see blocker 2, proxy timeouts). Budget: roughly
    8–10 model calls per user who finishes; measure the first ten users. Working estimate for
    the campaign: low hundreds of dollars.
 2. **Deploy.**
-   - Frontend: Next.js on Vercel. Backend: Express API + in-process Bull worker
-     (`main.ts:97`) on a container host (Railway, Render or Fly); Puppeteer and the
-     in-process worker rule out serverless. **There is no Dockerfile in the repo yet**;
+   - Decision (Leo: "figure it out"): **everything on Railway**, one account, one bill:
+     a Next.js service, the Express API + in-process Bull worker (`main.ts:97`) as a
+     Docker service, Railway Postgres and Redis. Railway does not cut long requests the
+     way Cloudflare-fronted hosts do, and one platform means one login for a solo
+     founder. Puppeteer and the in-process worker rule out serverless anyway.
+     **There is no Dockerfile in the repo yet**;
      add `backend/Dockerfile` on a Chromium-capable base for Puppeteer 24, or hide the
      Blueprint PDF button for the beta. Managed Postgres with daily backups; managed
      Redis; one domain with HTTPS.
@@ -247,7 +249,7 @@ Subject: Which of the 30 strategies at BPCON is actually yours?
 > If you do it before the conference, bring your identity card. I want to hear whether it
 > got you right.
 >
-> {Leo} · {city} · {what you invest in}
+> Leo · Cleveland, OH · one single-family rental, buying a 2–10 unit multifamily next
 > If you'd rather not hear from me about this, reply "no" or use the link below.
 > {mailing address} · {unsubscribe link}
 
@@ -280,21 +282,29 @@ phone. Don't demo; hand them the QR.
 
 ### 4. Schedule
 
-Anchor: today is 2026-09-13; Leo confirms the BPCON 2026 dates and replaces the T-n
-labels with dates. If day 1 is within four weeks, T-3 is this week.
+Anchor: today is Saturday 2026-09-13; BPCON is Friday October 2 to Sunday October 4.
 
-| When | What |
+| Dates | What |
 |---|---|
-| This week | Confirm dates; fund credits; create hosting, domain and Resend accounts (Leo, ~1 hour); start the landing rebuild in parallel (no backend dependency) |
-| T-3 weeks | Deploy live on the domain; long-request polling and rate limiters fixed first, then the real-API pass on the host (ten parallel syntheses included); blockers 4–6 fixed; sender DNS and list hygiene done. Heaviest week: ~5–7 focused days with Claude Code once the accounts exist |
-| T-2 weeks | Blockers 7–11 live (mobile pass first); landing page live; **pre-launch watch sessions** with three known contacts (see Assignment) and the hero rewritten in their words |
-| T-1 week | Email 1, ramped; fix whatever the first 20 users hit |
-| Event | Email 2 on the morning of day 1; QR everywhere; ten-second pitch; note every question people ask |
-| T+3 days | Email 3; book the **post-event feedback calls** |
-| T+2 weeks | Read the numbers against targets and floors; decide what the paid version is, if anyone asked |
+| Sat Sep 13 | Credits funded (done). Real-API pass on the laptop to measure real latencies. Leo: buy the domain, create the Railway and Resend accounts (~30 min, steps below) |
+| Sep 13–19 | Long-request polling, rate limiters, 429 retries, insights cache, password reset, growth default (blockers 2–6); Dockerfile; deploy live on the domain; real-API pass on the host with ten parallel syntheses; sender DNS; list hygiene |
+| Sep 20–25 | Terms & privacy page, delete script, feedback box, funnel SQL, mobile pass (blockers 7–11); landing page live; **pre-launch watch sessions** Sep 22–24 with three known contacts (see Assignment); hero rewritten in their words |
+| Thu Sep 25 | Email 1 to the ~50 known contacts; then ~100/day through Sep 30; fix whatever the first 20 users hit |
+| Fri Oct 2, morning | Email 2 (known contacts + Email 1 openers); QR everywhere Oct 2–4; ten-second pitch; note every question people ask |
+| Tue Oct 7 | Email 3; book the **post-event feedback calls** |
+| Sat Oct 18 | Read the numbers against targets and floors; decide what the paid version is, if anyone asked |
 
-If T-3 is under seven days away when the dates are confirmed, cuts in this order, decided
-now so nobody re-argues them under pressure: (1) stretch C; (2) blocker 5's env default,
+Accounts Leo creates (everything else is configured by Claude Code through the CLIs):
+1. A domain (Cloudflare Registrar or Namecheap; `investoros.app` or similar, ~$15/yr).
+2. Railway (railway.com; Hobby plan, ~$5/mo plus usage), then `! railway login` in this
+   terminal so the CLI is authenticated.
+3. Resend (resend.com; Pro for the launch month, $20, since the free tier caps at 100
+   emails/day), then paste the API key into `backend/.env` as `RESEND_API_KEY`.
+4. A mailing address for the email footers (a PO box or the Resend-hosted address is
+   fine).
+
+With 19 days on the clock the cuts are pre-decided, in this order, so nobody re-argues
+them under pressure: (1) stretch C; (2) blocker 5's env default,
 enable growth on request with the existing SQL instead; (3) the Blueprint PDF button hidden
 for the beta instead of a Chromium Dockerfile; (4) the free-text feedback box, mailto link
 only; (5) the daily funnel script, hand-run SQL instead. Nothing in blockers 1–4, 6, 7 or
@@ -304,9 +314,8 @@ identity-card image (PNG of archetype + score) and a set time and place at the e
 
 ## Open Questions
 
-- Exact BPCON 2026 dates and venue; whether Leo has a table, a slot, or just the hallway.
-- Domain name; hosting choice (Railway vs Fly vs Render, decided by the proxy-timeout
-  check); mailing address to print.
+- Venue logistics: whether Leo has a table, a slot, or just the hallway.
+- Domain name (Leo picks); mailing address to print in the footers.
 - Whether the coach/mastermind hosts in the list are a channel or a threat; one of the
   three pre-launch watch sessions should be with one if possible.
 - Anthropic rate-limit tier of the funded account.
