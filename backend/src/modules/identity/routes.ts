@@ -60,7 +60,8 @@ router.put('/:identityId/rate', async (req: Request, res: Response, next: NextFu
       throw new AppError('VALIDATION_ERROR', 'rating is required.', 400);
     }
 
-    const result = await identityService.rateIdentity(identityId, req.user!.tenantId, Number(rating));
+    const feedback = typeof req.body.feedback === 'string' ? req.body.feedback.trim() || null : null;
+    const result = await identityService.rateIdentity(identityId, req.user!.tenantId, Number(rating), feedback);
     res.json({ data: result });
   } catch (err) {
     next(err);

@@ -1,14 +1,16 @@
 {
   "name": "investoros-backend",
   "version": "0.1.0",
-  "description": "InvestorOS backend API — identity-centric real estate investment platform",
+  "description": "InvestorOS backend API \u2014 identity-centric real estate investment platform",
   "main": "dist/main.js",
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "build": "tsc",
     "start": "node dist/main.js",
     "test": "jest",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "delete-user": "tsx scripts/delete-user.ts",
+    "funnel": "tsx scripts/funnel-report.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

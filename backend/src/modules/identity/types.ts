@@ -21,6 +21,7 @@ export interface IdentityDetail {
   headlineInsight: string;
   aiInsights: Record<string, unknown>;
   generatedAt: string;
+  userRating: number | null;
 }
 
 /**

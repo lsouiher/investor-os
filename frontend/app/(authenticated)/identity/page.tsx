@@ -23,6 +23,7 @@ interface IdentityData {
     goal_clarity?: number | null;
   };
   sub_scores: Record<string, number>;
+  user_rating?: number | null;
 }
 
 interface AuditSummary {
@@ -49,6 +50,7 @@ export default function IdentityPage() {
   const [showReveal, setShowReveal] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState<number | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [feedbackText, setFeedbackText] = useState("");
   const [auditsComplete, setAuditsComplete] = useState(false);
 
   // Synthesis runs server-side for 30–90 s, longer than a phone keeps a request open, so
@@ -76,6 +78,7 @@ export default function IdentityPage() {
       setError(null);
       const data = await api.get<IdentityData | null>("/identity");
       setIdentity(data);
+      if (data?.user_rating) setFeedbackSubmitted(true);
 
       if (data) {
         const wasRevealed = localStorage.getItem(REVEAL_KEY);
@@ -135,11 +138,12 @@ export default function IdentityPage() {
     }
   };
 
-  const handleFeedback = async (rating: number) => {
-    if (!identity) return;
-    setFeedbackRating(rating);
+  // Rating and free text go together: the rating alone says how close we got, the text says
+  // what to fix. Both are stored on the identity version, so a reload doesn't ask again.
+  const handleFeedback = async () => {
+    if (!identity || feedbackRating === null) return;
     try {
-      await api.put(`/identity/${identity.id}/rate`, { rating });
+      await api.put(`/identity/${identity.id}/rate`, { rating: feedbackRating, feedback: feedbackText || null });
       setFeedbackSubmitted(true);
     } catch {
       // Silent fail for feedback
@@ -262,7 +266,7 @@ export default function IdentityPage() {
             {[1, 2, 3, 4, 5].map((n) => (
               <button
                 key={n}
-                onClick={() => handleFeedback(n)}
+                onClick={() => setFeedbackRating(n)}
                 className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-medium transition-colors ${
                   feedbackRating === n
                     ? "border-amber-600 bg-amber-600 text-white"
@@ -274,6 +278,24 @@ export default function IdentityPage() {
             ))}
           </div>
           <p className="mt-2 text-xs text-foreground-tertiary">{t("identity.feedback_scale")}</p>
+          {feedbackRating !== null && (
+            <div className="mx-auto mt-4 flex max-w-md flex-col gap-2">
+              <textarea
+                id="identity-feedback"
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value.slice(0, 2000))}
+                placeholder={t("identity.feedback_placeholder")}
+                rows={3}
+                className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-amber-500"
+              />
+              <button
+                onClick={handleFeedback}
+                className="self-center rounded bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+              >
+                {t("identity.feedback_submit")}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

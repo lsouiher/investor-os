@@ -8,6 +8,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import { takeSignupSource } from "@/lib/signup-source";
 import { api } from "./api-client";
 
 export interface User {
@@ -74,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = useCallback(async (email: string, password: string) => {
     const result = await api.post<{ token: string; user: User }>(
       "/auth/register",
-      { email, password }
+      { email, password, signup_source: takeSignupSource() }
     );
     localStorage.setItem("token", result.token);
     localStorage.setItem("user", JSON.stringify(result.user));

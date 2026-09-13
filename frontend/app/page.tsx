@@ -1,11 +1,18 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { rememberSignupSource } from "@/lib/signup-source";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { useTranslation } from "@/lib/i18n";
 
 export default function LandingPage() {
   const { t } = useTranslation();
+
+  // Keep the source of the visit (?utm_source=...) so registration can record it
+  useEffect(() => {
+    rememberSignupSource(window.location.search);
+  }, []);
 
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center bg-background px-4">

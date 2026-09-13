@@ -113,6 +113,7 @@ export default function StrategiesPage() {
         <p className="mt-1 text-sm text-foreground-muted">
           {t("strategies.subtitle")}
         </p>
+        <p className="mt-2 text-xs text-foreground-tertiary">{t("strategies.disclaimer")}</p>
       </div>
 
       {error && (

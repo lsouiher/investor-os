@@ -68,6 +68,7 @@ export async function getLatestIdentity(
     headlineInsight: identity.headlineInsight,
     aiInsights: identity.aiInsights as Record<string, unknown>,
     generatedAt: identity.generatedAt.toISOString(),
+    userRating: identity.userRating ?? null,
   };
 }
 
@@ -229,6 +230,7 @@ async function doSynthesizeIdentity(
     headlineInsight: identity.headlineInsight,
     aiInsights: identity.aiInsights as Record<string, unknown>,
     generatedAt: identity.generatedAt.toISOString(),
+    userRating: identity.userRating ?? null,
   };
 }
 
@@ -288,9 +290,13 @@ export async function rateIdentity(
   identityPublicId: string,
   tenantId: number,
   rating: number,
+  feedback: string | null = null,
 ): Promise<{ id: string; userRating: number }> {
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
     throw new AppError('VALIDATION_ERROR', 'Rating must be an integer between 1 and 5.', 400);
+  }
+  if (feedback !== null && feedback.length > 2000) {
+    throw new AppError('VALIDATION_ERROR', 'Feedback must be at most 2000 characters.', 400);
   }
 
   const identity = await identityRepo.getIdentityByPublicId(identityPublicId, tenantId);
@@ -298,7 +304,7 @@ export async function rateIdentity(
     throw new AppError('NOT_FOUND', 'Identity version not found.', 404);
   }
 
-  const updated = await identityRepo.updateUserRating(identity.id, rating);
+  const updated = await identityRepo.updateUserRating(identity.id, rating, feedback);
   return {
     id: updated.publicId,
     userRating: updated.userRating!,

@@ -69,10 +69,10 @@ export async function getIdentityByPublicId(publicId: string, tenantId: number) 
   });
 }
 
-export async function updateUserRating(identityId: number, rating: number) {
+export async function updateUserRating(identityId: number, rating: number, feedback: string | null) {
   return prisma.identityVersion.update({
     where: { id: identityId },
-    data: { userRating: rating },
+    data: { userRating: rating, ...(feedback !== null ? { userFeedback: feedback } : {}) },
   });
 }
 
