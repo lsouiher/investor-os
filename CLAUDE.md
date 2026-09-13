@@ -11,8 +11,8 @@ InvestorOS — an identity-centric real estate investment platform. Constructs a
 (v0.2), integration fixes (v0.3.0), dark mode (v0.3.1), French (v0.3.2), real-API hardening
 (v0.3.3) and launch readiness (v0.4.0: landing page, password reset email, terms, feedback,
 accept-and-poll AI calls, room-sized rate limits, Docker + Railway). The AI pipeline is verified
-end-to-end against the mock server; the real-API run is pending Anthropic credits landing on the
-account. Launch plan: `docs/designs/bpcon-beta-launch.md`; deployment: `docs/deploy.md`.
+end-to-end against the mock server and against the real Anthropic API (v0.4.1, 25/25; readiness
+scores are model-assessed against a rubric, see identity_synthesis in `prisma/seed.ts`). Launch plan: `docs/designs/bpcon-beta-launch.md`; deployment: `docs/deploy.md`.
 
 ## Architecture
 

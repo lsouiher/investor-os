@@ -2,6 +2,15 @@
 
 All notable changes to InvestorOS will be documented in this file.
 
+## [0.4.1.0] - 2026-09-13
+
+First run against the real Anthropic API (25/25). Synthesis 34–45 s, strategies 16 s, activation 44 s, growth paths 48–79 s, simulation 9 s; content specific to the profile (market, capital, hours, network).
+
+### Fixed
+
+- **Readiness and radar scores measure substance, not completeness.** The deterministic scorer counted filled-in fields, so every finished profile read 100/100. The synthesis prompt now carries a scoring rubric with anchors per dimension and the model's `readiness_score`, `sub_scores` and `radar_data` are stored (clamped, per-field fallback). Same profile: 100 → 56, radar capital 75 / network 20 / skills 38.
+- Thinking blocks from Claude 5 models no longer log a warning per call.
+
 ## [0.4.0.0] - 2026-09-13
 
 Beta-launch readiness for BPCON (October 2–4): everything a stranger on a phone at a conference needs, and everything the operator needs to run a free beta for a few hundred people. Plan and rationale: `docs/designs/bpcon-beta-launch.md`; deployment: `docs/deploy.md`.
