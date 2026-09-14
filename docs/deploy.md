@@ -10,12 +10,15 @@ restart policy.
 
 Project `investoros` in Leo's Railway workspace, environment `production`:
 
-- api: https://api-production-bfde.up.railway.app (health: `/api/v1/health`)
-- web: https://web-production-ac6fc.up.railway.app
+- web: **https://app.investorsmap.com** (Railway fallback: https://web-production-ac6fc.up.railway.app)
+- api: **https://api.investorsmap.com** (health: `/api/v1/health`; fallback: https://api-production-bfde.up.railway.app)
 - Postgres and Redis: Railway-managed, referenced as `${{Postgres.DATABASE_URL}}` / `${{Redis.REDIS_URL}}`
-
-Custom domains come next (see "Custom domain" below). The account is on the trial
-("30 days or $5.00 left"); upgrade to Hobby before Email 1 or the services stop.
+- DNS at Squarespace Domains: CNAME `app` → `ka6j1155.up.railway.app`, CNAME `api` →
+  `wgp57zef.up.railway.app`, TXT `_railway-verify.app` / `_railway-verify.api` (Railway ownership
+  proof; the certificate stayed at "validating ownership" until they existed), Google Workspace MX +
+  SPF, Resend `send` MX/SPF + `resend._domainkey` DKIM, `_dmarc` p=none. The bare domain is a
+  Squarespace forward to `https://app.investorsmap.com`.
+- Account: Hobby plan (upgraded 2026-09-14).
 
 ## Deploying a change
 
@@ -102,7 +105,9 @@ cd ../backend && railway domain api.yourdomain.com --service api
 
 Each command prints the DNS record to add at the registrar (a CNAME to Railway). Then update
 `APP_URL` and `CORS_ORIGIN` on `api`, `NEXT_PUBLIC_API_URL` on `web`, redeploy `web` (the URL
-is baked in at build time), and verify the domain in Resend.
+is baked in at build time), and verify the domain in Resend. Deleting and re-adding a domain
+on Railway generates a **new** CNAME target; don't do it to "kick" a pending certificate, add
+the `_railway-verify.<host>` TXT record it asks for instead.
 
 ## After the first deploy
 
