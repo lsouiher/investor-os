@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { api, ApiError } from "@/lib/api-client";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { LanguageToggle } from "@/components/shared/language-toggle";
 import { useTranslation } from "@/lib/i18n";
 
 export default function ForgotPasswordPage() {
@@ -34,7 +35,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="relative flex flex-1 items-center justify-center bg-background px-4">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 flex items-center gap-4">
+        <LanguageToggle />
         <ThemeToggle />
       </div>
       <div className="w-full max-w-md bg-surface-card p-8 shadow-sm" style={{ borderRadius: "var(--radius-card)" }}>

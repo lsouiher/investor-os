@@ -20,7 +20,7 @@ export default function RoadmapTimeline({
   milestones,
   onComplete,
 }: RoadmapTimelineProps) {
-  const { t } = useTranslation();
+  const { t, formatDate } = useTranslation();
   const sorted = [...milestones].sort((a, b) => a.sort_order - b.sort_order);
 
   if (sorted.length === 0) {
@@ -84,7 +84,7 @@ export default function RoadmapTimeline({
                 </h4>
                 {milestone.target_date && (
                   <span className="text-xs text-foreground-tertiary">
-                    {new Date(milestone.target_date).toLocaleDateString()}
+                    {formatDate(milestone.target_date)}
                   </span>
                 )}
                 {!milestone.is_completed && isPast && (

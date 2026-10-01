@@ -72,6 +72,25 @@ function AuthenticatedShell({
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">
+      {/* Phone header: the sidebar footer that holds these three controls is hidden below md */}
+      <header className="flex items-center justify-between border-b border-foreground/5 bg-surface-card px-4 py-1 md:hidden">
+        <p className="text-sm font-semibold tracking-widest uppercase text-accent">
+          {t("nav.brand")}
+        </p>
+        <div className="flex items-center">
+          <LanguageToggle className="p-3" />
+          <ThemeToggle className="p-3" />
+          <button
+            onClick={logout}
+            className="p-3 text-foreground-muted hover:text-foreground"
+            title={t("nav.logout")}
+            aria-label={t("nav.logout")}
+          >
+            <LogoutIcon className="h-4 w-4" />
+          </button>
+        </div>
+      </header>
+
       {/* Desktop sidebar */}
       <aside
         className="hidden md:flex md:flex-col md:justify-between border-r border-foreground/5 bg-surface-card"

@@ -69,7 +69,7 @@ function scoreTierClass(score: number): string {
 }
 
 export default function PathDetailPage() {
-  const { t } = useTranslation();
+  const { t, formatDate, formatTime } = useTranslation();
   const PATH_NAMES = usePathNames();
   const params = useParams();
   const pathType = params?.pathType as string;
@@ -301,9 +301,9 @@ export default function PathDetailPage() {
       {/* Metadata */}
       {path.generated_at && (
         <div className="text-xs text-foreground-tertiary">
-          {t("growth_path.generated_at", { date: new Date(path.generated_at).toLocaleDateString(), version: String(path.version) })}
+          {t("growth_path.generated_at", { date: formatDate(path.generated_at), version: String(path.version) })}
           {path.generation_cooldown_until && new Date(path.generation_cooldown_until) > new Date() && (
-            <span> · {t("growth_path.regeneration_after", { time: new Date(path.generation_cooldown_until).toLocaleTimeString() })}</span>
+            <span> · {t("growth_path.regeneration_after", { time: formatTime(path.generation_cooldown_until) })}</span>
           )}
         </div>
       )}

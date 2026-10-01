@@ -4,6 +4,7 @@ import { randomBytes } from 'crypto';
 import { AppError } from '../../shared/middleware/error-handler.js';
 import * as authRepo from './repository.js';
 import { sendPasswordResetEmail } from '../../shared/email.js';
+import { DEFAULT_LOCALE, type Locale } from '../../shared/i18n.js';
 import type { AuthResponse, UserProfile } from './types.js';
 
 const SALT_ROUNDS = 12;
@@ -27,6 +28,7 @@ export async function register(
   email: string,
   password: string,
   signupSource: string | null = null,
+  locale: Locale = DEFAULT_LOCALE,
 ): Promise<AuthResponse> {
   const existing = await authRepo.findUserByEmail(email);
   if (existing) {
@@ -34,11 +36,11 @@ export async function register(
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const { user } = await authRepo.createUserWithTenant(email, passwordHash, signupSource);
+  const { user } = await authRepo.createUserWithTenant(email, passwordHash, signupSource, locale);
   const token = generateToken(user);
 
   return {
-    user: { id: user.publicId, email: user.email, role: user.role },
+    user: { id: user.publicId, email: user.email, role: user.role, locale: user.locale },
     token,
   };
 }
@@ -58,8 +60,18 @@ export async function login(email: string, password: string): Promise<AuthRespon
   const token = generateToken(user);
 
   return {
-    user: { id: user.publicId, email: user.email, role: user.role },
+    user: { id: user.publicId, email: user.email, role: user.role, locale: user.locale },
     token,
+  };
+}
+
+function toProfile(user: { publicId: string; email: string; role: string; locale: Locale; createdAt: Date }): UserProfile {
+  return {
+    id: user.publicId,
+    email: user.email,
+    role: user.role,
+    locale: user.locale,
+    createdAt: user.createdAt.toISOString(),
   };
 }
 
@@ -69,12 +81,14 @@ export async function getProfile(userId: number): Promise<UserProfile> {
     throw new AppError('NOT_FOUND', 'User not found.', 404);
   }
 
-  return {
-    id: user.publicId,
-    email: user.email,
-    role: user.role,
-    createdAt: user.createdAt.toISOString(),
-  };
+  return toProfile(user);
+}
+
+// The user's own preferences. Today that is the language; it applies on every device after
+// sign-in and to everything generated or sent for the account.
+export async function updateProfile(userId: number, changes: { locale: Locale }): Promise<UserProfile> {
+  const user = await authRepo.updateUserLocale(userId, changes.locale);
+  return toProfile(user);
 }
 
 export async function forgotPassword(email: string): Promise<void> {

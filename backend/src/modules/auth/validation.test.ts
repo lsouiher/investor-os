@@ -1,4 +1,4 @@
-import { validateEmail, validatePassword, validateRegisterInput, validateLoginInput, validateResetPasswordInput } from './validation';
+import { validateEmail, validatePassword, validateLocale, validateRegisterInput, validateLoginInput, validateResetPasswordInput } from './validation';
 import { AppError } from '../../shared/middleware/error-handler';
 
 describe('validateEmail', () => {
@@ -58,10 +58,51 @@ describe('validatePassword', () => {
   });
 });
 
+describe('validateLocale', () => {
+  it('accepts en and fr', () => {
+    expect(validateLocale('en')).toBe('en');
+    expect(validateLocale('fr')).toBe('fr');
+  });
+
+  it('rejects anything else', () => {
+    for (const value of ['es', 'fr-CA', 'FR', '', null, undefined, 42, ['fr'], { locale: 'fr' }]) {
+      expect(() => validateLocale(value)).toThrow(AppError);
+    }
+  });
+
+  it('reports a VALIDATION_ERROR on the locale field', () => {
+    try {
+      validateLocale('es');
+      throw new Error('expected validateLocale to throw');
+    } catch (err) {
+      expect(err).toBeInstanceOf(AppError);
+      const appError = err as AppError;
+      expect(appError.code).toBe('VALIDATION_ERROR');
+      expect(appError.statusCode).toBe(400);
+      expect(appError.details).toEqual([{ field: 'locale', message: 'Must be one of: en, fr.' }]);
+    }
+  });
+
+  it('writes the message in the language of the request', () => {
+    expect(() => validateLocale('es', 'fr')).toThrow('Langue non valide.');
+    expect(() => validateLocale('es', 'en')).toThrow('Invalid language.');
+  });
+});
+
 describe('validateRegisterInput', () => {
   it('validates and returns email + password', () => {
     const result = validateRegisterInput({ email: 'Test@EXAMPLE.com', password: 'password123' });
-    expect(result).toEqual({ email: 'test@example.com', password: 'password123', signupSource: null });
+    expect(result).toEqual({ email: 'test@example.com', password: 'password123', signupSource: null, locale: null });
+  });
+
+  it('keeps a supported locale and ignores anything else', () => {
+    const base = { email: 'a@b.co', password: 'password123' };
+    expect(validateRegisterInput({ ...base, locale: 'fr' }).locale).toBe('fr');
+    expect(validateRegisterInput({ ...base, locale: 'en' }).locale).toBe('en');
+    expect(validateRegisterInput({ ...base, locale: 'es' }).locale).toBeNull();
+    expect(validateRegisterInput({ ...base, locale: 'fr-CA' }).locale).toBeNull();
+    expect(validateRegisterInput({ ...base, locale: 42 }).locale).toBeNull();
+    expect(validateRegisterInput(base).locale).toBeNull();
   });
 
   it('keeps a well-formed signup_source and drops anything else', () => {

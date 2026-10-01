@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { rememberSignupSource } from "@/lib/signup-source";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { LanguageToggle } from "@/components/shared/language-toggle";
 import { useTranslation } from "@/lib/i18n";
 
 // Landing page for a stranger who just got an email or scanned a QR at a conference: what
@@ -44,6 +45,7 @@ export default function LandingPage() {
           <Link href="/login" className="text-sm font-medium text-foreground-muted hover:text-foreground">
             {t("landing.cta_login")}
           </Link>
+          <LanguageToggle />
           <ThemeToggle />
         </div>
       </header>

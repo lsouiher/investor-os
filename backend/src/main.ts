@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { prisma } from './shared/db.js';
 import { errorHandler } from './shared/middleware/error-handler.js';
 import { requestLogger } from './shared/middleware/request-logger.js';
+import { resolveLocale } from './shared/middleware/locale.js';
 import { generalLimiter, userLimiter } from './shared/middleware/rate-limiter.js';
 import { authenticate } from './shared/middleware/auth.js';
 import { setTenantContext } from './shared/middleware/tenant-context.js';
@@ -36,6 +37,8 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '50kb' }));
 app.use(requestLogger);
+// Before the limiters, so that even a rate-limit response knows the request's language
+app.use(resolveLocale);
 app.use(generalLimiter);
 // Contract: all JSON responses use snake_case keys (applies to auth + health too)
 app.use('/api/v1', snakeCaseResponse);

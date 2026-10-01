@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 import { prisma } from '../../shared/db.js';
 import { generatePublicId } from '../../shared/utils/id.js';
+import { DEFAULT_LOCALE, type Locale } from '../../shared/i18n.js';
 
 function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
@@ -16,6 +17,7 @@ export async function createUserWithTenant(
   email: string,
   passwordHash: string,
   signupSource: string | null = null,
+  locale: Locale = DEFAULT_LOCALE,
 ) {
   const tenantPublicId = generatePublicId();
   const userPublicId = generatePublicId();
@@ -32,10 +34,18 @@ export async function createUserWithTenant(
         email,
         passwordHash,
         signupSource,
+        locale,
       },
     });
 
     return { user, tenant };
+  });
+}
+
+export async function updateUserLocale(userId: number, locale: Locale) {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { locale },
   });
 }
 

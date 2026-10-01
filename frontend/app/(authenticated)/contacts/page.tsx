@@ -169,7 +169,7 @@ function ContactsPageContent() {
         <div>
           <h1 className="text-2xl font-bold text-foreground-strong">{t("contacts.title")}</h1>
           <p className="mt-1 text-sm text-foreground-muted">
-            {t("contacts.subtitle", { count: String(contacts.length) })}
+            {t("contacts.subtitle", { count: contacts.length })}
           </p>
         </div>
         <button

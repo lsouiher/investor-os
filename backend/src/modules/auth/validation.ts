@@ -1,4 +1,5 @@
 import { AppError } from '../../shared/middleware/error-handler.js';
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES, isLocale, t, type Locale } from '../../shared/i18n.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
@@ -35,13 +36,26 @@ export function validateSignupSource(value: unknown): string | null {
   return /^[a-z0-9_-]{1,32}$/.test(slug) ? slug : null;
 }
 
+// The message is written in `lang`, the language of the request that sent the bad value
+export function validateLocale(value: unknown, lang: Locale = DEFAULT_LOCALE): Locale {
+  if (!isLocale(value)) {
+    throw new AppError('VALIDATION_ERROR', t(lang, 'validation.locale_invalid'), 400, [
+      { field: 'locale', message: t(lang, 'validation.locale_options', { locales: SUPPORTED_LOCALES.join(', ') }) },
+    ]);
+  }
+  return value;
+}
+
+// `locale` is optional at registration: null (missing or unsupported) means "use the
+// language of the request", which the route resolves.
 export function validateRegisterInput(
   body: Record<string, unknown>,
-): { email: string; password: string; signupSource: string | null } {
+): { email: string; password: string; signupSource: string | null; locale: Locale | null } {
   return {
     email: validateEmail(body.email),
     password: validatePassword(body.password),
     signupSource: validateSignupSource(body.signup_source),
+    locale: isLocale(body.locale) ? body.locale : null,
   };
 }
 

@@ -42,28 +42,45 @@ function clearAuthAndRedirect(): void {
   window.location.href = "/login";
 }
 
-async function request<T>(
-  method: string,
-  path: string,
-  body?: unknown
-): Promise<T> {
+// Every request announces the interface language, so the server can answer in it before it
+// knows who is asking (sign-in, registration, password reset). <html lang> is the source:
+// the server renders it and the language switch keeps it current.
+function buildHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
+
+  if (typeof document !== "undefined" && document.documentElement.lang) {
+    headers["Accept-Language"] = document.documentElement.lang;
+  }
 
   const token = getToken();
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
+  return headers;
+}
+
+interface RequestOptions {
+  /** On a 401, only throw: keep the visitor on the page instead of sending them to /login. */
+  stayOnUnauthorized?: boolean;
+}
+
+async function request<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  options: RequestOptions = {}
+): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
-    headers,
+    headers: buildHeaders(),
     body: body ? JSON.stringify(body) : undefined,
   });
 
   if (res.status === 401) {
-    clearAuthAndRedirect();
+    if (!options.stayOnUnauthorized) clearAuthAndRedirect();
     throw new ApiError("UNAUTHORIZED", "Session expired");
   }
 
@@ -90,11 +107,7 @@ async function requestEnvelope<T, M extends object = Record<string, unknown>>(
   path: string,
   body?: unknown
 ): Promise<ApiSuccessResponse<T> & M> {
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  const token = getToken();
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-
-  const res = await fetch(`${BASE_URL}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  const res = await fetch(`${BASE_URL}${path}`, { method, headers: buildHeaders(), body: body ? JSON.stringify(body) : undefined });
   if (res.status === 401) {
     clearAuthAndRedirect();
     throw new ApiError("UNAUTHORIZED", "Session expired");
@@ -125,7 +138,7 @@ export const api = {
   getEnvelope: <T, M extends object = Record<string, unknown>>(path: string) =>
     requestEnvelope<T, M>("GET", path),
   post: <T>(path: string, body?: unknown) => request<T>("POST", path, body),
-  put: <T>(path: string, body?: unknown) => request<T>("PUT", path, body),
+  put: <T>(path: string, body?: unknown, options?: RequestOptions) => request<T>("PUT", path, body, options),
   del: <T>(path: string) => request<T>("DELETE", path),
 };
 

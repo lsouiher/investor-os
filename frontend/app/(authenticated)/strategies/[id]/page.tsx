@@ -55,9 +55,8 @@ function getCountdown(deadline: string, t: (key: string, params?: Record<string,
   const diff = new Date(deadline).getTime() - Date.now();
   if (diff <= 0) return t("strategy.countdown.past_due");
   const hours = Math.floor(diff / (1000 * 60 * 60));
-  if (hours < 24) return t("strategy.countdown.hours", { hours });
-  const days = Math.floor(hours / 24);
-  return days === 1 ? t("strategy.countdown.one_day") : t("strategy.countdown.days", { days });
+  if (hours < 24) return t("strategy.countdown.hours", { count: hours });
+  return t("strategy.countdown.days", { count: Math.floor(hours / 24) });
 }
 
 // CUID2 ids are 24-character alphanumeric strings by default

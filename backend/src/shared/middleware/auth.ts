@@ -34,7 +34,19 @@ declare global {
   }
 }
 
+// Express 4 does not catch a promise rejected by async middleware: a failure has to reach the
+// error handler through next(err), otherwise the unhandled rejection stops the process.
 export async function authenticate(req: Request, _res: Response, next: NextFunction): Promise<void> {
+  try {
+    await identify(req);
+  } catch (err) {
+    next(err);
+    return;
+  }
+  next();
+}
+
+async function identify(req: Request): Promise<void> {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
     throw new AppError('UNAUTHORIZED', 'Authentication required.', 401);
@@ -52,7 +64,7 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
     // Resolve internal IDs from publicId (no internal IDs in JWT)
     const user = await prisma.user.findFirst({
       where: { publicId: parsed.data.sub, deletedAt: null },
-      select: { id: true, publicId: true, tenantId: true, email: true, role: true, tokenInvalidatedAt: true },
+      select: { id: true, publicId: true, tenantId: true, email: true, role: true, locale: true, tokenInvalidatedAt: true },
     });
 
     if (!user) {
@@ -74,7 +86,8 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
       email: user.email,
       role: user.role,
     };
-    next();
+    // Signed in: the account's language wins over the one the request announced
+    req.locale = user.locale;
   } catch (err) {
     if (err instanceof AppError) throw err;
     throw new AppError('UNAUTHORIZED', 'Invalid or expired token.', 401);

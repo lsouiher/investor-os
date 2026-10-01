@@ -1,3 +1,5 @@
+import type { Locale } from '../../shared/i18n.js';
+
 export interface RegisterInput {
   email: string;
   password: string;
@@ -22,6 +24,7 @@ export interface AuthResponse {
     id: string;
     email: string;
     role: string;
+    locale: Locale;
   };
   token: string;
 }
@@ -30,5 +33,6 @@ export interface UserProfile {
   id: string;
   email: string;
   role: string;
+  locale: Locale;
   createdAt: string;
 }

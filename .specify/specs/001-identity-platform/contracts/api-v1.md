@@ -69,6 +69,17 @@ Error codes: `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `RATE
 ### Public IDs
 All resource identifiers in requests and responses use CUID2 public IDs, never internal integer IDs.
 
+### Request Language
+Supported languages: `en` (default) and `fr`. The server picks the language of a request as follows (feature 004-french-language):
+
+| Caller | Language used |
+|--------|---------------|
+| Authenticated request | `locale` of the authenticated user |
+| Unauthenticated request | `Accept-Language` header (the supported language with the highest q-value), else `en` |
+| Background work for a user | `locale` of the user |
+
+The web client sends `Accept-Language: en` or `Accept-Language: fr` (its interface language) on every request. A regional tag such as `fr-CA` resolves to `fr`; anything unsupported resolves to `en`.
+
 ---
 
 ## Auth Service
@@ -80,9 +91,14 @@ Create a new account (auto-creates tenant).
 ```json
 {
   "email": "investor@example.com",
-  "password": "securePassword123"
+  "password": "securePassword123",
+  "signup_source": "bpcon",
+  "locale": "fr"
 }
 ```
+
+- `signup_source` (optional): where the signup came from, a slug of at most 32 characters (`a-z`, `0-9`, `_`, `-`). Anything else is ignored.
+- `locale` (optional): `"en"` or `"fr"`, saved as the account's language. Missing or invalid: the request's language is used (see Request Language).
 
 **Response (201):**
 ```json
@@ -91,7 +107,8 @@ Create a new account (auto-creates tenant).
     "user": {
       "id": "clx1abc...",
       "email": "investor@example.com",
-      "role": "investor"
+      "role": "investor",
+      "locale": "fr"
     },
     "token": "eyJhbG..."
   }
@@ -114,12 +131,15 @@ Create a new account (auto-creates tenant).
     "user": {
       "id": "clx1abc...",
       "email": "investor@example.com",
-      "role": "investor"
+      "role": "investor",
+      "locale": "fr"
     },
     "token": "eyJhbG..."
   }
 }
 ```
+
+`user.locale` is the account's language. The web client adopts it on the device after sign-in.
 
 ### POST /api/v1/auth/forgot-password
 **Request:**
@@ -154,10 +174,23 @@ Get current user profile. **Auth required.**
     "id": "clx1abc...",
     "email": "investor@example.com",
     "role": "investor",
+    "locale": "fr",
     "created_at": "2026-04-03T10:00:00Z"
   }
 }
 ```
+
+### PUT /api/v1/auth/me
+Update the current user's own preferences. **Auth required.** Rate limit: the per-user brake (120 requests per minute).
+
+**Request:**
+```json
+{ "locale": "fr" }
+```
+
+**Response (200):** same body as `GET /api/v1/auth/me`, with the new value.
+
+**Errors:** `400 VALIDATION_ERROR` when `locale` is missing or not one of `en`, `fr` (`details[0].field` is `"locale"`).
 
 ---
 

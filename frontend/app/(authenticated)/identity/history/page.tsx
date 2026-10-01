@@ -27,7 +27,7 @@ function scoreColorClass(score: number): string {
 }
 
 export default function IdentityHistoryPage() {
-  const { t } = useTranslation();
+  const { t, formatDate } = useTranslation();
   const [versions, setVersions] = useState<IdentityVersion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -150,7 +150,7 @@ export default function IdentityHistoryPage() {
                     v{version.version}
                   </span>
                   <span className="text-xs text-foreground-tertiary">
-                    {new Date(version.generated_at).toLocaleDateString()}
+                    {formatDate(version.generated_at)}
                   </span>
                 </div>
                 <p className="text-sm text-foreground-secondary">{version.archetype}</p>
