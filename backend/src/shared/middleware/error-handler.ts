@@ -93,9 +93,23 @@ const ERROR_STATUS_MAP: Record<ErrorCode, number> = {
   INTERNAL_ERROR: 500,
 };
 
+// express.json() refusals: the client's fault, so a 4xx in the request's language, not a 500
+const BODY_PARSER_ERRORS: Record<string, { status: number; key: MessageKey }> = {
+  'entity.parse.failed': { status: 400, key: 'validation.body_invalid_json' },
+  'entity.too.large': { status: 413, key: 'validation.body_too_large' },
+};
+
 export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction): void {
   // The account's language when signed in, the page's otherwise (set by resolveLocale)
   const locale = req.locale ?? DEFAULT_LOCALE;
+
+  const bodyError = BODY_PARSER_ERRORS[(err as Error & { type?: string }).type ?? ''];
+  if (bodyError) {
+    res.status(bodyError.status).json({
+      error: { code: 'VALIDATION_ERROR', message: t(locale, bodyError.key), details: [] },
+    });
+    return;
+  }
 
   if (err instanceof AppError) {
     const statusCode = err.statusCode || ERROR_STATUS_MAP[err.code] || 500;

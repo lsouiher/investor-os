@@ -35,10 +35,11 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000', 'http://localhost:3002'],
   credentials: true,
 }));
+// Before the body parser and the limiters, so that even a malformed body or a rate-limit
+// response is answered in the request's language
+app.use(resolveLocale);
 app.use(express.json({ limit: '50kb' }));
 app.use(requestLogger);
-// Before the limiters, so that even a rate-limit response knows the request's language
-app.use(resolveLocale);
 app.use(generalLimiter);
 // Contract: all JSON responses use snake_case keys (applies to auth + health too)
 app.use('/api/v1', snakeCaseResponse);

@@ -54,6 +54,8 @@ export const en = {
 
   'validation.locale_invalid': 'Invalid language.',
   'validation.locale_options': 'Must be one of: {{locales}}.',
+  'validation.body_invalid_json': 'The request body is not valid JSON.',
+  'validation.body_too_large': 'The request body is too large.',
 
   'auth.required': 'Authentication required.',
   'auth.token_payload_invalid': 'Invalid token payload.',
@@ -162,6 +164,8 @@ export const fr: Record<MessageKey, string> = {
   'rate_limit.blueprint': 'Trop de demandes de blueprint. Veuillez réessayer plus tard.',
 
   'validation.locale_invalid': 'Langue non valide.',
+  'validation.body_invalid_json': 'Le corps de la requête n’est pas un JSON valide.',
+  'validation.body_too_large': 'Le corps de la requête est trop volumineux.',
   'validation.locale_options': 'Doit être l’une des valeurs suivantes : {{locales}}.',
 
   'auth.required': 'Authentification requise.',

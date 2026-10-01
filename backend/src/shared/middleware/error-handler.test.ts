@@ -188,6 +188,21 @@ describe('errorHandler', () => {
     });
   });
 
+  // Regression: ISSUE-001 — a malformed or oversized JSON body answered 500 INTERNAL_ERROR in English
+  // Found by /qa on 2026-10-01
+  // Report: .gstack/qa-reports/run-20261001T130834Z/qa-report-localhost-2026-10-01.md
+  it.each([
+    ['entity.parse.failed', 400, 'Le corps de la requête n’est pas un JSON valide.'],
+    ['entity.too.large', 413, 'Le corps de la requête est trop volumineux.'],
+  ])('answers a body-parser %s error with %d in the language of the request', (type, status, message) => {
+    const res = mockRes();
+    const err = Object.assign(new SyntaxError('Unexpected token b in JSON'), { type, status });
+    errorHandler(err, { locale: 'fr' } as Request, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(status);
+    expect(res.json).toHaveBeenCalledWith({ error: { code: 'VALIDATION_ERROR', message, details: [] } });
+  });
+
   it('does not leak error details for unknown errors', () => {
     const res = mockRes();
     const err = new Error('SECRET: database connection string');
