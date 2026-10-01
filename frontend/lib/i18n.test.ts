@@ -75,6 +75,24 @@ describe("French typography", () => {
     // 25 000 $ US: no plain space inside a number or between a number, $ and US
     expect(offenders(/\d \d{3}(?!\d)|\d \$|\$ US/)).toEqual([]);
   });
+
+  // Regression: ISSUE-002 — the top "Sales / marketing" answer read "Parcours professionnel",
+  // the title of its own section, which tells the user nothing about the level it stands for
+  // Found by /qa on 2026-10-01
+  // Report: .gstack/qa-reports/run-20261001T130834Z/qa-report-localhost-2026-10-01.md
+  it("never words an audit answer like a section title of the same audit", () => {
+    const repeats = texts
+      .filter(([key]) => /^audit\.\w+\.option\./.test(key))
+      .filter(([key, text]) => {
+        const audit = key.split(".")[1];
+        return texts.some(
+          ([other, title]) =>
+            other.startsWith(`audit.${audit}.section.`) && title.toLowerCase() === text.toLowerCase()
+        );
+      })
+      .map(([key]) => key);
+    expect(repeats).toEqual([]);
+  });
 });
 
 describe("translate", () => {

@@ -568,7 +568,7 @@ Every text added in Sprint 2, English and French side by side, for the founder's
 | `audit.skills.field.sales_marketing.label` | Sales / marketing experience | Expérience en vente et en marketing |
 | `audit.skills.option.sales_marketing.none` | None | Aucune |
 | `audit.skills.option.sales_marketing.some` | Some experience | Une certaine expérience |
-| `audit.skills.option.sales_marketing.professional` | Professional background | Parcours professionnel |
+| `audit.skills.option.sales_marketing.professional` | Professional background | Expérience professionnelle |
 
 **Legal / contracts knowledge**
 
