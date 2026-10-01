@@ -80,6 +80,24 @@ Supported languages: `en` (default) and `fr`. The server picks the language of a
 
 The web client sends `Accept-Language: en` or `Accept-Language: fr` (its interface language) on every request. A regional tag such as `fr-CA` resolves to `fr`; anything unsupported resolves to `en`.
 
+### Messages in the Request's Language
+Text the server writes for a user follows the request's language (feature 004-french-language, Sprint 2). No field is added or renamed, and `code` values and status codes are language-independent.
+
+- `error.message` and any `error.details[].message`, on every endpoint, for every error a user can meet in the product. This includes rate-limit responses (`RATE_LIMITED`, 429) and the generic 500 message.
+- Admin-only and developer-facing messages stay in English (the admin endpoints, malformed-request messages such as an invalid `role_type` or a missing `is_completed`).
+- An error kept for a later request is written in the language of the request that reads it, not of the one that caused it.
+
+| Endpoint | Field in the request's language |
+|----------|---------------------------------|
+| `GET /identity/status` | `last_error` (rendered when read) |
+| `GET /simulations/jobs/:jobId` | `error.message` (rendered when read) |
+| `GET /growth-strategy`, `GET /growth-strategy/paths/:pathType` | `unlock_criteria`, `unlock_progress`, `export_staleness.changed_since_export[]` |
+| `POST /growth-strategy/paths/:pathType/generate` | Early-unlock and cooldown messages. A cooldown is a relative duration ("Try again in 12 min."), correct in any time zone |
+| `GET /dashboard` | `growth_strategy.refresh_suggestions[]`, and the "get started" entry of `intelligence_feed` for a user without an identity |
+| `POST /auth/forgot-password`, `POST /auth/reset-password` | `data.message` |
+
+Labels the web client shows for enumerated values (`type`, `severity`, `status`, `role_type`, path types, simulation variable keys) come from its own dictionaries, keyed by the value; the values themselves never change with the language.
+
 ---
 
 ## Auth Service

@@ -117,11 +117,7 @@ async function doGenerateStrategies(
   // Get latest identity
   const identity = await identityRepo.getLatestIdentity(userId, tenantId);
   if (!identity) {
-    throw new AppError(
-      'VALIDATION_ERROR',
-      'Identity must be synthesized before generating strategies.',
-      400,
-    );
+    throw AppError.localized('VALIDATION_ERROR', 'strategy.identity_required', {}, 400);
   }
 
   const template = await loadActiveTemplate('strategy_generation');
@@ -155,11 +151,7 @@ async function doGenerateStrategies(
   const parsed = parseJsonResponse<AiStrategyResponse>(aiResult.content, AiStrategyResponseSchema);
 
   if (!parsed.strategies || parsed.strategies.length !== 3) {
-    throw new AppError(
-      'AI_SERVICE_ERROR',
-      'AI did not return exactly 3 strategies. Please try again.',
-      503,
-    );
+    throw AppError.localized('AI_SERVICE_ERROR', 'strategy.ai_wrong_count', {}, 503);
   }
 
   // Store strategies
@@ -196,11 +188,11 @@ export async function activateStrategy(
 ): Promise<{ id: string; isActive: boolean }> {
   const strategy = await strategyRepo.getStrategyByPublicId(strategyPublicId, tenantId);
   if (!strategy) {
-    throw new AppError('NOT_FOUND', 'Strategy not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'strategy.not_found', {}, 404);
   }
 
   if (strategy.userId !== userId) {
-    throw new AppError('FORBIDDEN', 'You do not have access to this strategy.', 403);
+    throw AppError.localized('FORBIDDEN', 'strategy.forbidden', {}, 403);
   }
 
   // Activate
@@ -313,7 +305,7 @@ export async function getStrategyDetail(
 ) {
   const strategy = await strategyRepo.getStrategyByPublicId(strategyPublicId, tenantId);
   if (!strategy || strategy.userId !== userId) {
-    throw new AppError('NOT_FOUND', 'Strategy not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'strategy.not_found', {}, 404);
   }
   return {
     ...formatStrategy(strategy),
@@ -333,7 +325,7 @@ export async function getActionPlan(
 ) {
   const strategy = await strategyRepo.getStrategyByPublicId(strategyPublicId, tenantId);
   if (!strategy) {
-    throw new AppError('NOT_FOUND', 'Strategy not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'strategy.not_found', {}, 404);
   }
 
   if (!strategy.actionPlan) {
@@ -352,7 +344,7 @@ export async function getRoadmap(
 ) {
   const strategy = await strategyRepo.getStrategyByPublicId(strategyPublicId, tenantId);
   if (!strategy) {
-    throw new AppError('NOT_FOUND', 'Strategy not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'strategy.not_found', {}, 404);
   }
 
   if (!strategy.roadmap) {
@@ -371,7 +363,7 @@ export async function getMicroPlan(
 ) {
   const strategy = await strategyRepo.getStrategyByPublicId(strategyPublicId, tenantId);
   if (!strategy) {
-    throw new AppError('NOT_FOUND', 'Strategy not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'strategy.not_found', {}, 404);
   }
 
   if (!strategy.microPlan) {
@@ -380,6 +372,12 @@ export async function getMicroPlan(
 
   return strategy.microPlan as unknown as MicroPlanJson;
 }
+
+const ITEM_NOT_FOUND = {
+  'action-item': 'strategy.action_item_not_found',
+  milestone: 'strategy.milestone_not_found',
+  'micro-task': 'strategy.micro_task_not_found',
+} as const;
 
 /**
  * Update completion status of an action item, milestone, or micro-task.
@@ -426,7 +424,7 @@ export async function updateItemCompletion(
     }
   }
 
-  throw new AppError('NOT_FOUND', `${itemType} not found.`, 404);
+  throw AppError.localized('NOT_FOUND', ITEM_NOT_FOUND[itemType], {}, 404);
 }
 
 /**

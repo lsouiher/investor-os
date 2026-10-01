@@ -29,11 +29,7 @@ export async function callClaudeWithRetry(options: AiCallOptions): Promise<AiCal
       logger.error({ err: firstError }, 'AI call failed with non-format error, not retrying');
       throw firstError instanceof AppError
         ? firstError
-        : new AppError(
-            'AI_SERVICE_ERROR',
-            "We couldn't process your request right now. Please try again.",
-            503,
-          );
+        : AppError.localized('AI_SERVICE_ERROR', 'ai.unavailable', {}, 503);
     }
 
     logger.warn({ err: firstError }, 'AI response format error, retrying with stricter format');
@@ -45,11 +41,7 @@ export async function callClaudeWithRetry(options: AiCallOptions): Promise<AiCal
       });
     } catch (secondError) {
       logger.error({ err: secondError }, 'Second AI call failed');
-      throw new AppError(
-        'AI_SERVICE_ERROR',
-        "We couldn't process your request right now. Please try again.",
-        503,
-      );
+      throw AppError.localized('AI_SERVICE_ERROR', 'ai.unavailable', {}, 503);
     }
   }
 }
@@ -78,11 +70,7 @@ export function parseJsonResponse<T>(content: string, schema?: ZodType<T>): T {
   try {
     parsed = JSON.parse(cleaned);
   } catch {
-    throw new AppError(
-      'AI_PARSE_ERROR',
-      'Failed to parse AI response as JSON. Please try again.',
-      503,
-    );
+    throw AppError.localized('AI_PARSE_ERROR', 'ai.parse_failed', {}, 503);
   }
 
   if (!schema) {

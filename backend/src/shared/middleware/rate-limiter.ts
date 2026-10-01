@@ -1,5 +1,6 @@
 import rateLimit from 'express-rate-limit';
 import type { Request } from 'express';
+import { DEFAULT_LOCALE, t, type MessageKey } from '../i18n.js';
 
 // Use userId for authenticated endpoints, IP for public endpoints
 function userOrIpKey(req: Request): string {
@@ -14,8 +15,10 @@ function ipAndEmailKey(req: Request): string {
   return `${req.ip ?? 'unknown'}|${email}`;
 }
 
-const rateLimitedMessage = (message: string) => ({
-  error: { code: 'RATE_LIMITED', message, details: [] },
+// express-rate-limit calls a function given as `message` with the request being refused, so
+// the body is written in that request's language (the account's once authenticated)
+const rateLimitedMessage = (key: MessageKey) => (req: Request) => ({
+  error: { code: 'RATE_LIMITED', message: t(req.locale ?? DEFAULT_LOCALE, key), details: [] },
 });
 
 // Registration: 100 accounts / 15 minutes per IP (a venue's worth), no account to key on yet
@@ -24,7 +27,7 @@ export const registerLimiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-  message: rateLimitedMessage('Too many requests. Please try again later.'),
+  message: rateLimitedMessage('rate_limit.general'),
 });
 
 // Login: 10 attempts / 15 minutes per IP + email — brute-force protection that one
@@ -35,7 +38,7 @@ export const loginLimiter = rateLimit({
   keyGenerator: ipAndEmailKey,
   standardHeaders: true,
   legacyHeaders: false,
-  message: rateLimitedMessage('Too many login attempts. Please try again later.'),
+  message: rateLimitedMessage('rate_limit.login'),
 });
 
 // Forgot password: 5 requests / 15 minutes per IP + email
@@ -45,7 +48,7 @@ export const forgotPasswordLimiter = rateLimit({
   keyGenerator: ipAndEmailKey,
   standardHeaders: true,
   legacyHeaders: false,
-  message: rateLimitedMessage('Too many password reset requests. Please try again later.'),
+  message: rateLimitedMessage('rate_limit.forgot_password'),
 });
 
 // Reset password: 10 attempts / 15 minutes per IP (tokens are 256-bit; this is just a brake)
@@ -54,7 +57,7 @@ export const resetPasswordLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: rateLimitedMessage('Too many password reset attempts. Please try again later.'),
+  message: rateLimitedMessage('rate_limit.reset_password'),
 });
 
 // Identity synthesis: 5 requests / 5 minutes (keyed by userId)
@@ -64,13 +67,7 @@ export const synthesizerLimiter = rateLimit({
   keyGenerator: userOrIpKey,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    error: {
-      code: 'RATE_LIMITED',
-      message: 'Too many synthesis requests. Please try again later.',
-      details: [],
-    },
-  },
+  message: rateLimitedMessage('rate_limit.synthesis'),
 });
 
 // Strategy generation: 3 requests / 5 minutes (keyed by userId)
@@ -80,13 +77,7 @@ export const strategyLimiter = rateLimit({
   keyGenerator: userOrIpKey,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    error: {
-      code: 'RATE_LIMITED',
-      message: 'Too many strategy generation requests. Please try again later.',
-      details: [],
-    },
-  },
+  message: rateLimitedMessage('rate_limit.strategy'),
 });
 
 // Blueprint generation: 5 requests / 1 hour (keyed by userId)
@@ -96,13 +87,7 @@ export const blueprintLimiter = rateLimit({
   keyGenerator: userOrIpKey,
   standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    error: {
-      code: 'RATE_LIMITED',
-      message: 'Too many blueprint requests. Please try again later.',
-      details: [],
-    },
-  },
+  message: rateLimitedMessage('rate_limit.blueprint'),
 });
 
 // Global brake per IP: 600 requests / minute. Runs before authentication, so it can only key
@@ -113,7 +98,7 @@ export const generalLimiter = rateLimit({
   max: 600,
   standardHeaders: true,
   legacyHeaders: false,
-  message: rateLimitedMessage('Too many requests. Please try again later.'),
+  message: rateLimitedMessage('rate_limit.general'),
 });
 
 // Per-user brake: 120 requests / minute, mounted after authentication so the key is the
@@ -124,5 +109,5 @@ export const userLimiter = rateLimit({
   keyGenerator: userOrIpKey,
   standardHeaders: true,
   legacyHeaders: false,
-  message: rateLimitedMessage('Too many requests. Please try again later.'),
+  message: rateLimitedMessage('rate_limit.general'),
 });

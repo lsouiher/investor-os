@@ -9,7 +9,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const identity = await identityService.getLatestIdentity(req.user!.userId, req.user!.tenantId);
     if (!identity) {
-      throw new AppError('NOT_FOUND', 'No identity found. Complete your audits first.', 404);
+      throw AppError.localized('NOT_FOUND', 'identity.not_found', {}, 404);
     }
     res.json({ data: identity });
   } catch (err) {
@@ -30,7 +30,7 @@ router.get('/history', async (req: Request, res: Response, next: NextFunction) =
 // GET /identity/status — is a synthesis running, what's the latest version, did the last one fail
 router.get('/status', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const status = await identityService.getSynthesisStatus(req.user!.userId, req.user!.tenantId);
+    const status = await identityService.getSynthesisStatus(req.user!.userId, req.user!.tenantId, req.locale);
     res.json({ data: status });
   } catch (err) {
     next(err);
@@ -40,7 +40,7 @@ router.get('/status', async (req: Request, res: Response, next: NextFunction) =>
 // POST /identity/synthesize — start a synthesis; 202 straight away, poll GET /identity/status
 router.post('/synthesize', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const before = await identityService.getSynthesisStatus(req.user!.userId, req.user!.tenantId);
+    const before = await identityService.getSynthesisStatus(req.user!.userId, req.user!.tenantId, req.locale);
     if (!before.generating) {
       identityService.startSynthesis(req.user!.userId, req.user!.tenantId);
     }

@@ -4,7 +4,9 @@ import { logger } from '../../shared/logger.js';
 import { decryptField } from '../../shared/encryption/field-encryption.js';
 import { callClaudeWithRetry } from '../../shared/ai/retry.js';
 import { loadActiveTemplate, assemblePrompt } from '../../shared/ai/prompt-loader.js';
+import { t, type Locale } from '../../shared/i18n.js';
 import * as growthRepo from './repository.js';
+import { pathName } from './service.js';
 import type {
   ActionItem,
   PortfolioContent,
@@ -498,6 +500,7 @@ export function assembleZip(files: ExportFile[], res: Response): Promise<void> {
 export async function checkExportFreshness(
   userId: number,
   tenantId: number,
+  locale: Locale,
 ): Promise<{
   has_exported: boolean;
   last_export_at: string | null;
@@ -532,7 +535,7 @@ export async function checkExportFreshness(
   // Check identity version
   if (strategy.identityVersion.version > exportIdentityVersion) {
     changedSinceExport.push(
-      `Identity updated (v${exportIdentityVersion} -> v${strategy.identityVersion.version})`,
+      t(locale, 'export.staleness.identity_updated', { from: exportIdentityVersion, to: strategy.identityVersion.version }),
     );
   }
 
@@ -541,7 +544,7 @@ export async function checkExportFreshness(
     const exportVersion = exportPathVersions[path.pathType] ?? 0;
     if (path.version > exportVersion && path.status === 'generated') {
       changedSinceExport.push(
-        `${formatPathName(path.pathType)} regenerated (v${exportVersion} -> v${path.version})`,
+        t(locale, 'export.staleness.path_regenerated', { path: pathName(path.pathType), from: exportVersion, to: path.version }),
       );
     }
   }

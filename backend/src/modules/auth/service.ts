@@ -32,7 +32,7 @@ export async function register(
 ): Promise<AuthResponse> {
   const existing = await authRepo.findUserByEmail(email);
   if (existing) {
-    throw new AppError('VALIDATION_ERROR', 'Email already registered.', 400);
+    throw AppError.localized('VALIDATION_ERROR', 'auth.email_taken', {}, 400);
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -48,12 +48,12 @@ export async function register(
 export async function login(email: string, password: string): Promise<AuthResponse> {
   const user = await authRepo.findUserByEmail(email);
   if (!user || user.deletedAt) {
-    throw new AppError('UNAUTHORIZED', 'Invalid email or password.', 401);
+    throw AppError.localized('UNAUTHORIZED', 'auth.invalid_credentials', {}, 401);
   }
 
   const validPassword = await bcrypt.compare(password, user.passwordHash);
   if (!validPassword) {
-    throw new AppError('UNAUTHORIZED', 'Invalid email or password.', 401);
+    throw AppError.localized('UNAUTHORIZED', 'auth.invalid_credentials', {}, 401);
   }
 
   await authRepo.updateLastLogin(user.id);
@@ -78,7 +78,7 @@ function toProfile(user: { publicId: string; email: string; role: string; locale
 export async function getProfile(userId: number): Promise<UserProfile> {
   const user = await authRepo.findUserById(userId);
   if (!user) {
-    throw new AppError('NOT_FOUND', 'User not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'auth.user_not_found', {}, 404);
   }
 
   return toProfile(user);
@@ -108,7 +108,7 @@ export async function forgotPassword(email: string): Promise<void> {
 export async function resetPassword(token: string, newPassword: string): Promise<void> {
   const resetToken = await authRepo.findValidResetToken(token);
   if (!resetToken) {
-    throw new AppError('VALIDATION_ERROR', 'Invalid or expired reset token.', 400);
+    throw AppError.localized('VALIDATION_ERROR', 'auth.reset_token_invalid', {}, 400);
   }
 
   const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);

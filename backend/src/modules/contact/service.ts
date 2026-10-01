@@ -73,7 +73,7 @@ export async function updateContact(
 ) {
   const existing = await contactRepo.findContactByPublicId(contactPublicId, tenantId);
   if (!existing || existing.userId !== userId) {
-    throw new AppError('NOT_FOUND', 'Contact not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'contact.not_found', {}, 404);
   }
 
   const updateData: Record<string, unknown> = {};
@@ -105,7 +105,7 @@ export async function updateContact(
 export async function deleteContact(userId: number, tenantId: number, contactPublicId: string) {
   const existing = await contactRepo.findContactByPublicId(contactPublicId, tenantId);
   if (!existing || existing.userId !== userId) {
-    throw new AppError('NOT_FOUND', 'Contact not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'contact.not_found', {}, 404);
   }
 
   await contactRepo.softDeleteContact(existing.id, tenantId);

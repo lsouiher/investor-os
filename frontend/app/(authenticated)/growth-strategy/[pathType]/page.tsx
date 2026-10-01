@@ -69,7 +69,7 @@ function scoreTierClass(score: number): string {
 }
 
 export default function PathDetailPage() {
-  const { t, formatDate, formatTime } = useTranslation();
+  const { t, tOr, formatDate, formatTime } = useTranslation();
   const PATH_NAMES = usePathNames();
   const params = useParams();
   const pathType = params?.pathType as string;
@@ -143,6 +143,8 @@ export default function PathDetailPage() {
   if (!path) return null;
 
   const name = PATH_NAMES[path.path_type] || path.path_type;
+  // Headings of the generated content blocks; a key the dictionary does not know is prettified
+  const contentHeading = (key: string) => tOr(`growth_content.${key}`, key.replace(/_/g, " "));
   const content = path.content as Record<string, unknown>;
   const scalingPlan = content.scaling_plan as ScalingPlan | undefined;
   const sortedActions = [...path.action_items].sort((a, b) => b.priority_score - a.priority_score);
@@ -180,7 +182,7 @@ export default function PathDetailPage() {
           <div className="mt-2 flex items-center justify-between">
             <span className="font-medium text-foreground-strong">{path.strategy.name}</span>
             <span className={`rounded px-2 py-0.5 text-xs font-medium ${scoreTierClass(path.strategy.fit_score)}`}>
-              {path.strategy.fit_score}% fit
+              {path.strategy.fit_score}{t("growth_path.fit")}
             </span>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-4 text-center text-sm">
@@ -206,10 +208,10 @@ export default function PathDetailPage() {
           <h2 className="text-sm font-semibold uppercase text-foreground-muted">{t("growth_path.scaling_vision")}</h2>
           <div className="mt-3 space-y-3">
             {[
-              { label: "Year 1", value: scalingPlan.year_1_vision },
-              { label: "Year 3", value: scalingPlan.year_3_vision },
-              { label: "Year 5", value: scalingPlan.year_5_vision },
-              { label: "Year 10", value: scalingPlan.year_10_vision },
+              { label: t("growth_path.year_1"), value: scalingPlan.year_1_vision },
+              { label: t("growth_path.year_3"), value: scalingPlan.year_3_vision },
+              { label: t("growth_path.year_5"), value: scalingPlan.year_5_vision },
+              { label: t("growth_path.year_10"), value: scalingPlan.year_10_vision },
             ].map(({ label, value }) => (
               <div key={label}>
                 <span className="text-xs font-medium text-amber-600">{label}</span>
@@ -230,7 +232,7 @@ export default function PathDetailPage() {
                 return (
                   <div key={key}>
                     <h3 className="text-xs font-medium uppercase text-foreground-tertiary">
-                      {key.replace(/_/g, " ")}
+                      {contentHeading(key)}
                     </h3>
                     <p className="mt-1 text-sm text-foreground-secondary">{value}</p>
                   </div>
@@ -240,7 +242,7 @@ export default function PathDetailPage() {
                 return (
                   <div key={key}>
                     <h3 className="text-xs font-medium uppercase text-foreground-tertiary">
-                      {key.replace(/_/g, " ")}
+                      {contentHeading(key)}
                     </h3>
                     <ul className="mt-1 space-y-1">
                       {value.map((item: Record<string, unknown>, i: number) => (

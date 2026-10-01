@@ -407,7 +407,7 @@ export default function StrategyDetailPage() {
                     </div>
                     {task.estimated_minutes != null && (
                       <span className="flex-shrink-0 text-xs text-foreground-tertiary">
-                        ~{task.estimated_minutes} min
+                        {t("common.minutes_approx", { count: task.estimated_minutes })}
                       </span>
                     )}
                   </div>

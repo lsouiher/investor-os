@@ -38,7 +38,7 @@ export function validateCompletionRequirements(
   });
 
   if (missingSections.length > 0) {
-    throw new AppError('VALIDATION_ERROR', 'All required sections must have at least one field completed.', 400, [
+    throw AppError.localized('VALIDATION_ERROR', 'audit.sections_incomplete', {}, 400, [
       { missing_sections: missingSections },
     ]);
   }

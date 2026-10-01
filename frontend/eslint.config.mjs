@@ -6,12 +6,11 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
-    // Interface text lives in locales/{en,fr}.json, not in JSX. A warning while the remaining
-    // literals are moved; it becomes an error at the end of Sprint 2 (004-french-language, T047).
+    // Interface text lives in locales/{en,fr}.json, not in JSX (004-french-language, FR-1.13)
     files: ["**/*.tsx"],
     rules: {
       "react/jsx-no-literals": [
-        "warn",
+        "error",
         {
           noStrings: true,
           ignoreProps: true,
@@ -25,6 +24,12 @@ const eslintConfig = defineConfig([
         },
       ],
     },
+  },
+  {
+    // The terms are one page of legal prose, English only until the French version is written
+    // as its own component (004-french-language, T072). Remove this exemption then.
+    files: ["app/terms/page.tsx"],
+    rules: { "react/jsx-no-literals": "off" },
   },
   // Override default ignores of eslint-config-next.
   globalIgnores([

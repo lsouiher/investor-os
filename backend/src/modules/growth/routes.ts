@@ -38,7 +38,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     });
 
     if (!identity) {
-      throw new AppError('VALIDATION_ERROR', 'Complete your investor identity before creating a growth strategy.', 400);
+      throw AppError.localized('VALIDATION_ERROR', 'growth.identity_required', {}, 400);
     }
 
     const { strategyId, portfolioPathId } = await growthService.createGrowthStrategy(userId, tenantId, identity.id);
@@ -69,7 +69,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
       await revertPathToUnlocked(portfolioPathId, tenantId).catch(() => {});
     }
 
-    const strategy = await growthService.getGrowthStrategy(userId, tenantId);
+    const strategy = await growthService.getGrowthStrategy(userId, tenantId, req.locale);
     res.status(201).json({ data: strategy });
   } catch (err) {
     next(err);
@@ -81,9 +81,9 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Clean up any paths stuck in 'generating' > 5 minutes (stale state recovery)
     await growthService.cleanupStaleGenerating(req.user!.userId, req.user!.tenantId);
-    const strategy = await growthService.getGrowthStrategy(req.user!.userId, req.user!.tenantId);
+    const strategy = await growthService.getGrowthStrategy(req.user!.userId, req.user!.tenantId, req.locale);
     if (!strategy) {
-      throw new AppError('NOT_FOUND', 'No growth strategy found. Complete your investor identity first.', 404);
+      throw AppError.localized('NOT_FOUND', 'growth.not_found_identity_first', {}, 404);
     }
     res.json({ data: strategy });
   } catch (err) {
@@ -97,9 +97,9 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 router.get('/paths/:pathType', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const pathType = validatePathType(String(req.params.pathType));
-    const detail = await growthService.getGrowthPath(req.user!.userId, req.user!.tenantId, pathType);
+    const detail = await growthService.getGrowthPath(req.user!.userId, req.user!.tenantId, pathType, req.locale);
     if (!detail) {
-      throw new AppError('NOT_FOUND', 'Growth path not found.', 404);
+      throw AppError.localized('NOT_FOUND', 'growth.path_not_found', {}, 404);
     }
     res.json({ data: detail });
   } catch (err) {
@@ -139,7 +139,7 @@ router.post('/paths/:pathType/generate', async (req: Request, res: Response, nex
       logger.error({ err, pathId }, 'Failed to enqueue path generation');
       const { revertPathToUnlocked } = await import('./repository.js');
       await revertPathToUnlocked(pathId, tenantId).catch(() => {});
-      throw new AppError('AI_SERVICE_ERROR', 'Generation service temporarily unavailable. Please try again.', 503);
+      throw AppError.localized('AI_SERVICE_ERROR', 'growth.generation_unavailable', {}, 503);
     }
 
     const { getCurrentPath } = await import('./repository.js');
@@ -162,9 +162,9 @@ router.post('/paths/:pathType/generate', async (req: Request, res: Response, nex
 router.get('/paths/:pathType/status', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const pathType = validatePathType(String(req.params.pathType));
-    const detail = await growthService.getGrowthPath(req.user!.userId, req.user!.tenantId, pathType);
+    const detail = await growthService.getGrowthPath(req.user!.userId, req.user!.tenantId, pathType, req.locale);
     if (!detail) {
-      throw new AppError('NOT_FOUND', 'Growth path not found.', 404);
+      throw AppError.localized('NOT_FOUND', 'growth.path_not_found', {}, 404);
     }
     res.json({
       data: {
@@ -197,6 +197,7 @@ router.put('/paths/:pathType/action-items/:itemId', async (req: Request, res: Re
       pathType,
       itemId,
       is_completed,
+      req.locale,
     );
 
     res.json({
@@ -219,9 +220,9 @@ router.put('/paths/:pathType/action-items/:itemId', async (req: Request, res: Re
 // GET /growth-strategy/cross-path-insights
 router.get('/cross-path-insights', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const strategy = await growthService.getGrowthStrategy(req.user!.userId, req.user!.tenantId);
+    const strategy = await growthService.getGrowthStrategy(req.user!.userId, req.user!.tenantId, req.locale);
     if (!strategy) {
-      throw new AppError('NOT_FOUND', 'No growth strategy found.', 404);
+      throw AppError.localized('NOT_FOUND', 'growth.not_found', {}, 404);
     }
 
     res.json({
@@ -305,25 +306,20 @@ router.post('/export/markdown', async (req: Request, res: Response, next: NextFu
     });
 
     if (!identity) {
-      throw new AppError('VALIDATION_ERROR', 'Complete your investor identity before exporting.', 400);
+      throw AppError.localized('VALIDATION_ERROR', 'export.identity_required', {}, 400);
     }
 
     // Check consent (first-time users must have given consent via the frontend)
     const hasConsent = await growthRepo.hasGivenExportConsent(userId, tenantId);
     const { consent } = req.body ?? {};
     if (!hasConsent && consent !== true) {
-      throw new AppError(
-        'VALIDATION_ERROR',
-        'Export consent is required. This export may include sensitive financial data.',
-        400,
-        [{ requires_consent: true }],
-      );
+      throw AppError.localized('VALIDATION_ERROR', 'export.consent_required', {}, 400, [{ requires_consent: true }]);
     }
 
     // Get strategy and paths
     const strategy = await growthRepo.getActiveGrowthStrategy(userId, tenantId);
     if (!strategy) {
-      throw new AppError('NOT_FOUND', 'No active growth strategy found.', 404);
+      throw AppError.localized('NOT_FOUND', 'growth.no_active_strategy', {}, 404);
     }
 
     const paths = await growthRepo.getAllCurrentPaths(strategy.id, tenantId);
@@ -422,7 +418,7 @@ router.post('/export/markdown', async (req: Request, res: Response, next: NextFu
 router.get('/export/status', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId, tenantId } = req.user!;
-    const status = await exportModule.checkExportFreshness(userId, tenantId);
+    const status = await exportModule.checkExportFreshness(userId, tenantId, req.locale);
     res.json({ data: status });
   } catch (err) {
     next(err);

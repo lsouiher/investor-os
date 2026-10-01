@@ -56,11 +56,11 @@ interface DashboardData {
   } | null;
 }
 
-const PATH_LABELS: Record<string, string> = {
-  portfolio: "Portfolio",
-  income_capital: "Income & Capital",
-  skills_knowledge: "Skills & Knowledge",
-  time_operations: "Time & Operations",
+const PATH_LABEL_KEYS: Record<string, string> = {
+  portfolio: "growth.path_short.portfolio",
+  income_capital: "growth.path.income_capital",
+  skills_knowledge: "growth.path.skills_knowledge",
+  time_operations: "growth.path.time_operations",
 };
 
 const SEVERITY_STYLES: Record<string, string> = {
@@ -108,7 +108,7 @@ function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, tOr, formatPercent } = useTranslation();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -292,7 +292,7 @@ export default function DashboardPage() {
                   <span>
                     {active_strategy.progress
                       ? `${active_strategy.progress.completed}/${active_strategy.progress.total}`
-                      : "Plan generating…"}
+                      : t("dashboard.plan_generating")}
                   </span>
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-surface-subtle">
@@ -373,34 +373,38 @@ export default function DashboardPage() {
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
-              Growth Strategy
+              {t("growth.title")}
             </h2>
             <Link
               href="/growth-strategy"
               className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
             >
-              View Paths
+              {t("dashboard.view_paths")}
             </Link>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {growth_strategy.paths.map((p) => (
               <div key={p.path_type} className="rounded-md border border-border bg-surface-subtle px-3 py-2">
-                <p className="truncate text-xs font-medium text-foreground-secondary">{PATH_LABELS[p.path_type] ?? p.path_type}</p>
+                <p className="text-xs font-medium text-foreground-secondary">{PATH_LABEL_KEYS[p.path_type] ? t(PATH_LABEL_KEYS[p.path_type]) : p.path_type}</p>
                 <p className="mt-0.5 text-xs text-foreground-muted">
-                  {p.status === "locked" ? "Locked" : p.status === "generating" ? "Generating…" : `${p.progress}%`}
+                  {p.status === "locked"
+                    ? t("growth.path.locked")
+                    : p.status === "generating"
+                      ? t("growth.path.generating_short")
+                      : formatPercent(p.progress)}
                 </p>
               </div>
             ))}
           </div>
           {growth_strategy.next_best_action && (
             <div className="mt-4 rounded-md border border-amber-100 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">Next best action</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">{t("growth.next_best_action")}</p>
               <p className="mt-1 text-sm font-medium text-foreground-strong">{growth_strategy.next_best_action.title}</p>
               <p className="mt-0.5 text-xs text-foreground-secondary">{growth_strategy.next_best_action.reason}</p>
             </div>
           )}
           {growth_strategy.export_is_stale && (
-            <p className="mt-3 text-xs text-foreground-muted">Your last export is out of date.</p>
+            <p className="mt-3 text-xs text-foreground-muted">{t("dashboard.export_stale")}</p>
           )}
         </div>
       )}
@@ -419,14 +423,14 @@ export default function DashboardPage() {
               >
                 <div className="flex items-center gap-2">
                   <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${SEVERITY_STYLES[insight.severity] ?? SEVERITY_STYLES.info}`}>
-                    {insight.type.replace("_", " ")}
+                    {tOr(`dashboard.insight_type.${insight.type}`, insight.type.replace("_", " "))}
                   </span>
                   <span className="text-sm font-medium text-foreground-strong">{insight.title}</span>
                 </div>
                 <p className="mt-1 text-sm text-foreground-secondary">{insight.message}</p>
                 {insight.action_url && (
                   <Link href={insight.action_url} className="mt-1 inline-block text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700">
-                    Take action →
+                    {t("dashboard.take_action")}
                   </Link>
                 )}
               </div>

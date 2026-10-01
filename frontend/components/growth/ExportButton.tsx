@@ -59,9 +59,9 @@ export default function ExportButton({
             setIsDownloading(false);
             return;
           }
-          throw new Error(json.error?.message ?? "Export failed");
+          throw new Error(json.error?.message ?? t("export.error.failed"));
         }
-        throw new Error(`Export failed (${res.status})`);
+        throw new Error(t("export.error.failed_status", { status: res.status }));
       }
 
       // Download the zip blob

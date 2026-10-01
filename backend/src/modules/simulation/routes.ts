@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { AppError } from '../../shared/middleware/error-handler.js';
+import { render } from '../../shared/i18n.js';
 import * as simulationService from './service.js';
 
 const router = Router();
@@ -80,7 +81,7 @@ router.get('/config', async (req: Request, res: Response, next: NextFunction) =>
   try {
     const config = await simulationService.getSimulationConfig(req.user!.userId, req.user!.tenantId);
     if (!config) {
-      throw new AppError('NOT_FOUND', 'No identity profile found. Complete your audits first.', 404);
+      throw AppError.localized('NOT_FOUND', 'simulation.config_identity_required', {}, 404);
     }
     res.json({ data: config });
   } catch (err) {
@@ -110,9 +111,10 @@ router.get('/jobs/:jobId', async (req: Request, res: Response, next: NextFunctio
   try {
     const job = simulationService.getSimulationJob(String(req.params.jobId), req.user!.userId);
     if (!job) {
-      throw new AppError('NOT_FOUND', 'Simulation not found. Please run it again.', 404);
+      throw AppError.localized('NOT_FOUND', 'simulation.job_not_found', {}, 404);
     }
-    res.json({ data: { status: job.status, result: job.result ?? null, error: job.error ?? null } });
+    const error = job.error ? { code: job.error.code, message: render(req.locale, job.error.message) } : null;
+    res.json({ data: { status: job.status, result: job.result ?? null, error } });
   } catch (err) {
     next(err);
   }

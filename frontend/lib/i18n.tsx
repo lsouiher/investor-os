@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useCallback, useMemo } from "react
 import { DEFAULT_LOCALE, writeLocaleCookie, type Locale } from "./locale";
 import {
   translate,
+  translateOr,
   formatDate,
   formatTime,
   formatNumber,
@@ -22,6 +23,8 @@ interface I18nContextValue {
   /** Switches the interface on this device. Saving the choice to the account is the caller's job. */
   setLocale: (l: Locale) => void;
   t: (key: string, params?: TranslateParams) => string;
+  /** Like `t` for a key built from data: `fallback` when no language has the text. */
+  tOr: <T extends string | undefined>(key: string, fallback: T) => string | T;
   formatDate: (value: DateInput, options?: Intl.DateTimeFormatOptions) => string;
   formatTime: (value: DateInput, options?: Intl.DateTimeFormatOptions) => string;
   formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
@@ -31,6 +34,7 @@ interface I18nContextValue {
 function bindLocale(locale: Locale): Omit<I18nContextValue, "locale" | "setLocale"> {
   return {
     t: (key, params) => translate(locale, key, params),
+    tOr: (key, fallback) => translateOr(locale, key, fallback),
     formatDate: (value, options) => formatDate(locale, value, options),
     formatTime: (value, options) => formatTime(locale, value, options),
     formatNumber: (value, options) => formatNumber(locale, value, options),

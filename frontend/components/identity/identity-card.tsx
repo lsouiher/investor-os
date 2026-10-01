@@ -85,16 +85,17 @@ export default function IdentityCard({
   const { t } = useTranslation();
   return (
     <div
-      className="relative w-full overflow-hidden rounded-xl"
+      // No overflow-hidden: 16:9 is the minimum shape, and the card grows with its content on a phone
+      className="relative w-full rounded-xl"
       style={{
         backgroundColor: "var(--surface-dark)",
         aspectRatio: "16 / 9",
       }}
     >
       {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-600/10 via-transparent to-purple-900/10" />
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-amber-600/10 via-transparent to-purple-900/10" />
 
-      <div className="relative flex h-full flex-col justify-between p-6 sm:p-8">
+      <div className="relative flex min-h-full flex-col justify-between p-6 sm:p-8">
         {/* Top: archetype title */}
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">

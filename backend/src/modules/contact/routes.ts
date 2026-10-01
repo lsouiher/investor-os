@@ -50,7 +50,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, phone, role_type: roleType, notes, strategy_relevance: strategyRelevance, network_gap_filled: networkGapFilled } = req.body;
 
     if (!name || typeof name !== 'string') {
-      throw new AppError('VALIDATION_ERROR', 'name is required.', 400);
+      throw AppError.localized('VALIDATION_ERROR', 'contact.name_required', {}, 400);
     }
     if (!roleType || !VALID_ROLE_TYPES.has(roleType)) {
       throw new AppError('VALIDATION_ERROR', 'Valid role_type is required.', 400);

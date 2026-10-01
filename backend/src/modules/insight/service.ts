@@ -4,6 +4,7 @@ import { callClaudeWithRetry, parseJsonResponse } from '../../shared/ai/retry.js
 import { loadActiveTemplate, assemblePrompt } from '../../shared/ai/prompt-loader.js';
 import { prisma } from '../../shared/db.js';
 import { logger } from '../../shared/logger.js';
+import { t, type Locale } from '../../shared/i18n.js';
 import type { Prisma } from '@prisma/client';
 
 export type InsightType = 'progress' | 'contradiction' | 'score_change' | 'milestone' | 'network_alert';
@@ -63,7 +64,12 @@ interface InsightContext {
 const INSIGHTS_TTL_MS = 6 * 60 * 60 * 1000;
 const refreshInProgress = new Set<number>();
 
-export async function getInsights(userId: number, tenantId: number): Promise<Insight[]> {
+export async function getInsights(userId: number, tenantId: number, locale: Locale): Promise<Insight[]> {
+  // Users without an identity get the nudge, written for this request: it is a system
+  // sentence, never cached, so it follows the language of whoever reads it.
+  const identity = await prisma.identityVersion.findFirst({ where: { userId, tenantId }, select: { id: true } });
+  if (!identity) return [getStartedInsight(locale)];
+
   const user = await prisma.user.findFirst({
     where: { id: userId, tenantId },
     select: { insightsCache: true, insightsGeneratedAt: true },
@@ -72,12 +78,9 @@ export async function getInsights(userId: number, tenantId: number): Promise<Ins
   const fresh = !!user?.insightsGeneratedAt && Date.now() - user.insightsGeneratedAt.getTime() < INSIGHTS_TTL_MS;
 
   if (!cached || !fresh) refreshInsights(userId, tenantId);
-  if (cached) return cached;
 
-  // Nothing cached yet: answer without the model. Users without an identity get the nudge
-  // synchronously; the rest see the feed fill in on their next visit.
-  const identity = await prisma.identityVersion.findFirst({ where: { userId, tenantId }, select: { id: true } });
-  return identity ? [] : [getStartedInsight()];
+  // Nothing cached yet: answer without the model; the feed fills in on the next visit
+  return cached ?? [];
 }
 
 /** Regenerate in the background (deduplicated per user); errors are logged, never surfaced. */
@@ -100,11 +103,11 @@ export async function invalidateInsights(userId: number): Promise<void> {
   await prisma.user.update({ where: { id: userId }, data: { insightsGeneratedAt: null } }).catch(() => {});
 }
 
-function getStartedInsight(): Insight {
+export function getStartedInsight(locale: Locale): Insight {
   return {
     type: 'progress',
-    title: 'Get Started',
-    message: 'Complete all 5 audits to unlock your investor identity and personalized insights.',
+    title: t(locale, 'insight.get_started.title'),
+    message: t(locale, 'insight.get_started.message'),
     severity: 'info',
     actionUrl: '/audits',
   };
@@ -114,8 +117,9 @@ export async function generateInsights(userId: number, tenantId: number): Promis
   // Gather context
   const context = await gatherInsightContext(userId, tenantId);
 
+  // Nothing to generate without an identity; getInsights answers those users with the nudge
   if (!context.identity) {
-    return [getStartedInsight()];
+    return [];
   }
 
   // Load prompt template and call AI

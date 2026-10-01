@@ -4,302 +4,128 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
+import { useTranslation } from "@/lib/i18n";
 import AuditFormShell, {
   type AuditSection,
 } from "@/components/audit/audit-form-shell";
 
+// Structure only: the questions and answer choices are the `audit.skills.*` texts in
+// locales/en.json and locales/fr.json (key convention in AuditFormShell). Option values are
+// the stored codes.
 const sections: AuditSection[] = [
   {
     id: "re_experience",
-    title: "Real Estate Experience",
     fields: [
       {
-        name: "deals_closed",
-        label: "Number of RE deals closed",
-        type: "select",
-        required: true,
+        name: "deals_closed", type: "select", required: true,
+        options: ["0", "1-2", "3-5", "6-10", "over-10"],
+      },
+      {
+        name: "deal_types", type: "select",
         options: [
-          { value: "0", label: "None" },
-          { value: "1-2", label: "1-2 deals" },
-          { value: "3-5", label: "3-5 deals" },
-          { value: "6-10", label: "6-10 deals" },
-          { value: "over-10", label: "More than 10 deals" },
+          "none", "primary-residence", "single-family-rental", "multi-family", "commercial", "flip",
+          "mixed",
         ],
       },
       {
-        name: "deal_types",
-        label: "Types of deals (if any)",
-        type: "select",
-        options: [
-          { value: "none", label: "No experience" },
-          { value: "primary-residence", label: "Primary residence only" },
-          { value: "single-family-rental", label: "Single family rental" },
-          { value: "multi-family", label: "Multi-family" },
-          { value: "commercial", label: "Commercial" },
-          { value: "flip", label: "Fix and flip" },
-          { value: "mixed", label: "Multiple types" },
-        ],
+        name: "current_holdings", type: "select",
+        options: ["none", "primary-only", "1-rental", "2-4-rentals", "5-plus"],
       },
-      {
-        name: "current_holdings",
-        label: "Current RE holdings",
-        type: "select",
-        options: [
-          { value: "none", label: "None" },
-          { value: "primary-only", label: "Primary residence only" },
-          { value: "1-rental", label: "1 rental property" },
-          { value: "2-4-rentals", label: "2-4 rental properties" },
-          { value: "5-plus", label: "5+ properties" },
-        ],
-      },
-      {
-        name: "biggest_success",
-        label: "Biggest RE success (if any)",
-        type: "textarea",
-        placeholder: "Briefly describe your most successful RE experience...",
-      },
-      {
-        name: "biggest_failure",
-        label: "Biggest RE lesson / failure (if any)",
-        type: "textarea",
-        placeholder: "Briefly describe a RE setback or lesson learned...",
-      },
+      { name: "biggest_success", type: "textarea" },
+      { name: "biggest_failure", type: "textarea" },
     ],
   },
   {
     id: "professional",
-    title: "Professional Background",
     fields: [
+      { name: "profession", type: "text", required: true },
       {
-        name: "profession",
-        label: "Current profession / industry",
-        type: "text",
-        required: true,
-        placeholder: "e.g., Software Engineer, Nurse, Sales Manager",
+        name: "years_experience", type: "select", required: true,
+        options: ["under-2", "2-5", "5-10", "10-20", "over-20"],
       },
       {
-        name: "years_experience",
-        label: "Years of professional experience",
-        type: "select",
-        required: true,
-        options: [
-          { value: "under-2", label: "Under 2 years" },
-          { value: "2-5", label: "2-5 years" },
-          { value: "5-10", label: "5-10 years" },
-          { value: "10-20", label: "10-20 years" },
-          { value: "over-20", label: "Over 20 years" },
-        ],
+        name: "management_experience", type: "select", required: true,
+        options: ["none", "small-team", "medium-team", "large-team", "executive"],
       },
       {
-        name: "management_experience",
-        label: "Management / leadership experience",
-        type: "select",
-        required: true,
-        options: [
-          { value: "none", label: "None" },
-          { value: "small-team", label: "Small team (1-5 people)" },
-          { value: "medium-team", label: "Medium team (6-20 people)" },
-          { value: "large-team", label: "Large team (20+ people)" },
-          { value: "executive", label: "Executive / C-level" },
-        ],
+        name: "negotiation_skill", type: "select", required: true,
+        options: ["beginner", "intermediate", "advanced", "expert"],
       },
       {
-        name: "negotiation_skill",
-        label: "Negotiation skill level",
-        type: "select",
-        required: true,
-        options: [
-          { value: "beginner", label: "Beginner" },
-          { value: "intermediate", label: "Intermediate" },
-          { value: "advanced", label: "Advanced" },
-          { value: "expert", label: "Expert (professional negotiator)" },
-        ],
-      },
-      {
-        name: "analytical_skill",
-        label: "Analytical / financial analysis skill",
-        type: "select",
-        required: true,
-        options: [
-          { value: "beginner", label: "Beginner (basic math)" },
-          { value: "intermediate", label: "Intermediate (spreadsheets)" },
-          { value: "advanced", label: "Advanced (financial modeling)" },
-          { value: "expert", label: "Expert (professional analyst)" },
-        ],
+        name: "analytical_skill", type: "select", required: true,
+        options: ["beginner", "intermediate", "advanced", "expert"],
       },
     ],
   },
   {
     id: "transferable",
-    title: "Transferable Skills",
     fields: [
       {
-        name: "construction_knowledge",
-        label: "Construction / renovation knowledge",
-        type: "select",
-        options: [
-          { value: "none", label: "None" },
-          { value: "basic-diy", label: "Basic DIY" },
-          { value: "moderate", label: "Moderate (can manage projects)" },
-          { value: "professional", label: "Professional level" },
-        ],
+        name: "construction_knowledge", type: "select",
+        options: ["none", "basic-diy", "moderate", "professional"],
       },
       {
-        name: "sales_marketing",
-        label: "Sales / marketing experience",
-        type: "select",
-        options: [
-          { value: "none", label: "None" },
-          { value: "some", label: "Some experience" },
-          { value: "professional", label: "Professional background" },
-        ],
+        name: "sales_marketing", type: "select",
+        options: ["none", "some", "professional"],
       },
       {
-        name: "legal_knowledge",
-        label: "Legal / contracts knowledge",
-        type: "select",
-        options: [
-          { value: "none", label: "None" },
-          { value: "basic", label: "Basic (can read a contract)" },
-          { value: "moderate", label: "Moderate (comfortable negotiating terms)" },
-          { value: "professional", label: "Legal professional" },
-        ],
+        name: "legal_knowledge", type: "select",
+        options: ["none", "basic", "moderate", "professional"],
       },
       {
-        name: "accounting_knowledge",
-        label: "Accounting / bookkeeping knowledge",
-        type: "select",
-        options: [
-          { value: "none", label: "None" },
-          { value: "basic", label: "Basic (personal finances)" },
-          { value: "moderate", label: "Moderate (business bookkeeping)" },
-          { value: "professional", label: "Accounting professional" },
-        ],
+        name: "accounting_knowledge", type: "select",
+        options: ["none", "basic", "moderate", "professional"],
       },
       {
-        name: "project_management",
-        label: "Project management experience",
-        type: "select",
-        options: [
-          { value: "none", label: "None" },
-          { value: "informal", label: "Informal experience" },
-          { value: "formal", label: "Formal PM training / certification" },
-          { value: "professional", label: "Professional project manager" },
-        ],
+        name: "project_management", type: "select",
+        options: ["none", "informal", "formal", "professional"],
       },
       {
-        name: "technology_comfort",
-        label: "Technology comfort level",
-        type: "select",
-        options: [
-          { value: "basic", label: "Basic (email, web browsing)" },
-          { value: "moderate", label: "Moderate (spreadsheets, apps)" },
-          { value: "advanced", label: "Advanced (automation, data tools)" },
-          { value: "expert", label: "Tech professional" },
-        ],
+        name: "technology_comfort", type: "select",
+        options: ["basic", "moderate", "advanced", "expert"],
       },
     ],
   },
   {
     id: "education",
-    title: "RE Education",
     fields: [
       {
-        name: "courses_completed",
-        label: "RE-related courses / training completed",
-        type: "select",
-        required: true,
-        options: [
-          { value: "none", label: "None" },
-          { value: "online-courses", label: "Online courses / YouTube" },
-          { value: "books-podcasts", label: "Books and podcasts" },
-          { value: "formal-course", label: "Formal RE course / bootcamp" },
-          { value: "multiple", label: "Multiple courses and programs" },
-        ],
+        name: "courses_completed", type: "select", required: true,
+        options: ["none", "online-courses", "books-podcasts", "formal-course", "multiple"],
       },
       {
-        name: "licenses",
-        label: "RE-related licenses or certifications",
-        type: "select",
-        options: [
-          { value: "none", label: "None" },
-          { value: "re-license", label: "Real estate license" },
-          { value: "contractor-license", label: "Contractor license" },
-          { value: "other", label: "Other relevant license" },
-          { value: "multiple", label: "Multiple licenses" },
-        ],
+        name: "licenses", type: "select",
+        options: ["none", "re-license", "contractor-license", "other", "multiple"],
       },
-      {
-        name: "current_learning",
-        label: "Currently learning about",
-        type: "text",
-        placeholder: "e.g., BRRRR strategy, wholesaling, commercial analysis...",
-      },
+      { name: "current_learning", type: "text" },
     ],
   },
   {
     id: "network",
-    title: "Network",
     fields: [
       {
-        name: "has_agent",
-        label: "Do you have a real estate agent?",
-        type: "select",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-          { value: "looking", label: "Looking for one" },
-        ],
+        name: "has_agent", type: "select",
+        options: ["yes", "no", "looking"],
       },
       {
-        name: "has_lender",
-        label: "Do you have a lender relationship?",
-        type: "select",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-          { value: "looking", label: "Looking for one" },
-        ],
+        name: "has_lender", type: "select",
+        options: ["yes", "no", "looking"],
       },
       {
-        name: "has_contractor",
-        label: "Do you have a trusted contractor?",
-        type: "select",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-          { value: "looking", label: "Looking for one" },
-        ],
+        name: "has_contractor", type: "select",
+        options: ["yes", "no", "looking"],
       },
       {
-        name: "has_attorney",
-        label: "Do you have a real estate attorney?",
-        type: "select",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-          { value: "looking", label: "Looking for one" },
-        ],
+        name: "has_attorney", type: "select",
+        options: ["yes", "no", "looking"],
       },
       {
-        name: "has_cpa",
-        label: "Do you have a CPA familiar with RE?",
-        type: "select",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-          { value: "looking", label: "Looking for one" },
-        ],
+        name: "has_cpa", type: "select",
+        options: ["yes", "no", "looking"],
       },
       {
-        name: "has_mentor",
-        label: "Do you have an RE mentor or experienced investor contact?",
-        type: "select",
-        options: [
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-          { value: "looking", label: "Looking for one" },
-        ],
+        name: "has_mentor", type: "select",
+        options: ["yes", "no", "looking"],
       },
     ],
   },
@@ -318,9 +144,11 @@ interface AuditResponse {
 export default function SkillsAuditPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [initialData, setInitialData] = useState<Record<string, Record<string, string>>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  // A dictionary key, so the banner follows a language switch
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -343,7 +171,7 @@ export default function SkillsAuditPage() {
       try {
         await api.put("/audits/skills", { responses, complete: false });
       } catch {
-        setError("Failed to save progress. Please try again.");
+        setError("audit.error.save_failed");
       } finally {
         setSaving(false);
       }
@@ -359,7 +187,7 @@ export default function SkillsAuditPage() {
         await api.put("/audits/skills", { responses, complete: true });
         router.push("/hub");
       } catch {
-        setError("Failed to complete audit. Make sure all required fields are filled.");
+        setError("audit.error.complete_failed");
       } finally {
         setSaving(false);
       }
@@ -383,7 +211,7 @@ export default function SkillsAuditPage() {
     <div className="py-6">
       {error && (
         <div className="max-w-5xl mx-auto mb-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 text-sm">
-          {error}
+          {t(error)}
         </div>
       )}
       <AuditFormShell

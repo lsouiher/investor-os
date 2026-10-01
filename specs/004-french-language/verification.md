@@ -163,3 +163,125 @@ On `master`, `authenticate` is an `async` function that throws. Express 4 does n
 - After a switch without reload, the page description (`<meta name="description">`) keeps the previous language until the next page load. The tab title and `<html lang>` update at once.
 - If saving a switch to the account fails (network), the device shows the new language until the next page load, which applies the account's language again.
 - Test accounts created by this check in the local database: emails starting with `s1-` at `example.test`.
+
+---
+
+## Sprint 2: French Interface, Complete (T025 to T048)
+
+**Date:** 2026-10-01 · **Branch:** `004-french-language` · **Compared with:** the Sprint 1 commit `731a240`
+
+### Result
+
+| Exit criterion (spec, Sprint 2 "Done when") | Result |
+|---|---|
+| A French walkthrough of every screen (signed-out and signed-in, phone and desktop) finds no English text in the interface | Pass. The only English left is what the spec leaves for later sprints: AI-written content (Sprint 3), archetype names (Sprint 3, T058) and the terms page (Sprint 4, T072) |
+| The same answers produce the same sub-scores in both languages | Pass: 89 of 89 coded answers stored identically from the French and the English interface (see Scores) |
+| The automatic safeguards from Sprint 1 pass with the audits included | Pass: parity and typography tests green on 1,034 keys per language; `react/jsx-no-literals` is now an error and reports nothing |
+| `npm test` in `backend/` | Pass: 18 suites, 346 tests |
+| `npm test` in `frontend/` | Pass: 5 suites, 42 tests |
+| `npm run lint` in `frontend/` | No hard-coded text. Still exits 1 because of the 4 `react-hooks/set-state-in-effect` errors that exist on `master` (see Lint) |
+
+The three commands were run in the repository itself and in a copy on the Linux filesystem, with the same results.
+
+**Waiting on the founder** (the two tasks left open in `tasks.md`):
+
+- **T025, glossary sign-off.** `.specify/specs/004-french-language/glossary.md` is written and applied. Eight choices are listed at its top with a recommendation each. The translations were drafted on those recommendations instead of waiting, because a change of term is a search-and-replace.
+- **T045, copy review.** `specs/004-french-language/copy-review-sprint2.md` lists the 627 interface texts and 88 server messages added in this sprint, English and French side by side, plus the 9 existing French texts that changed. Corrections are not applied yet because none have been given.
+
+### What changed, in numbers
+
+| | Before | After |
+|---|---|---|
+| Interface texts per language (`frontend/locales`) | 407 | 1,034 |
+| of which the five audits | 17 | 572 (10 shared, 25 sections, 95 questions, 6 placeholders, 419 choices, 17 existing) |
+| Server messages per language (`backend/src/shared/i18n.ts`) | 2 | 88 |
+| Lines in the five audit pages | 1,802 | 1,078 |
+| Hard-coded texts reported by the lint rule | 43 | 0 (the terms page is exempt until T072) |
+
+### How the exit check was run
+
+Production build of the branch (`npm run build`, `next start` on port 3100), the API on port 3055 with the mock AI server, Postgres and Redis from `docker compose`, all from a copy of the tree on the Linux filesystem. A script drove headless Chrome 146 through 58 screens as a new French account, each at 360 px and 1280 px wide, in light and dark themes (164 full-page captures; every screen was measured in all four combinations). On each screen it recorded:
+
+- every visible text, attribute text (`aria-label`, `title`, `placeholder`) and select option, compared with the French dictionary and scanned for English words;
+- layout problems: horizontal page overflow, text outside the viewport, text cut by `overflow: hidden`, `text-overflow` or a line clamp, and selects whose content is wider than the control.
+
+Screens covered: landing, sign-in (and its error from the server), registration, forgot password, reset password (with and without token), terms; then, signed in, the empty states of dashboard, hub, identity, strategies, simulation, growth strategy, tasks and contacts; the 25 audit sections with their required-field messages; hub (partial and complete), identity, identity history, strategies, strategy detail (inactive and active), tasks, contacts with two contacts, simulation before and after a run, growth strategy, two growth path pages, and the full dashboard.
+
+| Check | Observed |
+|---|---|
+| English in the interface | None. Texts not found in the French dictionary were sorted by hand: sentences with a parameter (« Section 2 sur 5 », « Suivant : Passifs »), data typed by the user, symbols, and content written by the mock AI (English until Sprint 3). `<html lang>` and the tab title were French on all 57 French screens |
+| The language switch | Its label is « Switch to English » on a French page: each language is offered in its own words, by design (Sprint 1) |
+| Layout at 360 px and 1280 px | No page overflow, no text outside the viewport, no interface text cut. Left as designed: the account's email in the sidebar is truncated (user data), and the one-line and two-line previews of AI descriptions on the strategies and growth pages are clamped |
+| Light and dark | Same result in both; captures reviewed by eye for the audits, dashboard, identity, simulation and growth pages |
+| Server messages | Sign-in with a wrong password shows « Courriel ou mot de passe incorrect. ». With `curl`: registration, forgot and reset password, missing token, rate limit (11th sign-in attempt), identity, simulation, blueprint, growth and contact errors are French for a French account and English for an English one. A stored synthesis error read by a French request is French, and the same error read after switching the account to English is English |
+| Screen readers | The five path-card labels, the growth score and the theme and sign-out buttons are French |
+
+### Scores: same answers, same result
+
+A French account and an English account completed the five audits through the interface, each in its own language, with the same rule choosing the answers (the third choice of every question, free-text fields filled in each language).
+
+| | French account | English account |
+|---|---|---|
+| Coded answers stored (`GET /audits/:type`) | 89 | 89, all identical to the French account's |
+| Audits completed | 5 of 5 | 5 of 5 |
+| Audit `sub_score` | 100 each | 100 each |
+| Identity `sub_scores` and readiness (mock AI) | 78 / 62 / 70 / 80 / 82, readiness 74 | identical |
+
+What this proves: the language of the interface changes nothing in what is stored or sent to the scoring. The identity figures come from the mock AI, which returns the same answer to everyone; parity against the real model is measured in Sprint 3 (T064).
+
+### Lint (T047)
+
+`npm run lint`: 15 problems, 4 errors and 11 warnings, all present on `master` (baseline in the Sprint 1 section).
+
+- `react/jsx-no-literals` is an error and reports nothing. A probe file with `<p>Hello there</p>` fails the lint, as intended. The single exemption is `app/terms/page.tsx`, to be removed with T072.
+- The 4 errors are `react-hooks/set-state-in-effect` in `lib/theme.tsx`, `lib/auth-context.tsx`, `app/(authenticated)/hub/page.tsx` and `components/audit/audit-form-shell.tsx`. They are not about language and were left alone. Until they are fixed, `npm run lint` cannot gate a pull request on its exit code. Recommended as a small separate change.
+- The 11 warnings are the `react-hooks/exhaustive-deps` ones (a missing `t`), unchanged.
+
+### Decisions taken during implementation
+
+Each is the recommended option, applied. None changes the spec.
+
+| # | Decision | Why |
+|---|---|---|
+| 1 | Translations were drafted before the glossary sign-off (T025 asks for it before T027) | A term changed at sign-off is a search-and-replace in two files, and T045 exists to apply corrections. Waiting would have blocked the whole sprint |
+| 2 | Glossary: « courriel » everywhere (labels said « E-mail », password reset said « courriel ») and « correspondance » for fit (the interface also said « adéquation » and « compatibilité »). 9 existing French texts changed, listed at the end of the copy-review sheet | FR-2.7: one term per concept. Both are sign-off items 3 and 4 |
+| 3 | French typography is applied by rule and tested: U+00A0 before `: ; ? ! %`, inside « », and inside amounts (« 25 000 $ US »); ’ for the apostrophe. 31 existing texts changed in typography only | T044. The test also refuses straight quotes |
+| 4 | Audit separators: English choices such as "Panic - consider selling" read « Panique : j’envisage de vendre » in French | A hyphen between two clauses is not French punctuation |
+| 5 | Gender-neutral wording in the audits where French would otherwise need « (e) »: « Pourquoi pas, avec l’accompagnement d’un mentor » rather than « Ouvert(e)… ». « Marié(e) » is kept | Reads better, and the audits address everyone |
+| 6 | The audit title now uses `audit.<type>.name`, as T026 asks. In English three titles change: "Skills Audit" becomes "Skills & Experience", "Risk Audit" becomes "Risk Profile", "Horizon Audit" becomes "Horizon & Goals", the names the Identity Hub already shows | T026. Worth knowing for Scenario 4: it is the one deliberate change to English wording on the audit pages |
+| 7 | The required-field message stores which fields are empty, not the sentence | So the message follows a language switch while it is displayed (T032) |
+| 8 | New `tOr(key, fallback)` next to `t()`, for keys built from data: an audit field's optional placeholder, a growth content heading, a simulation variable, an insight type | Three call sites needed "the text if the dictionary has it, otherwise this" |
+| 9 | Simulation slider names, contact roles, cross-path link types and insight types are labeled from the dictionary by their code, with the server's English label or the raw code as fallback | They were raw codes or English labels from the server (FR-2.4). In English, a contact's role now reads "Property Manager" instead of `property_manager`, and "CPA" instead of `cpa` |
+| 10 | Simulation results keep the raw response and build their labels when displayed | Same reason as 7 |
+| 11 | "min", the "v" of a version and the founder's initial went into the dictionary (`common.minutes_approx`, `common.version_short`, `landing.built_initial`) rather than into the lint rule's allow-list | Sprint 1 left them for this sprint to settle; the allow-list stays limited to punctuation, symbols and the brand |
+| 12 | Percentages go through `formatPercent` on the dashboard, the path cards, the strategies list and the growth page: « 45 % » in French, "45%" in English | FR-1.10 |
+| 13 | The card-reveal animation moved from an inline `<style jsx>` in the identity page to `app/globals.css` | The CSS text was the last thing the lint rule flagged outside the terms page; same class, same animation |
+| 14 | Server: `AppError.localized` keeps the English text in `message` for logs and renders in the request's language when the response is written; rate-limit messages are functions of the request; deferred errors store the key | T037, T038, T042, research R5 |
+| 15 | Server: the two cooldown messages read "Try again in 12 min." instead of a clock time | T041, research R13. The only English server text that changed. "min" avoids a plural form |
+| 16 | Server: the "get started" insight is written for each request and never cached; a user without an identity costs one small extra query per dashboard load | T043: a cached sentence would keep the language it was written in |
+| 17 | Server: localized beyond the files T040 names, because the web client shows them: "name is required" (contacts), "title is required" (tasks), the identity and simulation "not found" messages in the route files | FR-2.5 |
+| 18 | Server: left in English: the admin module, role and feature-flag refusals, prompt-loader errors, and malformed-request messages the web client cannot produce (invalid `role_type`, missing `is_completed`, invalid path type, simulation parameter validation) | T040: developer-facing messages stay as they are |
+
+### Layout fixes (T046)
+
+| Where | Problem at 360 px | Fix |
+|---|---|---|
+| Audit selects | A long chosen answer was cut inside the closed control (about 30 of the French selects, and the longer English ones) | `field-sizing: content` with `white-space: normal`: the control grows to two or three lines. Browsers without `field-sizing` keep the single line, as before |
+| Identity card | Fixed 16:9 box with `overflow: hidden`: the score ring, the insight and the sub-scores were cut on a phone, in both languages | 16:9 is now the minimum shape; the card grows with its content. Unchanged on desktop |
+| Dashboard, growth paths | Path names were truncated (« Compétences et … ») | They wrap |
+
+### Known limits after Sprint 2
+
+- AI-written content is English until Sprint 3: identity headline and insights, strategies, plans, tasks derived from a plan, simulation insight, growth paths, dashboard feed. Archetype names are English until T058.
+- The terms page is English until Sprint 4.
+- A language switch does not refetch: sentences composed by the server that are already on screen (unlock criteria, an error banner) stay in the previous language until the page loads data again.
+- On a browser without `field-sizing` (older Safari and Firefox), a long answer is still cut inside the closed select, in both languages. A radio list for the long questions would remove the limit; it is a design decision.
+- The export and blueprint download requests do not send `Accept-Language`. It does not matter while they require sign-in (the account's language applies).
+- Test accounts created by this check in the local database: emails starting with `s2-` at `example.test`.
+
+### Outside the task list, noticed and not changed
+
+- `backend/package.json` has a `lint` script but no ESLint config or dependency: it cannot run.
+- `synthesizerLimiter`, `strategyLimiter` and `blueprintLimiter` are defined but mounted on no route.
+- `regeneratePath` and `regenerateFullStrategy` have no route; their messages are localized but unreachable. `getUnlockProgress` always returns an empty string.
+- The pages' fetch effects depend on `user`, which is replaced when `GET /auth/me` answers: an audit page refetches about a second after it opens and would overwrite an answer typed in that second. Not seen in the walkthrough; mentioned because the audit shell was open on the table.

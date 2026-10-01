@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { generatePublicId } from '../../shared/utils/id.js';
-import { AppError } from '../../shared/middleware/error-handler.js';
+import { AppError, deferredMessage } from '../../shared/middleware/error-handler.js';
+import type { LocalizedText } from '../../shared/i18n.js';
 import { callClaudeWithRetry, parseJsonResponse } from '../../shared/ai/retry.js';
 import { loadActiveTemplate, assemblePrompt } from '../../shared/ai/prompt-loader.js';
 import { prisma } from '../../shared/db.js';
@@ -32,7 +33,8 @@ interface SimulationJob {
   userId: number;
   status: 'running' | 'done' | 'failed';
   result?: SimulationOutcome;
-  error?: { code: string; message: string };
+  // The job fails without a request in hand: the message is rendered when the job is read
+  error?: { code: string; message: LocalizedText | string };
   createdAt: number;
 }
 const simulationJobs = new Map<string, SimulationJob>();
@@ -59,10 +61,10 @@ export async function startSimulation(
     })
     .catch((err: unknown) => {
       job.status = 'failed';
-      job.error =
-        err instanceof AppError
-          ? { code: err.code, message: err.message }
-          : { code: 'AI_SERVICE_ERROR', message: "We couldn't process your request right now. Please try again." };
+      job.error = {
+        code: err instanceof AppError ? err.code : 'AI_SERVICE_ERROR',
+        message: deferredMessage(err, 'ai.unavailable'),
+      };
     });
   return { jobId };
 }
@@ -75,11 +77,7 @@ export function getSimulationJob(jobId: string, userId: number): SimulationJob |
 async function precheckSimulation(userId: number, tenantId: number) {
   const recentCount = await simulationRepo.getSimulationCountLast24h(userId, tenantId);
   if (recentCount >= MAX_SIMULATIONS_PER_24H) {
-    throw new AppError(
-      'RATE_LIMITED',
-      `Maximum ${MAX_SIMULATIONS_PER_24H} simulations per 24 hours. Please try again later.`,
-      429,
-    );
+    throw AppError.localized('RATE_LIMITED', 'simulation.daily_limit', { max: MAX_SIMULATIONS_PER_24H }, 429);
   }
 
   const currentIdentity = await prisma.identityVersion.findFirst({
@@ -87,11 +85,7 @@ async function precheckSimulation(userId: number, tenantId: number) {
     orderBy: { version: 'desc' },
   });
   if (!currentIdentity) {
-    throw new AppError(
-      'VALIDATION_ERROR',
-      'No identity profile found. Complete all 5 audits and synthesize your identity first.',
-      400,
-    );
+    throw AppError.localized('VALIDATION_ERROR', 'simulation.identity_required', {}, 400);
   }
   return { recentCount, currentIdentity };
 }

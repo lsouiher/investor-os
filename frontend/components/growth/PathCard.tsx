@@ -61,7 +61,7 @@ export default function PathCard({
   onGenerate,
   isStub,
 }: PathCardProps) {
-  const { t } = useTranslation();
+  const { t, formatPercent } = useTranslation();
   const PATH_NAMES = usePathNames();
   const name = PATH_NAMES[pathType] || pathType;
   const accentColor = PATH_COLORS[pathType] || "border-l-gray-400";
@@ -73,7 +73,7 @@ export default function PathCard({
       <div
         className={`rounded-lg border border-border border-l-2 ${accentColor} bg-surface-subtle px-6 py-4 opacity-70`}
         role="article"
-        aria-label={`${name} - Coming Soon`}
+        aria-label={t("growth.path.aria.coming_soon", { name })}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -95,7 +95,7 @@ export default function PathCard({
         href={`/growth-strategy/${pathType}`}
         className={`block rounded-lg border border-border border-l-2 ${accentColor} bg-surface-card px-6 py-4 transition-shadow hover:shadow-sm`}
         role="article"
-        aria-label={`${name} - ${progress}% complete`}
+        aria-label={t("growth.path.aria.progress", { name, progress })}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -104,7 +104,7 @@ export default function PathCard({
           </div>
           <div className="flex items-center gap-3">
             <span className={`rounded px-2 py-0.5 text-xs font-medium ${scoreTierClass(progress)}`}>
-              {progress}%
+              {formatPercent(progress)}
             </span>
             <span className="text-sm text-foreground-muted">
               {completedActionItems}/{actionItemCount} {t("growth_path.action_items")}
@@ -132,7 +132,7 @@ export default function PathCard({
       <div
         className={`rounded-lg border border-border border-l-2 ${accentColor} bg-surface-card px-6 py-4`}
         role="article"
-        aria-label={`${name} - Generating`}
+        aria-label={t("growth.path.aria.generating", { name })}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export default function PathCard({
       <div
         className={`rounded-lg border border-border border-l-2 ${accentColor} bg-surface-card px-6 py-4`}
         role="article"
-        aria-label={`${name} - Ready to generate`}
+        aria-label={t("growth.path.aria.ready", { name })}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -176,7 +176,7 @@ export default function PathCard({
     <div
       className={`rounded-lg border border-border border-l-2 ${accentColor} bg-surface-subtle px-6 py-4 opacity-70`}
       role="article"
-      aria-label={`${name} - Locked`}
+      aria-label={t("growth.path.aria.locked", { name })}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

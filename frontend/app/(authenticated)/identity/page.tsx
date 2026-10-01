@@ -252,7 +252,7 @@ export default function IdentityPage() {
           readinessScore={identity.readiness_score}
           radarData={identity.radar_data}
           headlineInsight={identity.headline_insight}
-          subScores={toSubScoreList(identity.sub_scores)}
+          subScores={toSubScoreList(identity.sub_scores, t)}
         />
       </div>
 
@@ -313,26 +313,6 @@ export default function IdentityPage() {
           {t("identity.view_history")}
         </Link>
       </div>
-
-      {/* CSS keyframes for card flip reveal */}
-      <style jsx global>{`
-        @keyframes cardReveal {
-          0% {
-            transform: perspective(1000px) rotateY(90deg);
-            opacity: 0;
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            transform: perspective(1000px) rotateY(0deg);
-            opacity: 1;
-          }
-        }
-        .animate-card-reveal {
-          animation: cardReveal 0.8s ease-out forwards;
-        }
-      `}</style>
     </div>
   );
 }

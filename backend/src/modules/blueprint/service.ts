@@ -96,9 +96,10 @@ export async function generateBlueprint(userId: number, tenantId: number): Promi
   const missingTypes = REQUIRED_AUDIT_TYPES.filter((t) => !completedTypes.has(t));
 
   if (missingTypes.length > 0) {
-    throw new AppError(
+    throw AppError.localized(
       'VALIDATION_ERROR',
-      `All 5 audits must be completed before generating a blueprint. Missing: ${missingTypes.join(', ')}.`,
+      'blueprint.audits_required',
+      { missing: missingTypes.map((type) => ({ key: `audit.type.${type}` as const })) },
       400,
     );
   }
@@ -110,11 +111,7 @@ export async function generateBlueprint(userId: number, tenantId: number): Promi
   });
 
   if (!identity) {
-    throw new AppError(
-      'VALIDATION_ERROR',
-      'No identity profile found. Synthesize your identity before generating a blueprint.',
-      400,
-    );
+    throw AppError.localized('VALIDATION_ERROR', 'blueprint.identity_required', {}, 400);
   }
 
   // Get strategies for this identity version

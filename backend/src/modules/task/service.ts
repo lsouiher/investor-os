@@ -95,7 +95,7 @@ export async function updateTask(
 ) {
   const existing = await taskRepo.findTaskByPublicId(taskPublicId, tenantId);
   if (!existing || existing.userId !== userId) {
-    throw new AppError('NOT_FOUND', 'Task not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'task.not_found', {}, 404);
   }
 
   const task = await taskRepo.updateTask(existing.id, tenantId, {
@@ -128,7 +128,7 @@ export async function updateTask(
 export async function deleteTask(userId: number, tenantId: number, taskPublicId: string) {
   const existing = await taskRepo.findTaskByPublicId(taskPublicId, tenantId);
   if (!existing || existing.userId !== userId) {
-    throw new AppError('NOT_FOUND', 'Task not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'task.not_found', {}, 404);
   }
 
   await taskRepo.softDeleteTask(existing.id, tenantId);

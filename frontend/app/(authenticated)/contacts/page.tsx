@@ -65,7 +65,7 @@ export default function ContactsPage() {
 }
 
 function ContactsPageContent() {
-  const { t } = useTranslation();
+  const { t, tOr } = useTranslation();
   const ROLE_TYPES = useRoleTypes();
   const searchParams = useSearchParams();
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -224,7 +224,7 @@ function ContactsPageContent() {
                     {contact.name}
                   </p>
                   <span className="rounded bg-surface-subtle px-1.5 py-0.5 text-xs text-foreground-muted">
-                    {contact.role_type}
+                    {tOr(`contacts.role.${contact.role_type}`, contact.role_type)}
                   </span>
                 </div>
                 <p className="text-xs text-foreground-muted">

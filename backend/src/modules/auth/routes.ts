@@ -3,6 +3,7 @@ import { authenticate } from '../../shared/middleware/auth.js';
 import { registerLimiter, loginLimiter, forgotPasswordLimiter, resetPasswordLimiter, userLimiter } from '../../shared/middleware/rate-limiter.js';
 import { validateRegisterInput, validateLoginInput, validateResetPasswordInput, validateEmail, validateLocale } from './validation.js';
 import * as authService from './service.js';
+import { t } from '../../shared/i18n.js';
 
 const router = Router();
 
@@ -38,7 +39,7 @@ router.get('/me', authenticate, async (req: Request, res: Response, next: NextFu
 
 router.put('/me', authenticate, userLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const locale = validateLocale(req.body.locale, req.locale);
+    const locale = validateLocale(req.body.locale);
     const profile = await authService.updateProfile(req.user!.userId, { locale });
     res.status(200).json({ data: profile });
   } catch (err) {
@@ -50,7 +51,7 @@ router.post('/forgot-password', forgotPasswordLimiter, async (req: Request, res:
   try {
     const email = validateEmail(req.body.email);
     await authService.forgotPassword(email);
-    res.status(200).json({ data: { message: 'If an account exists, a reset email has been sent.' } });
+    res.status(200).json({ data: { message: t(req.locale, 'auth.forgot_password_sent') } });
   } catch (err) {
     next(err);
   }
@@ -60,7 +61,7 @@ router.post('/reset-password', resetPasswordLimiter, async (req: Request, res: R
   try {
     const { token, password } = validateResetPasswordInput(req.body);
     await authService.resetPassword(token, password);
-    res.status(200).json({ data: { message: 'Password has been reset.' } });
+    res.status(200).json({ data: { message: t(req.locale, 'auth.password_reset_done') } });
   } catch (err) {
     next(err);
   }

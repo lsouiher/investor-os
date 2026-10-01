@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 export interface RadarData {
   capital?: number | null;
@@ -16,13 +17,14 @@ interface RadarChartProps {
   size?: number;
 }
 
-const ALL_AXES: { key: keyof RadarData; label: string }[] = [
-  { key: "capital", label: "Capital" },
-  { key: "time", label: "Time" },
-  { key: "skills", label: "Skills" },
-  { key: "risk_tolerance", label: "Risk" },
-  { key: "network", label: "Network" },
-  { key: "goal_clarity", label: "Goals" },
+// In drawing order. The labels are the `identity.axis.*` texts.
+const ALL_AXES: (keyof RadarData)[] = [
+  "capital",
+  "time",
+  "skills",
+  "risk_tolerance",
+  "network",
+  "goal_clarity",
 ];
 
 function polarToCartesian(
@@ -38,8 +40,9 @@ function polarToCartesian(
 }
 
 export default function RadarChart({ data, size = 300 }: RadarChartProps) {
+  const { t } = useTranslation();
   const axes = useMemo(
-    () => ALL_AXES.filter((a) => data[a.key] != null),
+    () => ALL_AXES.filter((axis) => data[axis] != null),
     [data]
   );
 
@@ -54,7 +57,7 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
         className="flex items-center justify-center text-sm text-foreground-tertiary"
         style={{ width: size, height: size }}
       >
-        No data available
+        {t("identity.radar_empty")}
       </div>
     );
   }
@@ -63,7 +66,7 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
   const startAngle = -Math.PI / 2; // Start from top
 
   const dataPoints = axes.map((axis, i) => {
-    const value = Math.max(0, Math.min(100, (data[axis.key] as number) ?? 0));
+    const value = Math.max(0, Math.min(100, (data[axis] as number) ?? 0));
     const angle = startAngle + i * angleStep;
     const r = (value / 100) * radius;
     return polarToCartesian(center, center, r, angle);
@@ -133,14 +136,14 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
         const anchor = Math.abs(dx) < 1 ? "middle" : dx > 0 ? "start" : "end";
         return (
           <text
-            key={axis.key}
+            key={axis}
             x={pos.x}
             y={pos.y}
             textAnchor={anchor}
             dominantBaseline="central"
             className="fill-foreground-secondary text-xs font-medium"
           >
-            {axis.label}
+            {t(`identity.axis.${axis}`)}
           </text>
         );
       })}

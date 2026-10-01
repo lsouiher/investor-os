@@ -5,7 +5,8 @@ import { buildSubScores, calculateReadinessScore } from './scoring.js';
 import { buildRadarData } from './radar.js';
 import { loadActiveTemplate, assemblePrompt } from '../../shared/ai/prompt-loader.js';
 import { callClaudeWithRetry, parseJsonResponse } from '../../shared/ai/retry.js';
-import { AppError } from '../../shared/middleware/error-handler.js';
+import { AppError, deferredMessage } from '../../shared/middleware/error-handler.js';
+import { render, type Locale, type LocalizedText } from '../../shared/i18n.js';
 import { logger } from '../../shared/logger.js';
 import type { IdentityDetail, IdentitySummary, AiSynthesisResponse } from './types.js';
 import { AiSynthesisResponseSchema } from './types.js';
@@ -22,8 +23,10 @@ function compact<T extends object>(obj: T | undefined): Partial<T> {
 // audit-completion auto-trigger and the explicit POST /identity/synthesize, which a user will hit
 // while the auto-trigger is still running now that a real synthesis takes tens of seconds.
 const synthesisInProgress = new Map<number, Promise<IdentityDetail>>();
-// Last failure per user, so a client polling for a result can tell "still working" from "gave up"
-const lastSynthesisError = new Map<number, string>();
+// Last failure per user, so a client polling for a result can tell "still working" from "gave up".
+// Kept as a dictionary key where there is one: the synthesis runs without a request, and the
+// message is written in the language of the request that reads it.
+const lastSynthesisError = new Map<number, LocalizedText | string>();
 
 export interface SynthesisStatus {
   generating: boolean;
@@ -38,19 +41,17 @@ export interface SynthesisStatus {
 export function startSynthesis(userId: number, tenantId: number): void {
   lastSynthesisError.delete(userId);
   synthesizeIdentity(userId, tenantId).catch((err: unknown) => {
-    lastSynthesisError.set(
-      userId,
-      err instanceof AppError ? err.message : "We couldn't process your request right now. Please try again.",
-    );
+    lastSynthesisError.set(userId, deferredMessage(err, 'ai.unavailable'));
   });
 }
 
-export async function getSynthesisStatus(userId: number, tenantId: number): Promise<SynthesisStatus> {
+export async function getSynthesisStatus(userId: number, tenantId: number, locale: Locale): Promise<SynthesisStatus> {
   const latest = await identityRepo.getLatestIdentity(userId, tenantId);
+  const lastError = lastSynthesisError.get(userId);
   return {
     generating: synthesisInProgress.has(userId),
     latestVersion: latest?.version ?? null,
-    lastError: lastSynthesisError.get(userId) ?? null,
+    lastError: lastError ? render(locale, lastError) : null,
   };
 }
 
@@ -129,11 +130,7 @@ async function doSynthesizeIdentity(
   const completedAudits = await getCompletedAuditsForSynthesis(userId, tenantId);
 
   if (completedAudits.length === 0) {
-    throw new AppError(
-      'VALIDATION_ERROR',
-      'At least one audit must be completed before identity synthesis.',
-      400,
-    );
+    throw AppError.localized('VALIDATION_ERROR', 'identity.audit_required', {}, 400);
   }
 
   // 2. Build sub-scores and composite readiness score
@@ -311,15 +308,15 @@ export async function rateIdentity(
   feedback: string | null = null,
 ): Promise<{ id: string; userRating: number }> {
   if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-    throw new AppError('VALIDATION_ERROR', 'Rating must be an integer between 1 and 5.', 400);
+    throw AppError.localized('VALIDATION_ERROR', 'identity.rating_range', {}, 400);
   }
   if (feedback !== null && feedback.length > 2000) {
-    throw new AppError('VALIDATION_ERROR', 'Feedback must be at most 2000 characters.', 400);
+    throw AppError.localized('VALIDATION_ERROR', 'identity.feedback_too_long', {}, 400);
   }
 
   const identity = await identityRepo.getIdentityByPublicId(identityPublicId, tenantId);
   if (!identity) {
-    throw new AppError('NOT_FOUND', 'Identity version not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'identity.version_not_found', {}, 404);
   }
 
   const updated = await identityRepo.updateUserRating(identity.id, rating, feedback);

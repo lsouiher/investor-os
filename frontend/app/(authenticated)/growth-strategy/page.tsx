@@ -95,7 +95,7 @@ function scoreTierColor(score: number): string {
 }
 
 export default function GrowthStrategyPage() {
-  const { t } = useTranslation();
+  const { t, formatPercent } = useTranslation();
   const PATH_NAMES = usePathNames();
   const scoreTierLabel = useScoreTierLabel();
   const [strategy, setStrategy] = useState<GrowthStrategy | null>(null);
@@ -162,7 +162,7 @@ export default function GrowthStrategyPage() {
     const path = strategy?.paths.find((p) => p.path_type === pathType);
     // Locked paths need an explicit early-unlock confirmation first
     if (path?.status === "locked" && !confirmEarlyUnlock) {
-      setUnlockPrompt({ pathType, criteria: path.unlock_criteria ?? "completing earlier paths" });
+      setUnlockPrompt({ pathType, criteria: path.unlock_criteria ?? t("growth.unlock.criteria_fallback") });
       return;
     }
     try {
@@ -174,7 +174,7 @@ export default function GrowthStrategyPage() {
       await fetchStrategy();
     } catch (err) {
       if (err instanceof ApiError && err.code === "VALIDATION_ERROR") {
-        setUnlockPrompt({ pathType, criteria: path?.unlock_criteria ?? "completing earlier paths" });
+        setUnlockPrompt({ pathType, criteria: path?.unlock_criteria ?? t("growth.unlock.criteria_fallback") });
       } else {
         setError(t("growth.error.generate_failed", { path: PATH_NAMES[pathType] || pathType }));
       }
@@ -390,7 +390,7 @@ export default function GrowthStrategyPage() {
       <div className="rounded-lg border border-border bg-surface-card px-5 py-4">
         <div className="flex items-center justify-between text-sm">
           <span className="text-foreground-secondary">{t("growth.overall_progress")}</span>
-          <span className="font-medium">{strategy.overall_progress}%</span>
+          <span className="font-medium">{formatPercent(strategy.overall_progress)}</span>
         </div>
         <div className="mt-2 h-2 w-full rounded-full bg-surface-subtle">
           <div

@@ -52,7 +52,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
     } = req.body;
 
     if (!title || typeof title !== 'string') {
-      throw new AppError('VALIDATION_ERROR', 'title is required.', 400);
+      throw AppError.localized('VALIDATION_ERROR', 'task.title_required', {}, 400);
     }
     if (
       identityImpactScore !== undefined &&

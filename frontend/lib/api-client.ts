@@ -1,3 +1,6 @@
+import { DEFAULT_LOCALE, isLocale, type Locale } from "./locale";
+import { translate } from "./translate";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
 
 export interface ApiSuccessResponse<T> {
@@ -42,9 +45,15 @@ function clearAuthAndRedirect(): void {
   window.location.href = "/login";
 }
 
+// The interface language, for code outside React. <html lang> is the source: the server
+// renders it and the language switch keeps it current.
+function currentLocale(): Locale {
+  const lang = typeof document !== "undefined" ? document.documentElement.lang : "";
+  return isLocale(lang) ? lang : DEFAULT_LOCALE;
+}
+
 // Every request announces the interface language, so the server can answer in it before it
-// knows who is asking (sign-in, registration, password reset). <html lang> is the source:
-// the server renders it and the language switch keeps it current.
+// knows who is asking (sign-in, registration, password reset).
 function buildHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -81,14 +90,14 @@ async function request<T>(
 
   if (res.status === 401) {
     if (!options.stayOnUnauthorized) clearAuthAndRedirect();
-    throw new ApiError("UNAUTHORIZED", "Session expired");
+    throw new ApiError("UNAUTHORIZED", translate(currentLocale(), "error.session_expired"));
   }
 
   const contentType = res.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) {
     throw new ApiError(
       "NON_JSON_RESPONSE",
-      `Server returned an unexpected response (${res.status} ${res.statusText})`
+      translate(currentLocale(), "error.unexpected_response", { status: `${res.status} ${res.statusText}` })
     );
   }
 
@@ -110,7 +119,7 @@ async function requestEnvelope<T, M extends object = Record<string, unknown>>(
   const res = await fetch(`${BASE_URL}${path}`, { method, headers: buildHeaders(), body: body ? JSON.stringify(body) : undefined });
   if (res.status === 401) {
     clearAuthAndRedirect();
-    throw new ApiError("UNAUTHORIZED", "Session expired");
+    throw new ApiError("UNAUTHORIZED", translate(currentLocale(), "error.session_expired"));
   }
   const json = (await res.json()) as ApiResponse<T> & M;
   if (isErrorResponse(json)) {
@@ -130,7 +139,7 @@ export async function poll<T>(
     if (done(value)) return value;
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }
-  throw new ApiError("TIMEOUT", "This is taking longer than expected. Please try again.");
+  throw new ApiError("TIMEOUT", translate(currentLocale(), "error.timeout"));
 }
 
 export const api = {

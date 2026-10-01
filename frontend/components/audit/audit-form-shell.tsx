@@ -1,19 +1,23 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { useTranslation } from "@/lib/i18n";
 
+// Structure only. The text comes from the dictionaries, by convention:
+//   audit.<type>.section.<id>                 section title
+//   audit.<type>.field.<name>.label           question
+//   audit.<type>.field.<name>.placeholder     example text, when the field has one
+//   audit.<type>.option.<name>.<value>        answer choice
+// Option values are the codes that are stored, so answers do not depend on the language.
 export interface AuditField {
   name: string;
-  label: string;
   type: "text" | "number" | "select" | "textarea";
-  options?: { value: string; label: string }[];
-  placeholder?: string;
+  options?: string[];
   required?: boolean;
 }
 
 export interface AuditSection {
   id: string;
-  title: string;
   fields: AuditField[];
 }
 
@@ -34,11 +38,13 @@ export default function AuditFormShell({
   onComplete,
   saving = false,
 }: AuditFormShellProps) {
+  const { t, tOr } = useTranslation();
   const [currentPage, setCurrentPage] = useState(0);
   const [responses, setResponses] = useState<Record<string, Record<string, string>>>(initialData);
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
   const [mode, setMode] = useState<"form" | "conversational">("form");
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  // Names of the required fields left empty; the message is rendered in the current language
+  const [missingFields, setMissingFields] = useState<Set<string>>(new Set());
 
   // Sync initial data when it loads
   useEffect(() => {
@@ -73,18 +79,23 @@ export default function AuditFormShell({
     []
   );
 
+  const sectionTitle = (section: AuditSection) => t(`audit.${auditType}.section.${section.id}`);
+  const fieldLabel = (field: AuditField) => t(`audit.${auditType}.field.${field.name}.label`);
+  const fieldPlaceholder = (field: AuditField) =>
+    tOr(`audit.${auditType}.field.${field.name}.placeholder`, undefined);
+
   const validateCurrentSection = useCallback((): boolean => {
-    const errors: Record<string, string> = {};
+    const missing = new Set<string>();
     for (const field of currentSection.fields) {
       if (field.required) {
         const value = responses[currentSection.id]?.[field.name] ?? "";
         if (!value.trim()) {
-          errors[field.name] = `${field.label} is required`;
+          missing.add(field.name);
         }
       }
     }
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    setMissingFields(missing);
+    return missing.size === 0;
   }, [currentSection, responses]);
 
   const handleAutoSave = useCallback(async () => {
@@ -105,7 +116,7 @@ export default function AuditFormShell({
   }, [currentSection, handleAutoSave, sections.length, validateCurrentSection]);
 
   const handleBack = useCallback(() => {
-    setValidationErrors({});
+    setMissingFields(new Set());
     setCurrentPage((prev) => Math.max(prev - 1, 0));
   }, []);
 
@@ -120,7 +131,7 @@ export default function AuditFormShell({
       const targetSection = sections[index];
       // Allow jumping to any completed section or the current one
       if (completedSections.has(targetSection.id) || index === currentPage) {
-        setValidationErrors({});
+        setMissingFields(new Set());
         setCurrentPage(index);
       }
     },
@@ -134,12 +145,12 @@ export default function AuditFormShell({
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-bold text-foreground-strong capitalize">
-            {auditType} Audit
+          <h1 className="text-2xl font-bold text-foreground-strong">
+            {t(`audit.${auditType}.name`)}
           </h1>
           <div className="flex items-center gap-3">
             <span className="text-sm text-foreground-muted">
-              Section {currentPage + 1} of {sections.length}
+              {t("audit.shell.section_of", { current: currentPage + 1, total: sections.length })}
             </span>
             {/* Mode toggle placeholder */}
             <button
@@ -148,10 +159,10 @@ export default function AuditFormShell({
                 setMode((m) => (m === "form" ? "conversational" : "form"))
               }
               className="text-xs border border-border px-3 py-1.5 text-foreground-secondary hover:bg-surface-subtle"
-              title="Conversational mode coming soon"
+              title={t("audit.shell.mode.coming_soon")}
               disabled
             >
-              {mode === "form" ? "Form" : "Chat"} mode
+              {t(`audit.shell.mode.${mode}`)}
             </button>
           </div>
         </div>
@@ -191,7 +202,7 @@ export default function AuditFormShell({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               )}
-              {section.title}
+              {sectionTitle(section)}
             </button>
           );
         })}
@@ -200,12 +211,16 @@ export default function AuditFormShell({
       {/* Current section form */}
       <div className="bg-surface-card rounded-lg border border-border p-6">
         <h2 className="text-lg font-semibold text-foreground-strong mb-6">
-          {currentSection.title}
+          {sectionTitle(currentSection)}
         </h2>
 
         <div className="space-y-5">
           {currentSection.fields.map((field) => {
-            const fieldError = validationErrors[field.name];
+            const label = fieldLabel(field);
+            const placeholder = fieldPlaceholder(field);
+            const fieldError = missingFields.has(field.name)
+              ? t("audit.shell.required", { field: label })
+              : null;
             const errorBorderClass = fieldError ? "border-red-400 dark:border-red-600" : "border-border";
             return (
             <div key={field.name}>
@@ -213,7 +228,7 @@ export default function AuditFormShell({
                 htmlFor={`${currentSection.id}-${field.name}`}
                 className="block text-sm font-medium text-foreground-secondary mb-1.5"
               >
-                {field.label}
+                {label}
                 {field.required && (
                   <span className="text-red-500 dark:text-red-400 ml-0.5">*</span>
                 )}
@@ -226,12 +241,14 @@ export default function AuditFormShell({
                   onChange={(e) =>
                     updateField(currentSection.id, field.name, e.target.value)
                   }
-                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong bg-surface-card focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
+                  // A long answer wraps inside the closed control instead of being clipped on a
+                  // phone (browsers without field-sizing keep the single line)
+                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong bg-surface-card whitespace-normal field-sizing-content focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
                 >
-                  <option value="">Select...</option>
-                  {field.options?.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
+                  <option value="">{t("audit.shell.select")}</option>
+                  {field.options?.map((value) => (
+                    <option key={value} value={value}>
+                      {t(`audit.${auditType}.option.${field.name}.${value}`)}
                     </option>
                   ))}
                 </select>
@@ -242,7 +259,7 @@ export default function AuditFormShell({
                   onChange={(e) =>
                     updateField(currentSection.id, field.name, e.target.value)
                   }
-                  placeholder={field.placeholder}
+                  placeholder={placeholder}
                   rows={3}
                   className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
                 />
@@ -254,7 +271,7 @@ export default function AuditFormShell({
                   onChange={(e) =>
                     updateField(currentSection.id, field.name, e.target.value)
                   }
-                  placeholder={field.placeholder}
+                  placeholder={placeholder}
                   className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
                 />
               ) : (
@@ -265,7 +282,7 @@ export default function AuditFormShell({
                   onChange={(e) =>
                     updateField(currentSection.id, field.name, e.target.value)
                   }
-                  placeholder={field.placeholder}
+                  placeholder={placeholder}
                   className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
                 />
               )}
@@ -290,12 +307,12 @@ export default function AuditFormShell({
               : "text-foreground-secondary hover:bg-surface-subtle"
           }`}
         >
-          Back
+          {t("audit.shell.back")}
         </button>
 
         <div className="flex items-center gap-3">
           {saving && (
-            <span className="text-xs text-foreground-tertiary">Saving...</span>
+            <span className="text-xs text-foreground-tertiary">{t("audit.shell.saving")}</span>
           )}
 
           {isLastPage ? (
@@ -305,7 +322,7 @@ export default function AuditFormShell({
               disabled={saving}
               className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
             >
-              Complete Audit
+              {t("audit.shell.complete")}
             </button>
           ) : (
             <button
@@ -314,7 +331,7 @@ export default function AuditFormShell({
               disabled={saving}
               className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
             >
-              Next: {sections[currentPage + 1]?.title}
+              {t("audit.shell.next", { section: sectionTitle(sections[currentPage + 1]) })}
             </button>
           )}
         </div>

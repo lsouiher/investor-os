@@ -136,7 +136,7 @@ export default function LandingPage() {
         <section className="border-t border-border py-16">
           <div className="grid gap-6 md:grid-cols-[auto_1fr] md:items-start">
             <div className="flex h-16 w-16 items-center justify-center bg-accent/10 text-xl font-bold text-accent" style={{ borderRadius: "var(--radius-card)" }}>
-              L
+              {t("landing.built_initial")}
             </div>
             <div>
               <h2 className="text-2xl font-bold text-foreground">{t("landing.built_title")}</h2>

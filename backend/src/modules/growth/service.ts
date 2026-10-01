@@ -2,6 +2,7 @@ import { GrowthPathType } from '@prisma/client';
 import { AppError } from '../../shared/middleware/error-handler.js';
 import { logger } from '../../shared/logger.js';
 import { prisma } from '../../shared/db.js';
+import { render, t, type Locale, type LocalizedText, type MessageKey } from '../../shared/i18n.js';
 import * as growthRepo from './repository.js';
 import { recalculateStrategyProgress } from './generation.js';
 import type {
@@ -20,12 +21,18 @@ const PATH_ORDER: GrowthPathType[] = ['portfolio', 'income_capital', 'skills_kno
 // Stub paths (Approach C: only Portfolio + Income & Capital get AI content)
 const STUB_PATHS: Set<string> = new Set(['skills_knowledge', 'time_operations']);
 
-// Unlock criteria descriptions
-const UNLOCK_CRITERIA: Record<string, string> = {
-  income_capital: 'Complete 2+ micro-plan tasks from Portfolio Growth',
-  skills_knowledge: 'Coming soon — this path will be available in a future update',
-  time_operations: 'Coming soon — this path will be available in a future update',
+// Unlock criteria descriptions, as dictionary keys: they are written in the language of the
+// request that displays them
+const UNLOCK_CRITERIA: Record<string, MessageKey> = {
+  income_capital: 'growth.unlock_criteria.income_capital',
+  skills_knowledge: 'growth.unlock_criteria.coming_soon',
+  time_operations: 'growth.unlock_criteria.coming_soon',
 };
+
+function unlockCriteria(pathType: string, locale: Locale): string {
+  const key = UNLOCK_CRITERIA[pathType];
+  return key ? t(locale, key) : '';
+}
 
 /**
  * Create a growth strategy with 4 path rows.
@@ -39,7 +46,7 @@ export async function createGrowthStrategy(
   // Check for existing active strategy (idempotency)
   const existing = await growthRepo.getActiveGrowthStrategy(userId, tenantId);
   if (existing) {
-    throw new AppError('VALIDATION_ERROR', 'Active growth strategy already exists.', 409);
+    throw AppError.localized('VALIDATION_ERROR', 'growth.already_exists', {}, 409);
   }
 
   // Find active V1 strategy for Portfolio Growth reference
@@ -133,6 +140,7 @@ export async function maybeCreateGrowthStrategy(
 export async function getGrowthStrategy(
   userId: number,
   tenantId: number,
+  locale: Locale,
 ): Promise<GrowthStrategyResponse | null> {
   const strategy = await growthRepo.getActiveGrowthStrategy(userId, tenantId);
   if (!strategy) return null;
@@ -152,7 +160,7 @@ export async function getGrowthStrategy(
     if (strategy.identityVersion.version > exportIdentityVersion) {
       exportStaleness.is_stale = true;
       exportStaleness.changed_since_export.push(
-        `Identity updated (v${exportIdentityVersion} → v${strategy.identityVersion.version})`,
+        t(locale, 'growth.staleness.identity_updated', { from: exportIdentityVersion, to: strategy.identityVersion.version }),
       );
     }
 
@@ -161,7 +169,7 @@ export async function getGrowthStrategy(
       if (path.version > exportVersion && path.status === 'generated') {
         exportStaleness.is_stale = true;
         exportStaleness.changed_since_export.push(
-          `${formatPathName(path.pathType)} path regenerated (v${exportVersion} → v${path.version})`,
+          t(locale, 'growth.staleness.path_regenerated', { path: pathName(path.pathType), from: exportVersion, to: path.version }),
         );
       }
     }
@@ -184,7 +192,7 @@ export async function getGrowthStrategy(
     };
 
     if (p.status === 'locked') {
-      summary.unlock_criteria = UNLOCK_CRITERIA[p.pathType] ?? '';
+      summary.unlock_criteria = unlockCriteria(p.pathType, locale);
       summary.unlock_progress = getUnlockProgress(p.pathType, userId, tenantId);
     }
 
@@ -217,6 +225,7 @@ export async function getGrowthPath(
   userId: number,
   tenantId: number,
   pathType: GrowthPathType,
+  locale: Locale,
 ): Promise<GrowthPathDetail | null> {
   const strategy = await growthRepo.getActiveGrowthStrategy(userId, tenantId);
   if (!strategy) return null;
@@ -269,7 +278,7 @@ export async function getGrowthPath(
   }
 
   if (path.status === 'locked') {
-    detail.unlock_criteria = UNLOCK_CRITERIA[path.pathType] ?? '';
+    detail.unlock_criteria = unlockCriteria(path.pathType, locale);
     detail.unlock_progress = getUnlockProgress(path.pathType, userId, tenantId);
   }
 
@@ -288,32 +297,34 @@ export async function initiatePathGeneration(
 ): Promise<{ pathId: number; growthStrategyId: number; identityVersionId: number; strategyId: number | null }> {
   // Check for stub paths
   if (STUB_PATHS.has(pathType)) {
-    throw new AppError('VALIDATION_ERROR', `${formatPathName(pathType)} is coming soon and not yet available for generation.`, 400);
+    throw AppError.localized('VALIDATION_ERROR', 'growth.coming_soon_generate', { path: pathName(pathType) }, 400);
   }
 
   const strategy = await growthRepo.getActiveGrowthStrategy(userId, tenantId);
   if (!strategy) {
-    throw new AppError('NOT_FOUND', 'No active growth strategy found.', 404);
+    throw AppError.localized('NOT_FOUND', 'growth.no_active_strategy', {}, 404);
   }
 
   const path = await growthRepo.getCurrentPath(strategy.id, pathType, tenantId);
   if (!path) {
-    throw new AppError('NOT_FOUND', 'Growth path not found.', 404);
+    throw AppError.localized('NOT_FOUND', 'growth.path_not_found', {}, 404);
   }
 
   // Check if already generating (idempotency guard — 409)
   if (path.status === 'generating') {
-    throw new AppError('VALIDATION_ERROR', 'This path is already being generated.', 409);
+    throw AppError.localized('VALIDATION_ERROR', 'growth.path_already_generating', {}, 409);
   }
 
   // Handle locked paths (manual early unlock)
   if (path.status === 'locked') {
     if (!confirmEarlyUnlock) {
-      throw new AppError(
+      const criteria = UNLOCK_CRITERIA[pathType];
+      throw AppError.localized(
         'VALIDATION_ERROR',
-        `This path is most valuable after ${UNLOCK_CRITERIA[pathType] || 'meeting unlock criteria'}. Set confirm_early_unlock to true to generate now.`,
+        'growth.early_unlock',
+        { criteria: { key: criteria ?? 'growth.unlock_criteria.default' } },
         400,
-        [{ unlock_criteria: UNLOCK_CRITERIA[pathType] || '' }],
+        [{ unlock_criteria: criteria ? { key: criteria } : '' }],
       );
     }
 
@@ -327,9 +338,10 @@ export async function initiatePathGeneration(
 
   // Rate limit check
   if (path.generationCooldownUntil && new Date() < path.generationCooldownUntil) {
-    throw new AppError(
+    throw AppError.localized(
       'RATE_LIMITED',
-      `This path was recently generated. Try again after ${path.generationCooldownUntil.toLocaleTimeString()}.`,
+      'growth.cooldown_generate',
+      { minutes: minutesUntil(path.generationCooldownUntil) },
       429,
       [{ cooldown_until: path.generationCooldownUntil.toISOString() }],
     );
@@ -431,6 +443,7 @@ export async function completeActionItem(
   pathType: GrowthPathType,
   actionItemId: string,
   isCompleted: boolean,
+  locale: Locale,
 ): Promise<{
   updatedItem: ActionItem;
   pathProgress: number;
@@ -439,12 +452,12 @@ export async function completeActionItem(
 }> {
   const strategy = await growthRepo.getActiveGrowthStrategy(userId, tenantId);
   if (!strategy) {
-    throw new AppError('NOT_FOUND', 'No active growth strategy found.', 404);
+    throw AppError.localized('NOT_FOUND', 'growth.no_active_strategy', {}, 404);
   }
 
   const path = await growthRepo.getCurrentPath(strategy.id, pathType, tenantId);
   if (!path || path.status !== 'generated') {
-    throw new AppError('NOT_FOUND', 'Growth path not found or not yet generated.', 404);
+    throw AppError.localized('NOT_FOUND', 'growth.path_not_generated', {}, 404);
   }
 
   // Atomically update action item with row-level locking
@@ -465,7 +478,7 @@ export async function completeActionItem(
   const unlocksTriggered = unlockedPathTypes.map((pt) => ({
     path_type: pt,
     unlock_type: 'organic',
-    message: `You've unlocked ${formatPathName(pt as GrowthPathType)}!`,
+    message: t(locale, 'growth.unlocked', { path: pathName(pt) }),
   }));
 
   // Log action item completion
@@ -492,22 +505,23 @@ export async function regeneratePath(
   pathType: GrowthPathType,
 ): Promise<{ newPathId: number; growthStrategyId: number; identityVersionId: number; strategyId: number | null }> {
   if (STUB_PATHS.has(pathType)) {
-    throw new AppError('VALIDATION_ERROR', `${formatPathName(pathType)} is coming soon and cannot be regenerated.`, 400);
+    throw AppError.localized('VALIDATION_ERROR', 'growth.coming_soon_regenerate', { path: pathName(pathType) }, 400);
   }
 
   const strategy = await growthRepo.getActiveGrowthStrategy(userId, tenantId);
-  if (!strategy) throw new AppError('NOT_FOUND', 'No active growth strategy found.', 404);
+  if (!strategy) throw AppError.localized('NOT_FOUND', 'growth.no_active_strategy', {}, 404);
 
   const currentPath = await growthRepo.getCurrentPath(strategy.id, pathType, tenantId);
   if (!currentPath || currentPath.status !== 'generated') {
-    throw new AppError('VALIDATION_ERROR', 'Path must be generated before it can be regenerated.', 400);
+    throw AppError.localized('VALIDATION_ERROR', 'growth.path_must_be_generated', {}, 400);
   }
 
   // Rate limit check
   if (currentPath.generationCooldownUntil && new Date() < currentPath.generationCooldownUntil) {
-    throw new AppError(
+    throw AppError.localized(
       'RATE_LIMITED',
-      `Regeneration available after ${currentPath.generationCooldownUntil.toLocaleTimeString()}.`,
+      'growth.cooldown_regenerate',
+      { minutes: minutesUntil(currentPath.generationCooldownUntil) },
       429,
     );
   }
@@ -532,7 +546,7 @@ export async function regenerateFullStrategy(
   tenantId: number,
 ): Promise<Array<{ pathType: GrowthPathType; newPathId: number }>> {
   const strategy = await growthRepo.getActiveGrowthStrategy(userId, tenantId);
-  if (!strategy) throw new AppError('NOT_FOUND', 'No active growth strategy found.', 404);
+  if (!strategy) throw AppError.localized('NOT_FOUND', 'growth.no_active_strategy', {}, 404);
 
   const generatedPaths = strategy.paths.filter(
     (p) => p.status === 'generated' && !STUB_PATHS.has(p.pathType),
@@ -591,6 +605,7 @@ export async function checkRegenerationSuggestion(
 export async function getRefreshSuggestions(
   userId: number,
   tenantId: number,
+  locale: Locale,
 ): Promise<string[]> {
   const strategy = await growthRepo.getActiveGrowthStrategy(userId, tenantId);
   if (!strategy) return [];
@@ -598,7 +613,7 @@ export async function getRefreshSuggestions(
   const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
   return strategy.paths
     .filter((p) => p.status === 'generated' && p.generatedAt && p.generatedAt < ninetyDaysAgo)
-    .map((p) => formatPathName(p.pathType));
+    .map((p) => render(locale, pathName(p.pathType)));
 }
 
 /**
@@ -626,14 +641,23 @@ export async function cleanupStaleGenerating(userId: number, tenantId: number): 
 
 // --- Helpers ---
 
-function formatPathName(pathType: GrowthPathType | string): string {
-  const names: Record<string, string> = {
-    portfolio: 'Portfolio Growth',
-    income_capital: 'Income & Capital',
-    skills_knowledge: 'Skills & Knowledge',
-    time_operations: 'Time & Operations',
-  };
-  return names[pathType] || pathType;
+const PATH_NAMES: Record<string, MessageKey> = {
+  portfolio: 'path.portfolio',
+  income_capital: 'path.income_capital',
+  skills_knowledge: 'path.skills_knowledge',
+  time_operations: 'path.time_operations',
+};
+
+// The path's display name as a message parameter: a dictionary key, rendered with the sentence
+// around it; an unknown type passes through as written
+export function pathName(pathType: string): LocalizedText | string {
+  const key = PATH_NAMES[pathType];
+  return key ? { key } : pathType;
+}
+
+// Cooldowns are told as a duration, not a clock time: the server does not know the reader's time zone
+function minutesUntil(date: Date): number {
+  return Math.max(1, Math.ceil((date.getTime() - Date.now()) / 60_000));
 }
 
 function getUnlockProgress(_pathType: string, _userId: number, _tenantId: number): string {

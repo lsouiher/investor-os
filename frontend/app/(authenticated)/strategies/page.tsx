@@ -27,7 +27,7 @@ function scoreColorClass(score: number): string {
 }
 
 export default function StrategiesPage() {
-  const { t } = useTranslation();
+  const { t, formatPercent } = useTranslation();
   const [strategies, setStrategies] = useState<Strategy[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -233,7 +233,7 @@ export default function StrategiesPage() {
           <span
             className={`flex-shrink-0 rounded-full px-3 py-1 text-sm font-bold ${scoreColorClass(strategy.fit_score)}`}
           >
-            {strategy.fit_score}%
+            {formatPercent(strategy.fit_score)}
           </span>
           <Link
             href={`/strategies/${strategy.id}`}

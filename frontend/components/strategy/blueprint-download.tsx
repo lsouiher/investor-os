@@ -48,7 +48,7 @@ export default function BlueprintDownload({
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         window.location.href = "/login";
-        throw new ApiError("UNAUTHORIZED", "Session expired");
+        throw new ApiError("UNAUTHORIZED", t("error.session_expired"));
       }
 
       if (!res.ok) {
@@ -59,7 +59,7 @@ export default function BlueprintDownload({
             throw new ApiError(json.error.code ?? "BLUEPRINT_ERROR", json.error.message);
           }
         }
-        throw new ApiError("BLUEPRINT_ERROR", `Failed to generate blueprint (${res.status})`);
+        throw new ApiError("BLUEPRINT_ERROR", t("blueprint.error_status", { status: res.status }));
       }
 
       const blob = await res.blob();

@@ -49,7 +49,7 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
 async function identify(req: Request): Promise<void> {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
-    throw new AppError('UNAUTHORIZED', 'Authentication required.', 401);
+    throw AppError.localized('UNAUTHORIZED', 'auth.required', {}, 401);
   }
 
   const token = authHeader.slice(7);
@@ -58,7 +58,7 @@ async function identify(req: Request): Promise<void> {
     const decoded = jwt.verify(token, JWT_SECRET);
     const parsed = JwtPayloadSchema.safeParse(decoded);
     if (!parsed.success) {
-      throw new AppError('UNAUTHORIZED', 'Invalid token payload.', 401);
+      throw AppError.localized('UNAUTHORIZED', 'auth.token_payload_invalid', {}, 401);
     }
 
     // Resolve internal IDs from publicId (no internal IDs in JWT)
@@ -68,14 +68,14 @@ async function identify(req: Request): Promise<void> {
     });
 
     if (!user) {
-      throw new AppError('UNAUTHORIZED', 'User not found.', 401);
+      throw AppError.localized('UNAUTHORIZED', 'auth.user_not_found', {}, 401);
     }
 
     // Reject JWTs issued before password reset
     if (user.tokenInvalidatedAt) {
       const issuedAt = new Date(parsed.data.iat * 1000);
       if (issuedAt < user.tokenInvalidatedAt) {
-        throw new AppError('UNAUTHORIZED', 'Token has been invalidated. Please log in again.', 401);
+        throw AppError.localized('UNAUTHORIZED', 'auth.token_invalidated', {}, 401);
       }
     }
 
@@ -90,6 +90,6 @@ async function identify(req: Request): Promise<void> {
     req.locale = user.locale;
   } catch (err) {
     if (err instanceof AppError) throw err;
-    throw new AppError('UNAUTHORIZED', 'Invalid or expired token.', 401);
+    throw AppError.localized('UNAUTHORIZED', 'auth.token_invalid', {}, 401);
   }
 }

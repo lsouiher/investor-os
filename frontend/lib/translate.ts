@@ -46,6 +46,14 @@ export function translate(locale: Locale, key: string, params?: TranslateParams)
   return template.replace(/\{\{(\w+)\}\}/g, (_, name: string) => String(params[name] ?? `{{${name}}}`));
 }
 
+/**
+ * For a key built from data (an audit field's optional placeholder, the heading of a growth
+ * content block): the text when a language has it, otherwise `fallback`.
+ */
+export function translateOr<T extends string | undefined>(locale: Locale, key: string, fallback: T): string | T {
+  return dictionaries[locale][key] ?? dictionaries[DEFAULT_LOCALE][key] ?? fallback;
+}
+
 function format(locale: Locale, value: DateInput, options: Intl.DateTimeFormatOptions): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";

@@ -1,6 +1,6 @@
 import en from "@/locales/en.json";
 import fr from "@/locales/fr.json";
-import { translate, formatDate, formatTime, formatNumber, formatPercent } from "./translate";
+import { translate, translateOr, formatDate, formatTime, formatNumber, formatPercent } from "./translate";
 
 const english: Record<string, string> = en;
 const french: Record<string, string> = fr;
@@ -49,6 +49,31 @@ describe("dictionaries", () => {
       }
     }
     expect(problems).toEqual([]);
+  });
+});
+
+// FR-2.7. The space is U+00A0 (U+202F, the narrow one, is accepted too). A French text that
+// fails here is fixed in fr.json, not exempted.
+describe("French typography", () => {
+  const texts = Object.entries(french);
+  const offenders = (pattern: RegExp) => texts.filter(([, text]) => pattern.test(text)).map(([key]) => key);
+
+  it("puts a non-breaking space before : ; ? ! and %", () => {
+    // "://" is a URL scheme, not punctuation
+    expect(offenders(/(?<![\u00a0\u202f])[;?!%]|(?<![\u00a0\u202f]):(?!\/\/)/)).toEqual([]);
+  });
+
+  it("puts a non-breaking space inside guillemets", () => {
+    expect(offenders(/«(?![\u00a0\u202f])|(?<![\u00a0\u202f])»/)).toEqual([]);
+  });
+
+  it("uses the typographic apostrophe and guillemets, not straight quotes", () => {
+    expect(offenders(/['"]/)).toEqual([]);
+  });
+
+  it("keeps amounts on one line", () => {
+    // 25 000 $ US: no plain space inside a number or between a number, $ and US
+    expect(offenders(/\d \d{3}(?!\d)|\d \$|\$ US/)).toEqual([]);
   });
 });
 
@@ -111,6 +136,12 @@ describe("translate", () => {
 
   it("returns the key itself only when no language has the text", () => {
     expect(translate("fr", "test.nowhere")).toBe("test.nowhere");
+  });
+
+  it("offers a fallback for keys built from data", () => {
+    expect(translateOr("fr", "growth_content.learning_roadmap", "learning roadmap")).toBe("Feuille de route d’apprentissage");
+    expect(translateOr("fr", "growth_content.some_new_block", "some new block")).toBe("some new block");
+    expect(translateOr("fr", "audit.financial.field.primary_income.placeholder", undefined)).toBeUndefined();
   });
 });
 

@@ -6,6 +6,7 @@ import RadarChart, { type RadarData } from "@/components/identity/radar-chart";
 import { SkeletonCard, SpinnerOverlay } from "@/components/shared/loading-states";
 import AiErrorState from "@/components/shared/ai-error-state";
 import { useTranslation } from "@/lib/i18n";
+import { SUB_SCORE_KEYS, subScoreLabel } from "@/lib/identity";
 
 interface SimulationConfig {
   remaining_simulations: number;
@@ -52,32 +53,26 @@ interface SimulationResult {
   insight: string;
 }
 
-const SUB_SCORE_LABELS: Record<string, string> = {
-  financial: "Financial",
-  time: "Time",
-  skills: "Skills",
-  risk: "Risk",
-  horizon: "Horizon",
-};
+type Translate = ReturnType<typeof useTranslation>["t"];
 
-function toResult(res: SimulationResponse): SimulationResult {
+function toResult(res: SimulationResponse, t: Translate): SimulationResult {
   const { original, simulated } = res.delta;
-  const changes = Object.keys(SUB_SCORE_LABELS)
-    .filter((k) => original.sub_scores?.[k] !== undefined || simulated.sub_scores?.[k] !== undefined)
-    .map((k) => {
+  const changes = SUB_SCORE_KEYS.filter(
+    (k) => original.sub_scores?.[k] !== undefined || simulated.sub_scores?.[k] !== undefined
+  ).map((k) => {
       const from = Number(original.sub_scores?.[k] ?? 0);
       const to = Number(simulated.sub_scores?.[k] ?? from);
-      return { label: SUB_SCORE_LABELS[k], from, to, delta: to - from };
+      return { label: subScoreLabel(k, t), from, to, delta: to - from };
     });
   changes.unshift({
-    label: "Readiness",
+    label: t("identity_card.readiness"),
     from: original.readiness_score,
     to: simulated.readiness_score,
     delta: res.delta.score_delta,
   });
   const insight = [
     simulated.headline_insight,
-    simulated.strategy_changes ? `Strategies: ${simulated.strategy_changes}` : "",
+    simulated.strategy_changes ? t("simulation.strategy_changes", { changes: simulated.strategy_changes }) : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -103,10 +98,12 @@ interface SimulationJob {
 }
 
 export default function SimulationPage() {
-  const { t } = useTranslation();
+  const { t, tOr } = useTranslation();
   const [config, setConfig] = useState<SimulationConfig | null>(null);
   const [sliderValues, setSliderValues] = useState<Record<string, number>>({});
-  const [result, setResult] = useState<SimulationResult | null>(null);
+  // The raw response is kept; its labels are rendered in the current language
+  const [response, setResponse] = useState<SimulationResponse | null>(null);
+  const result = response ? toResult(response, t) : null;
   const [loading, setLoading] = useState(true);
   const [simulating, setSimulating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -171,7 +168,7 @@ export default function SimulationPage() {
         throw Object.assign(new Error(job.error?.message ?? "failed"), { code: job.error?.code });
       }
       const data = job.result;
-      setResult(toResult(data));
+      setResponse(data);
       setConfig((prev) =>
         prev ? { ...prev, remaining_simulations: data.remaining } : prev
       );
@@ -271,7 +268,7 @@ export default function SimulationPage() {
               <div key={variable.key}>
                 <div className="mb-1 flex items-center justify-between">
                   <label className="text-sm font-medium text-foreground-secondary">
-                    {variable.label}
+                    {tOr(`simulation.variable.${variable.key}`, variable.label)}
                   </label>
                   <span className="text-sm font-bold text-amber-600">
                     {sliderValues[variable.key] ?? variable.current}

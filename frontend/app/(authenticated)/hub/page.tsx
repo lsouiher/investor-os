@@ -251,7 +251,7 @@ export default function IdentityHubPage() {
                       </p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-foreground-tertiary">
-                          ~{auditDef.estimatedMinutes} min
+                          {t("common.minutes_approx", { count: auditDef.estimatedMinutes })}
                         </span>
                         <button
                           onClick={() => router.push(`/audits/${auditDef.type}`)}
@@ -266,7 +266,7 @@ export default function IdentityHubPage() {
                   {/* Collapsed content for non-recommended, non-completed */}
                   {!isRecommended && status === "not_started" && (
                     <p className="mt-1 text-xs text-foreground-tertiary">
-                      ~{auditDef.estimatedMinutes} min
+                      {t("common.minutes_approx", { count: auditDef.estimatedMinutes })}
                     </p>
                   )}
 

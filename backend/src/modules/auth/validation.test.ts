@@ -58,6 +58,35 @@ describe('validatePassword', () => {
   });
 });
 
+describe('messages', () => {
+  const thrownBy = (fn: () => unknown): AppError => {
+    try {
+      fn();
+    } catch (err) {
+      return err as AppError;
+    }
+    throw new Error('expected a validation error');
+  };
+
+  it('keeps the English text as it was', () => {
+    const err = thrownBy(() => validatePassword('short'));
+    expect(err.message).toBe('Password too short.');
+    expect(err.details).toEqual([{ field: 'password', message: 'Must be at least 8 characters.' }]);
+    expect(thrownBy(() => validateEmail('nope')).details).toEqual([{ field: 'email', message: 'Must be a valid email address.' }]);
+  });
+
+  it('renders the message and details[].message in French', () => {
+    expect(thrownBy(() => validatePassword('a'.repeat(129))).render('fr')).toEqual({
+      message: 'Mot de passe trop long.',
+      details: [{ field: 'password', message: 'Doit contenir au plus 128 caractères.' }],
+    });
+    expect(thrownBy(() => validateEmail('nope')).render('fr')).toEqual({
+      message: 'Format de courriel non valide.',
+      details: [{ field: 'email', message: 'Doit être une adresse courriel valide.' }],
+    });
+  });
+});
+
 describe('validateLocale', () => {
   it('accepts en and fr', () => {
     expect(validateLocale('en')).toBe('en');
@@ -83,9 +112,18 @@ describe('validateLocale', () => {
     }
   });
 
-  it('writes the message in the language of the request', () => {
-    expect(() => validateLocale('es', 'fr')).toThrow('Langue non valide.');
-    expect(() => validateLocale('es', 'en')).toThrow('Invalid language.');
+  it('is rendered in the language of the request', () => {
+    try {
+      validateLocale('es');
+      throw new Error('expected validateLocale to throw');
+    } catch (err) {
+      const appError = err as AppError;
+      expect(appError.render('en').message).toBe('Invalid language.');
+      expect(appError.render('fr').message).toBe('Langue non valide.');
+      expect(appError.render('fr').details).toEqual([
+        { field: 'locale', message: 'Doit être l’une des valeurs suivantes\u00a0: en, fr.' },
+      ]);
+    }
   });
 });
 

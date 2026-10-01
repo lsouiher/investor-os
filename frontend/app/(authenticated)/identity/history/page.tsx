@@ -147,7 +147,7 @@ export default function IdentityHistoryPage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-foreground-strong">
-                    v{version.version}
+                    {t("common.version_short", { version: version.version })}
                   </span>
                   <span className="text-xs text-foreground-tertiary">
                     {formatDate(version.generated_at)}
@@ -175,7 +175,7 @@ export default function IdentityHistoryPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-foreground-tertiary">
-                  v{versionA.version}
+                  {t("common.version_short", { version: versionA.version })}
                 </span>
                 <span className={`text-xl font-bold ${scoreColorClass(versionA.readiness_score)}`}>
                   {versionA.readiness_score}
@@ -193,7 +193,7 @@ export default function IdentityHistoryPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold uppercase tracking-wider text-foreground-tertiary">
-                    v{versionB.version}
+                    {t("common.version_short", { version: versionB.version })}
                   </span>
                   <span className={`text-xl font-bold ${scoreColorClass(versionB.readiness_score)}`}>
                     {versionB.readiness_score}

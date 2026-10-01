@@ -43,7 +43,7 @@ interface CrossPathInsightsProps {
 }
 
 export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
-  const { t } = useTranslation();
+  const { t, tOr } = useTranslation();
   const PATH_NAMES = usePathNamesShort();
   const [expanded, setExpanded] = useState(false);
 
@@ -68,7 +68,7 @@ export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
           {links.map((link) => (
             <div key={link.id} className="flex items-start gap-3">
               <span className={`mt-0.5 rounded px-1.5 py-0.5 text-xs font-medium ${LINK_COLORS[link.type] || "text-foreground-secondary bg-surface-subtle"}`}>
-                {LINK_ICONS[link.type] || "•"} {link.type}
+                {LINK_ICONS[link.type] || "•"} {tOr(`growth.link_type.${link.type}`, link.type)}
               </span>
               <div className="flex-1">
                 <div className="text-sm text-foreground-secondary">

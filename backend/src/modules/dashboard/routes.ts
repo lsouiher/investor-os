@@ -43,7 +43,7 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
       getAuditCompletion(userId, tenantId),
 
       // Intelligence feed
-      getInsights(userId, tenantId).catch(() => []),
+      getInsights(userId, tenantId, req.locale).catch(() => []),
     ]);
 
     // Calculate strategy progress
@@ -68,9 +68,9 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
       const flags = (tenant?.featureFlags ?? {}) as Record<string, unknown>;
       if (flags.growth_strategy_enabled) {
         const { getGrowthStrategy, getRefreshSuggestions } = await import('../growth/service.js');
-        const gs = await getGrowthStrategy(userId, tenantId);
+        const gs = await getGrowthStrategy(userId, tenantId, req.locale);
         if (gs) {
-          const stalePathNames = await getRefreshSuggestions(userId, tenantId);
+          const stalePathNames = await getRefreshSuggestions(userId, tenantId, req.locale);
           growthStrategySummary = {
             id: gs.id,
             overall_progress: gs.overall_progress,
