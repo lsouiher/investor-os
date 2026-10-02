@@ -102,6 +102,9 @@ describe('render', () => {
   it('tells a keyed message from other objects', () => {
     expect(isLocalizedText({ key: 'ai.unavailable' })).toBe(true);
     expect(isLocalizedText({ key: 'not.a.message' })).toBe(false);
+    // Object built-ins are not messages: `in` would accept them and t() would then throw
+    expect(isLocalizedText({ key: 'toString' })).toBe(false);
+    expect(isLocalizedText({ key: 'constructor' })).toBe(false);
     expect(isLocalizedText({ field: 'email' })).toBe(false);
     expect(isLocalizedText('ai.unavailable')).toBe(false);
     expect(isLocalizedText(null)).toBe(false);

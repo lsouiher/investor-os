@@ -280,7 +280,7 @@ export function isLocalizedText(value: unknown): value is LocalizedText {
     typeof value === 'object' &&
     value !== null &&
     typeof (value as LocalizedText).key === 'string' &&
-    (value as LocalizedText).key in en
+    Object.hasOwn(en, (value as LocalizedText).key) // own keys only: not toString, constructor...
   );
 }
 

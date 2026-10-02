@@ -97,6 +97,15 @@ const ERROR_STATUS_MAP: Record<ErrorCode, number> = {
 };
 
 // express.json() refusals: the client's fault, so a 4xx in the request's language, not a 500
+// The other client-side refusals body-parser can raise (see raw-body and body-parser's read.js)
+const BODY_PARSER_CLIENT_ERRORS = new Set([
+  'charset.unsupported',
+  'encoding.unsupported',
+  'request.aborted',
+  'request.size.invalid',
+  'parameters.too.many',
+]);
+
 const BODY_PARSER_ERRORS: Record<string, { status: number; key: MessageKey }> = {
   'entity.parse.failed': { status: 400, key: 'validation.body_invalid_json' },
   'entity.too.large': { status: 413, key: 'validation.body_too_large' },
@@ -115,8 +124,9 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
     return;
   }
   // Any other body the parser refuses as the client's fault (unsupported charset or encoding,
-  // aborted upload): keep its 4xx status rather than answering 500
-  if (typeof parserError.type === 'string' && parserError.status && parserError.status >= 400 && parserError.status < 500) {
+  // aborted upload): keep its 4xx status rather than answering 500. Named, so another
+  // middleware's 4xx error that happens to carry a `type` is not mislabeled here.
+  if (BODY_PARSER_CLIENT_ERRORS.has(parserError.type ?? '') && parserError.status && parserError.status >= 400 && parserError.status < 500) {
     res.status(parserError.status).json({
       error: { code: 'VALIDATION_ERROR', message: t(locale, 'validation.body_unreadable'), details: [] },
     });

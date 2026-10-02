@@ -78,7 +78,7 @@ function AuthenticatedShell({
           {t("nav.brand")}
         </p>
         <div className="flex items-center">
-          <LanguageToggle className="p-3" />
+          <LanguageToggle className="p-3" persist />
           <ThemeToggle className="p-3" />
           <button
             onClick={logout}
@@ -140,7 +140,7 @@ function AuthenticatedShell({
               </p>
               <p className="text-xs text-foreground-muted">{t("nav.score", { score: score ?? "--" })}</p>
             </div>
-            <LanguageToggle />
+            <LanguageToggle persist />
             <ThemeToggle />
             <button
               onClick={logout}

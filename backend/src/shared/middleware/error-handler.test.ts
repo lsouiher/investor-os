@@ -228,6 +228,14 @@ describe('errorHandler', () => {
     });
   });
 
+  it('leaves another middleware 4xx error that happens to carry a type to the generic path', () => {
+    const res = mockRes();
+    const err = Object.assign(new Error('forbidden by some middleware'), { type: 'some.other.error', status: 403 });
+    errorHandler(err, { locale: 'fr' } as Request, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+  });
+
   it('does not leak error details for unknown errors', () => {
     const res = mockRes();
     const err = new Error('SECRET: database connection string');

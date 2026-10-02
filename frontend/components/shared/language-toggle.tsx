@@ -13,15 +13,12 @@ const OPTIONS: Record<Locale, { label: string; title: string }> = {
 // Signed in, the choice belongs to the account and follows it to other devices. A failure
 // is silent: the device has switched, and the next switch tries again.
 function saveToAccount(locale: Locale) {
-  let signedIn = false;
-  try {
-    signedIn = localStorage.getItem("token") !== null;
-  } catch {}
-  if (!signedIn) return;
   api.put("/auth/me", { locale }, { stayOnUnauthorized: true }).catch(() => {});
 }
 
-export function LanguageToggle({ className }: { className?: string }) {
+// `persist` is set by the signed-in app only. On public pages a token can be left over from
+// someone else (a shared device): the switch there changes this device, never an account.
+export function LanguageToggle({ className, persist = false }: { className?: string; persist?: boolean }) {
   const { locale, setLocale } = useTranslation();
 
   const target: Locale = locale === "en" ? "fr" : "en";
@@ -29,7 +26,7 @@ export function LanguageToggle({ className }: { className?: string }) {
 
   const toggle = () => {
     setLocale(target);
-    saveToAccount(target);
+    if (persist) saveToAccount(target);
   };
 
   return (
