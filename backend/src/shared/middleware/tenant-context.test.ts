@@ -4,6 +4,8 @@
  * try/catch around $executeRaw is removed; why_new=no test covered setTenantContext; seam=none
  *
  * Regression: found by /ship red team on 2026-10-02 (tenant-context.ts:17).
+ * Red proof: the first test failed against ee9af73 (no try/catch: "Received promise rejected
+ * instead of resolved") and passes from b0547c4.
  */
 const mockExecuteRaw = jest.fn();
 jest.mock('../db.js', () => ({ prisma: { $executeRaw: (...args: unknown[]) => mockExecuteRaw(...args) } }));

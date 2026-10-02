@@ -219,14 +219,9 @@ async function doSynthesizeIdentity(
       logger.error({ err, userId }, 'Chained strategy generation failed (non-blocking)');
     });
 
-  // Warm the dashboard's insight cache so the first visit after synthesis isn't empty. A first
-  // identity also drops what was cached before it: at most the pre-identity nudge, which older
-  // code stored in English and a failed warm-up would otherwise serve for hours.
+  // Warm the dashboard's insight cache so the first visit after synthesis isn't empty
   import('../insight/service.js')
-    .then(async (insightService) => {
-      if (identity.version === 1) await insightService.invalidateInsights(userId, { discard: true });
-      insightService.refreshInsights(userId, tenantId);
-    })
+    .then((insightService) => insightService.refreshInsights(userId, tenantId))
     .catch((err) => logger.error({ err, userId }, 'Insight warm-up failed (non-blocking)'));
 
   // Growth strategy hooks (fire-and-forget)

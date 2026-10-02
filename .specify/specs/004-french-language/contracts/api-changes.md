@@ -16,7 +16,7 @@ Additive only. No endpoint is removed, no field is renamed, no error code change
 | Unauthenticated request | `Accept-Language` header (the supported language with the highest q-value, header order on ties), else `en` |
 | Background work for a user | `users.locale` |
 
-The web client sends `Accept-Language: en` or `Accept-Language: fr` on every request. Supported values: `en`, `fr`; a regional tag such as `fr-CA` resolves to `fr`. Anything else resolves to `en`.
+The web client sends `Accept-Language: en` or `Accept-Language: fr` on every request. Supported values: `en`, `fr`; a regional tag such as `fr-CA` resolves to `fr`. Anything else resolves to `en`. A response produced before the token is read (the global per-IP rate limit, a refused request body) uses `Accept-Language` even when a token is present.
 
 ### Error responses (Sprint 2)
 

@@ -80,7 +80,7 @@ Supported languages: `en` (default) and `fr`. The server picks the language of a
 | Unauthenticated request | `Accept-Language` header (the supported language with the highest q-value), else `en` |
 | Background work for a user | `locale` of the user |
 
-The web client sends `Accept-Language: en` or `Accept-Language: fr` (its interface language) on every request. A regional tag such as `fr-CA` resolves to `fr`; anything unsupported resolves to `en`.
+The web client sends `Accept-Language: en` or `Accept-Language: fr` (its interface language) on every request. A regional tag such as `fr-CA` resolves to `fr`; anything unsupported resolves to `en`. A response produced before the token is read (the global per-IP rate limit, a refused request body) uses `Accept-Language` even when a token is present.
 
 ### Messages in the Request's Language
 Text the server writes for a user follows the request's language (feature 004-french-language, Sprint 2). No field is added or renamed, and `code` values and status codes are language-independent.
@@ -742,11 +742,14 @@ Set a template as the active version for its service_type (deactivates previous)
 
 | Endpoint Group | Limit | Window |
 |---------------|-------|--------|
-| Auth (login, register) | 10 requests | 15 minutes |
-| Auth (forgot-password) | 3 requests | 15 minutes |
+| Auth (register) | 100 requests per IP | 15 minutes |
+| Auth (login) | 10 requests per IP + email | 15 minutes |
+| Auth (forgot-password) | 5 requests per IP + email | 15 minutes |
+| Auth (reset-password) | 10 requests per IP | 15 minutes |
 | Audit conversational | 60 requests | 1 minute |
 | Identity synthesis | 5 requests | 5 minutes |
 | Strategy generation | 3 requests | 5 minutes |
 | Simulation | 3 per user | 24-hour rolling window |
 | Blueprint generation | 5 requests | 1 hour |
-| All other endpoints | 100 requests | 1 minute |
+| All endpoints, before authentication | 600 requests per IP | 1 minute |
+| All authenticated endpoints | 120 requests per user | 1 minute |

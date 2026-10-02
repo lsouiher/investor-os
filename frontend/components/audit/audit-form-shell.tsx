@@ -295,26 +295,14 @@ export default function AuditFormShell({
         </div>
       </div>
 
-      {/* Navigation buttons. On a phone they stack full width (Next on top): a French "Next:
-          <section>" label does not fit beside Back at 360px. */}
-      <div className="flex flex-col-reverse gap-3 mt-6 sm:flex-row sm:items-center sm:justify-between">
-        <button
-          type="button"
-          onClick={handleBack}
-          disabled={isFirstPage}
-          className={`w-full sm:w-auto px-6 py-3 text-sm font-medium border border-border ${
-            isFirstPage
-              ? "text-foreground-tertiary cursor-not-allowed"
-              : "text-foreground-secondary hover:bg-surface-subtle"
-          }`}
-        >
-          {t("audit.shell.back")}
-        </button>
-
-        <div className="flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:gap-3">
-          {/* Always laid out, shown only while saving, so the buttons never move */}
-          <span aria-hidden={!saving} className={`text-center text-xs text-foreground-tertiary ${saving ? "" : "invisible"}`}>
-            {t("audit.shell.saving")}
+      {/* Navigation buttons. On a phone they stack full width, the forward action first: a French
+          "Next: <section>" label does not fit beside Back at 360px. The DOM follows that order, so
+          focus moves down the screen; wider screens put Back on the left with row-reverse. */}
+      <div className="flex flex-col gap-3 mt-6 sm:flex-row-reverse sm:items-center sm:justify-between">
+        <div className="relative">
+          {/* Out of the flow, so the buttons never move; announced while a save runs */}
+          <span role="status" className="absolute -top-5 right-0 whitespace-nowrap text-xs text-foreground-tertiary">
+            {saving ? t("audit.shell.saving") : ""}
           </span>
 
           {isLastPage ? (
@@ -337,6 +325,19 @@ export default function AuditFormShell({
             </button>
           )}
         </div>
+
+        <button
+          type="button"
+          onClick={handleBack}
+          disabled={isFirstPage}
+          className={`w-full sm:w-auto px-6 py-3 text-sm font-medium border border-border ${
+            isFirstPage
+              ? "text-foreground-tertiary cursor-not-allowed"
+              : "text-foreground-secondary hover:bg-surface-subtle"
+          }`}
+        >
+          {t("audit.shell.back")}
+        </button>
       </div>
     </div>
   );
