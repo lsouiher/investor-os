@@ -11,7 +11,8 @@ const OPTIONS: Record<Locale, { label: string; title: string }> = {
 };
 
 // Signed in, the choice belongs to the account and follows it to other devices. A failure
-// is silent: the device has switched, and the next switch tries again.
+// is silent: the device has switched, but the next full load of the signed-in app adopts the
+// account's language again, so the choice only sticks once a save succeeds.
 function saveToAccount(locale: Locale) {
   api.put("/auth/me", { locale }, { stayOnUnauthorized: true }).catch(() => {});
 }

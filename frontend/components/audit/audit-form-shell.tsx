@@ -295,13 +295,14 @@ export default function AuditFormShell({
         </div>
       </div>
 
-      {/* Navigation buttons */}
-      <div className="flex items-center justify-between mt-6">
+      {/* Navigation buttons. On a phone they stack full width (Next on top): a French "Next:
+          <section>" label does not fit beside Back at 360px. */}
+      <div className="flex flex-col-reverse gap-3 mt-6 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={handleBack}
           disabled={isFirstPage}
-          className={`px-6 py-3 text-sm font-medium border border-border ${
+          className={`w-full sm:w-auto px-6 py-3 text-sm font-medium border border-border ${
             isFirstPage
               ? "text-foreground-tertiary cursor-not-allowed"
               : "text-foreground-secondary hover:bg-surface-subtle"
@@ -310,17 +311,18 @@ export default function AuditFormShell({
           {t("audit.shell.back")}
         </button>
 
-        <div className="flex items-center gap-3">
-          {saving && (
-            <span className="text-xs text-foreground-tertiary">{t("audit.shell.saving")}</span>
-          )}
+        <div className="flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:gap-3">
+          {/* Always laid out, shown only while saving, so the buttons never move */}
+          <span aria-hidden={!saving} className={`text-center text-xs text-foreground-tertiary ${saving ? "" : "invisible"}`}>
+            {t("audit.shell.saving")}
+          </span>
 
           {isLastPage ? (
             <button
               type="button"
               onClick={handleComplete}
               disabled={saving}
-              className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
+              className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
             >
               {t("audit.shell.complete")}
             </button>
@@ -329,7 +331,7 @@ export default function AuditFormShell({
               type="button"
               onClick={handleNext}
               disabled={saving}
-              className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
+              className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
             >
               {t("audit.shell.next", { section: sectionTitle(sections[currentPage + 1]) })}
             </button>

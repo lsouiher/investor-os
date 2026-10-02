@@ -103,3 +103,9 @@ body {
 .animate-card-reveal {
   animation: cardReveal 0.8s ease-out forwards;
 }
+@media (prefers-reduced-motion: reduce) {
+  .animate-card-reveal {
+    animation: none;
+    opacity: 1;
+  }
+}

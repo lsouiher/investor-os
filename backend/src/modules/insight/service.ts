@@ -5,7 +5,7 @@ import { loadActiveTemplate, assemblePrompt } from '../../shared/ai/prompt-loade
 import { prisma } from '../../shared/db.js';
 import { logger } from '../../shared/logger.js';
 import { t, type Locale } from '../../shared/i18n.js';
-import type { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 export type InsightType = 'progress' | 'contradiction' | 'score_change' | 'milestone' | 'network_alert';
 
@@ -98,9 +98,13 @@ export function refreshInsights(userId: number, tenantId: number): void {
     .finally(() => refreshInProgress.delete(userId));
 }
 
-/** Mark the cache stale so the next dashboard visit serves it once more and regenerates. */
-export async function invalidateInsights(userId: number): Promise<void> {
-  await prisma.user.update({ where: { id: userId }, data: { insightsGeneratedAt: null } }).catch(() => {});
+/**
+ * Mark the cache stale so the next dashboard visit serves it once more and regenerates.
+ * `discard` drops it instead, for a cache that must not be served even once.
+ */
+export async function invalidateInsights(userId: number, { discard = false } = {}): Promise<void> {
+  const data = discard ? { insightsCache: Prisma.DbNull, insightsGeneratedAt: null } : { insightsGeneratedAt: null };
+  await prisma.user.update({ where: { id: userId }, data }).catch(() => {});
 }
 
 export function getStartedInsight(locale: Locale): Insight {

@@ -45,10 +45,12 @@ describe('getSynthesisStatus', () => {
 
   it('falls back to the generic AI message for an unexpected failure', async () => {
     mockGetCompletedAudits.mockResolvedValue([{ auditType: 'financial', version: 1, subScore: 50, responses: {} }]);
-    mockCallClaude.mockRejectedValue(new Error('socket hang up'));
+    mockCallClaude.mockReset().mockRejectedValue(new Error('socket hang up'));
 
     startSynthesis(2, 1);
     await settle();
+
+    expect(mockCallClaude).toHaveBeenCalledTimes(1);
 
     expect((await getSynthesisStatus(2, 1, 'en')).lastError).toBe("We couldn't process your request right now. Please try again.");
     expect((await getSynthesisStatus(2, 1, 'fr')).lastError).toBe(
@@ -58,10 +60,12 @@ describe('getSynthesisStatus', () => {
 
   it('does not show a server failure’s internal English text to the reader', async () => {
     mockGetCompletedAudits.mockResolvedValue([{ auditType: 'financial', version: 1, subScore: 50, responses: {} }]);
-    mockCallClaude.mockRejectedValue(new AppError('INTERNAL_ERROR', 'No active prompt template found for service type: identity_synthesis'));
+    mockCallClaude.mockReset().mockRejectedValue(new AppError('INTERNAL_ERROR', 'No active prompt template found for service type: identity_synthesis'));
 
     startSynthesis(3, 1);
     await settle();
+
+    expect(mockCallClaude).toHaveBeenCalledTimes(1);
 
     expect((await getSynthesisStatus(3, 1, 'fr')).lastError).toBe(
       'Nous n’avons pas pu traiter votre demande pour le moment. Veuillez réessayer.',

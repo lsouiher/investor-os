@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LanguageToggle } from "@/components/shared/language-toggle";
+import { EnglishOnlyNote } from "./english-only-note";
 
 const CONTACT = process.env.NEXT_PUBLIC_FEEDBACK_EMAIL ?? "";
 const EFFECTIVE = "September 2026";
@@ -17,6 +18,7 @@ export default function TermsPage() {
         </div>
         <h1 className="mt-2 text-3xl font-bold text-foreground">Beta terms &amp; privacy</h1>
         <p className="mt-1 text-sm text-foreground-muted">Effective {EFFECTIVE}</p>
+        <EnglishOnlyNote />
 
         <Section title="What this is">
           <p>

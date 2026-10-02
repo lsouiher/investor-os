@@ -94,6 +94,8 @@ Text the server writes for a user follows the request's language (feature 004-fr
 | `GET /identity/status` | `last_error` (rendered when read) |
 | `GET /simulations/jobs/:jobId` | `error.message` (rendered when read) |
 | `GET /growth-strategy`, `GET /growth-strategy/paths/:pathType` | `unlock_criteria`, `unlock_progress`, `export_staleness.changed_since_export[]` |
+| `PUT /growth-strategy/paths/:pathType/action-items/:itemId` | `unlocks_triggered[].message` |
+| `GET /growth-strategy/export/status` | `changed_since_export[]` |
 | `POST /growth-strategy/paths/:pathType/generate` | Early-unlock and cooldown messages. A cooldown is a relative duration ("Try again in 12 min."), correct in any time zone |
 | `GET /dashboard` | `growth_strategy.refresh_suggestions[]`, and the "get started" entry of `intelligence_feed` for a user without an identity |
 | `POST /auth/forgot-password`, `POST /auth/reset-password` | `data.message` |

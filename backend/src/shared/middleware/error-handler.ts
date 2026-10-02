@@ -96,7 +96,6 @@ const ERROR_STATUS_MAP: Record<ErrorCode, number> = {
   INTERNAL_ERROR: 500,
 };
 
-// express.json() refusals: the client's fault, so a 4xx in the request's language, not a 500
 // The other client-side refusals body-parser can raise (see raw-body and body-parser's read.js)
 const BODY_PARSER_CLIENT_ERRORS = new Set([
   'charset.unsupported',
@@ -106,6 +105,7 @@ const BODY_PARSER_CLIENT_ERRORS = new Set([
   'parameters.too.many',
 ]);
 
+// express.json() refusals: the client's fault, so a 4xx in the request's language, not a 500
 const BODY_PARSER_ERRORS: Record<string, { status: number; key: MessageKey }> = {
   'entity.parse.failed': { status: 400, key: 'validation.body_invalid_json' },
   'entity.too.large': { status: 413, key: 'validation.body_too_large' },

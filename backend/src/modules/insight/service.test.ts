@@ -4,11 +4,12 @@
  */
 const mockIdentityFindFirst = jest.fn();
 const mockUserFindFirst = jest.fn();
+const mockUserUpdate = jest.fn().mockResolvedValue({});
 
 jest.mock('../../shared/db.js', () => ({
   prisma: {
     identityVersion: { findFirst: (...args: unknown[]) => mockIdentityFindFirst(...args) },
-    user: { findFirst: (...args: unknown[]) => mockUserFindFirst(...args), update: jest.fn().mockResolvedValue({}) },
+    user: { findFirst: (...args: unknown[]) => mockUserFindFirst(...args), update: (...args: unknown[]) => mockUserUpdate(...args) },
   },
 }));
 jest.mock('../../shared/ai/retry.js', () => ({ callClaudeWithRetry: jest.fn(), parseJsonResponse: jest.fn() }));
@@ -17,7 +18,8 @@ jest.mock('../../shared/logger.js', () => ({
   logger: { info: jest.fn(), warn: jest.fn(), error: jest.fn() },
 }));
 
-import { getInsights, getStartedInsight } from './service';
+import { Prisma } from '@prisma/client';
+import { getInsights, getStartedInsight, invalidateInsights } from './service';
 
 describe('getStartedInsight', () => {
   it('is written in the requested language, with the same type, severity and link', () => {
@@ -56,5 +58,25 @@ describe('getInsights', () => {
     mockUserFindFirst.mockResolvedValue({ insightsCache: cached, insightsGeneratedAt: new Date() });
 
     await expect(getInsights(1, 1, 'fr')).resolves.toEqual(cached);
+  });
+});
+
+// Value: protects=a first identity drops the pre-identity cache (older code stored the nudge in
+// English) instead of serving it again; fails_when=discard only marks the cache stale;
+// why_new=no test covered invalidateInsights; seam=none
+describe('invalidateInsights', () => {
+  beforeEach(() => mockUserUpdate.mockClear());
+
+  it('marks the cache stale, keeping it to serve once more', async () => {
+    await invalidateInsights(7);
+    expect(mockUserUpdate).toHaveBeenCalledWith({ where: { id: 7 }, data: { insightsGeneratedAt: null } });
+  });
+
+  it('drops the cache when asked to discard it', async () => {
+    await invalidateInsights(7, { discard: true });
+    expect(mockUserUpdate).toHaveBeenCalledWith({
+      where: { id: 7 },
+      data: { insightsCache: Prisma.DbNull, insightsGeneratedAt: null },
+    });
   });
 });

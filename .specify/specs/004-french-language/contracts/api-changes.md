@@ -89,6 +89,8 @@ No new fields. Messages and system-composed strings in existing responses follow
 | `GET /identity/status` | `last_error` (rendered when read) |
 | `GET /simulations/jobs/:jobId` | `error.message` |
 | `GET /growth-strategy`, `GET /growth-strategy/paths/:pathType` | `unlock_criteria`, `unlock_progress`, `export_staleness.changed_since_export[]` |
+| `PUT /growth-strategy/paths/:pathType/action-items/:itemId` | `unlocks_triggered[].message` |
+| `GET /growth-strategy/export/status` | `changed_since_export[]` |
 | `POST /growth-strategy/paths/:pathType/generate` | Early-unlock and cooldown messages. Cooldowns are expressed as a relative duration |
 | `GET /dashboard` | `growth_strategy.refresh_suggestions[]`, the "get started" insight |
 | `POST /auth/forgot-password`, `POST /auth/reset-password` | `data.message` |
