@@ -180,7 +180,7 @@ function ExampleCard({ t }: { t: (key: string, params?: Record<string, string | 
         {t("landing.example_label")}
       </span>
       <p className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">{t("identity_card.label")}</p>
-      <p className="mt-2 text-2xl font-bold text-foreground">{t("landing.example_archetype")}</p>
+      <p className="mt-2 text-2xl font-bold text-balance text-foreground">{t("landing.example_archetype")}</p>
       <div className="mt-4 flex items-end gap-2">
         <span className="text-5xl font-bold leading-none text-accent">{EXAMPLE.score}</span>
         <span className="pb-1 text-sm text-foreground-muted">/ 100 {t("identity_card.readiness")}</span>
@@ -188,7 +188,7 @@ function ExampleCard({ t }: { t: (key: string, params?: Record<string, string | 
       <ul className="mt-5 flex flex-col gap-2">
         {EXAMPLE.axes.map((axis) => (
           <li key={axis.key} className="flex items-center gap-3 text-xs">
-            <span className="w-16 text-foreground-muted">{t(`landing.axis.${axis.key}`)}</span>
+            <span className="w-20 shrink-0 text-foreground-muted">{t(`landing.axis.${axis.key}`)}</span>
             <span className="h-1.5 flex-1 overflow-hidden bg-border" style={{ borderRadius: 2 }}>
               <span className="block h-full bg-accent" style={{ width: `${axis.value}%` }} />
             </span>

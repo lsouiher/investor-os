@@ -71,6 +71,9 @@ function buildHeaders(): Record<string, string> {
   return headers;
 }
 
+// Public calls where a 401 answers the attempt itself, not a lost session
+const AUTH_ATTEMPTS = new Set(["/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password"]);
+
 interface RequestOptions {
   /** On a 401, only throw: keep the visitor on the page instead of sending them to /login. */
   stayOnUnauthorized?: boolean;
@@ -82,16 +85,15 @@ async function request<T>(
   body?: unknown,
   options: RequestOptions = {}
 ): Promise<T> {
-  const headers = buildHeaders();
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
-    headers,
+    headers: buildHeaders(),
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  // Only a request that carried a session can have lost it. A refused sign-in is a 401 too,
-  // and its message (wrong email or password) belongs on the form: it falls through below.
-  if (res.status === 401 && headers["Authorization"]) {
+  // A refused sign-in is a 401 too, and its message (wrong email or password) belongs on the
+  // form: it falls through below. Any other 401 means the session is gone.
+  if (res.status === 401 && !AUTH_ATTEMPTS.has(path)) {
     if (!options.stayOnUnauthorized) clearAuthAndRedirect();
     throw new ApiError("UNAUTHORIZED", translate(currentLocale(), "error.session_expired"));
   }
