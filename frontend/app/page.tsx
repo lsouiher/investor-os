@@ -17,7 +17,6 @@ const FAQ_KEYS = ["free", "time", "data", "advice", "beta"] as const;
 
 // Example card in the hero: illustrative numbers, labelled as an example on the page.
 const EXAMPLE = {
-  archetype: "Value-Add Operator",
   score: 68,
   axes: [
     { key: "capital", value: 72 },
@@ -181,7 +180,7 @@ function ExampleCard({ t }: { t: (key: string, params?: Record<string, string | 
         {t("landing.example_label")}
       </span>
       <p className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">{t("identity_card.label")}</p>
-      <p className="mt-2 text-2xl font-bold text-foreground">{EXAMPLE.archetype}</p>
+      <p className="mt-2 text-2xl font-bold text-foreground">{t("landing.example_archetype")}</p>
       <div className="mt-4 flex items-end gap-2">
         <span className="text-5xl font-bold leading-none text-accent">{EXAMPLE.score}</span>
         <span className="pb-1 text-sm text-foreground-muted">/ 100 {t("identity_card.readiness")}</span>

@@ -13,7 +13,7 @@ Additive only. No endpoint is removed, no field is renamed, no error code change
 | Caller | Language used |
 |--------|---------------|
 | Authenticated request | `users.locale` of the authenticated user |
-| Unauthenticated request | `Accept-Language` header (first supported language), else `en` |
+| Unauthenticated request | `Accept-Language` header (the supported language with the highest q-value, header order on ties), else `en` |
 | Background work for a user | `users.locale` |
 
 The web client sends `Accept-Language: en` or `Accept-Language: fr` on every request. Supported values: `en`, `fr`; a regional tag such as `fr-CA` resolves to `fr`. Anything else resolves to `en`.

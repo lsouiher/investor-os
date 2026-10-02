@@ -82,13 +82,16 @@ async function request<T>(
   body?: unknown,
   options: RequestOptions = {}
 ): Promise<T> {
+  const headers = buildHeaders();
   const res = await fetch(`${BASE_URL}${path}`, {
     method,
-    headers: buildHeaders(),
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  if (res.status === 401) {
+  // Only a request that carried a session can have lost it. A refused sign-in is a 401 too,
+  // and its message (wrong email or password) belongs on the form: it falls through below.
+  if (res.status === 401 && headers["Authorization"]) {
     if (!options.stayOnUnauthorized) clearAuthAndRedirect();
     throw new ApiError("UNAUTHORIZED", translate(currentLocale(), "error.session_expired"));
   }

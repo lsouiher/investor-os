@@ -1,3 +1,4 @@
+import { Locale as DbLocale } from '@prisma/client';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES, en, fr, isLocale, isLocalizedText, parseAcceptLanguage, render, t, type MessageKey } from './i18n';
 
 describe('isLocale', () => {
@@ -14,6 +15,12 @@ describe('isLocale', () => {
   it('defaults to English', () => {
     expect(DEFAULT_LOCALE).toBe('en');
     expect(SUPPORTED_LOCALES).toEqual(['en', 'fr']);
+  });
+
+  // A language accepted here but missing from the Postgres "Locale" enum would fail the user
+  // insert/update with a 500: adding one needs an ALTER TYPE ... ADD VALUE migration first
+  it('matches the database Locale enum', () => {
+    expect([...SUPPORTED_LOCALES].sort()).toEqual(Object.values(DbLocale).sort());
   });
 });
 

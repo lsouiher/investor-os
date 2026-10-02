@@ -78,7 +78,10 @@ function renderDetails(locale: Locale, details: unknown[]): unknown[] {
  * synthesis): the key when there is one, so it is rendered in that request's language.
  */
 export function deferredMessage(err: unknown, fallback: MessageKey): LocalizedText | string {
-  if (err instanceof AppError) return err.text ?? err.message;
+  if (err instanceof AppError && err.text) return err.text;
+  // A plain-English AppError is kept only when it is the client's fault; a server failure
+  // ("No active prompt template found ...") is internal detail, so the reader gets the fallback
+  if (err instanceof AppError && err.statusCode < 500) return err.message;
   return { key: fallback };
 }
 
@@ -103,10 +106,19 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
   // The account's language when signed in, the page's otherwise (set by resolveLocale)
   const locale = req.locale ?? DEFAULT_LOCALE;
 
-  const bodyError = BODY_PARSER_ERRORS[(err as Error & { type?: string }).type ?? ''];
+  const parserError = err as Error & { type?: string; status?: number };
+  const bodyError = BODY_PARSER_ERRORS[parserError.type ?? ''];
   if (bodyError) {
     res.status(bodyError.status).json({
       error: { code: 'VALIDATION_ERROR', message: t(locale, bodyError.key), details: [] },
+    });
+    return;
+  }
+  // Any other body the parser refuses as the client's fault (unsupported charset or encoding,
+  // aborted upload): keep its 4xx status rather than answering 500
+  if (typeof parserError.type === 'string' && parserError.status && parserError.status >= 400 && parserError.status < 500) {
+    res.status(parserError.status).json({
+      error: { code: 'VALIDATION_ERROR', message: t(locale, 'validation.body_unreadable'), details: [] },
     });
     return;
   }

@@ -9,7 +9,8 @@ const EFFECTIVE = "September 2026";
 export default function TermsPage() {
   return (
     <div className="flex-1 bg-background px-4 py-10">
-      <article className="mx-auto max-w-2xl">
+      {/* The text is English whatever the interface language, so screen readers read it as English */}
+      <article lang="en" className="mx-auto max-w-2xl">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold tracking-widest uppercase text-accent">InvestorOS</p>
           <LanguageToggle />

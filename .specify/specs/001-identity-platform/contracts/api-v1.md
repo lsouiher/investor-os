@@ -46,6 +46,8 @@ Status values: `ok` (all checks pass), `degraded` (some checks fail), `down` (cr
 
 Error codes: `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `RATE_LIMITED`, `AI_SERVICE_ERROR`, `INTERNAL_ERROR`
 
+A request body the server cannot read is the client's fault and answers `VALIDATION_ERROR` with a 4xx status, in the request's language: malformed JSON → `400`; a body over 50 kb → `413`; any other refused body (unsupported charset or content encoding, aborted upload) → the parser's own 4xx (`415` or `400`).
+
 ### Success Response Shape
 ```json
 {

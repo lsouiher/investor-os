@@ -56,7 +56,7 @@ describe('getSynthesisStatus', () => {
     );
   });
 
-  it('keeps a developer-facing failure as written', async () => {
+  it('does not show a server failure’s internal English text to the reader', async () => {
     mockGetCompletedAudits.mockResolvedValue([{ auditType: 'financial', version: 1, subScore: 50, responses: {} }]);
     mockCallClaude.mockRejectedValue(new AppError('INTERNAL_ERROR', 'No active prompt template found for service type: identity_synthesis'));
 
@@ -64,7 +64,7 @@ describe('getSynthesisStatus', () => {
     await settle();
 
     expect((await getSynthesisStatus(3, 1, 'fr')).lastError).toBe(
-      'No active prompt template found for service type: identity_synthesis',
+      'Nous n’avons pas pu traiter votre demande pour le moment. Veuillez réessayer.',
     );
   });
 

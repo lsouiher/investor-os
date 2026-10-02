@@ -12,10 +12,6 @@ import {
   type TranslateParams,
 } from "./translate";
 
-// For code outside React (the API client, helpers). Server components import it from
-// "@/lib/translate" instead: they cannot call into this client module.
-export { translate };
-
 type DateInput = Date | string | number;
 
 interface I18nContextValue {

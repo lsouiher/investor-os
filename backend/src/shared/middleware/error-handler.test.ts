@@ -71,13 +71,23 @@ describe('AppError.localized', () => {
 });
 
 describe('deferredMessage', () => {
-  it('keeps the key of a localized error, the text of a plain one, and the fallback for anything else', () => {
+  it('keeps the key of a localized error, the text of a plain client error, and the fallback for anything else', () => {
     expect(deferredMessage(AppError.localized('RATE_LIMITED', 'simulation.daily_limit', { max: 3 }, 429), 'ai.unavailable')).toEqual({
       key: 'simulation.daily_limit',
       params: { max: 3 },
     });
-    expect(deferredMessage(new AppError('INTERNAL_ERROR', 'No active prompt template'), 'ai.unavailable')).toBe('No active prompt template');
+    expect(deferredMessage(new AppError('VALIDATION_ERROR', 'responses object is required.', 400), 'ai.unavailable')).toBe(
+      'responses object is required.',
+    );
     expect(deferredMessage(new Error('socket hang up'), 'ai.unavailable')).toEqual({ key: 'ai.unavailable' });
+  });
+
+  // A background job's server failure is read later by the user: internal English text
+  // ("No active prompt template found for service type: x") must not reach them
+  it('replaces a plain server error with the fallback', () => {
+    expect(deferredMessage(new AppError('INTERNAL_ERROR', 'No active prompt template found for service type: x', 500), 'ai.unavailable')).toEqual({
+      key: 'ai.unavailable',
+    });
   });
 });
 
@@ -201,6 +211,21 @@ describe('errorHandler', () => {
 
     expect(res.status).toHaveBeenCalledWith(status);
     expect(res.json).toHaveBeenCalledWith({ error: { code: 'VALIDATION_ERROR', message, details: [] } });
+  });
+
+  it.each([
+    ['charset.unsupported', 415],
+    ['encoding.unsupported', 415],
+    ['request.aborted', 400],
+  ])('keeps the 4xx of any other body-parser refusal (%s) instead of a 500', (type, status) => {
+    const res = mockRes();
+    const err = Object.assign(new Error('unsupported'), { type, status, expose: true });
+    errorHandler(err, { locale: 'fr' } as Request, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(status);
+    expect(res.json).toHaveBeenCalledWith({
+      error: { code: 'VALIDATION_ERROR', message: 'Le corps de la requête n’a pas pu être lu.', details: [] },
+    });
   });
 
   it('does not leak error details for unknown errors', () => {

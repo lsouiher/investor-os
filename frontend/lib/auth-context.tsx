@@ -10,7 +10,7 @@ import {
 } from "react";
 import { takeSignupSource } from "@/lib/signup-source";
 import { useTranslation } from "@/lib/i18n";
-import type { Locale } from "@/lib/locale";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/locale";
 import { api } from "./api-client";
 
 export interface User {
@@ -69,7 +69,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     (account: User) => {
       localStorage.setItem("user", JSON.stringify(account));
       setUser(account);
-      setLocale(account.locale);
+      // A language this build does not ship yet (the server learned it first) reads as English
+      setLocale(isLocale(account.locale) ? account.locale : DEFAULT_LOCALE);
     },
     [setLocale]
   );
