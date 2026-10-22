@@ -25,7 +25,7 @@ function EmptyWrapper({
       <p className="mb-6 max-w-sm text-sm text-foreground-muted">{description}</p>
       <Link
         href={actionHref}
-        className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+        className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
       >
         {actionLabel}
       </Link>

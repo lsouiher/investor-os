@@ -303,7 +303,7 @@ export default function AuditFormShell({
               type="button"
               onClick={handleComplete}
               disabled={saving}
-              className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
+              className="bg-accent text-on-accent hover:bg-accent-hover px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
             >
               Complete Audit
             </button>
@@ -312,7 +312,7 @@ export default function AuditFormShell({
               type="button"
               onClick={handleNext}
               disabled={saving}
-              className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
+              className="bg-accent text-on-accent hover:bg-accent-hover px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
             >
               Next: {sections[currentPage + 1]?.title}
             </button>

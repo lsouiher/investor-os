@@ -7,7 +7,8 @@
 
   /* Brand */
   --accent: #D97706;
-  --accent-hover: #B45309;
+  --accent-hover: #F59E0B; /* brand.md v0.3: on-accent on it is 7.9:1; navy on #B45309 was 3.4:1 */
+  --on-accent: #1A1A2E; /* text on an accent fill, navy in both modes (5.4:1 light, 7.9:1 dark) */
 
   /* Surfaces */
   --background: #FAFAFA;
@@ -15,7 +16,7 @@
   --surface-dark: #1A1A2E;
   --surface-subtle: #F9FAFB;
   --foreground: #171717;
-  --foreground-muted: #6B7280;
+  --foreground-muted: #4B5563; /* brand.md v0.3: 6.9:1 on surface-subtle, 7.6:1 on white */
   --foreground-strong: #111827;
   --foreground-secondary: #4B5563;
   --foreground-tertiary: #9CA3AF;
@@ -57,6 +58,11 @@
 
   --border: #2D2D44;
   --border-muted: #1F1F35;
+
+  /* brand.md §2 dark column: the bright amber as the fill, the light accent as its hover,
+     so on-accent (navy) keeps 4.5:1 on both (7.9:1 and 5.4:1); on #B45309 it was 3.4:1 */
+  --accent: #F59E0B;
+  --accent-hover: #D97706;
 }
 
 @theme inline {
@@ -68,6 +74,7 @@
   --color-foreground-tertiary: var(--foreground-tertiary);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
   --color-surface-card: var(--surface-card);
   --color-surface-dark: var(--surface-dark);
   --color-surface-subtle: var(--surface-subtle);

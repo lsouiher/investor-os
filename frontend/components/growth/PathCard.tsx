@@ -162,7 +162,7 @@ export default function PathCard({
           </div>
           <button
             onClick={onGenerate}
-            className="rounded bg-amber-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
+            className="rounded bg-accent px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-accent-hover"
           >
             {t("growth.path.generate")}
           </button>

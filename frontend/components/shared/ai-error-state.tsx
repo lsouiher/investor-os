@@ -41,7 +41,7 @@ export default function AiErrorState({
         {onRetry && (
           <button
             onClick={onRetry}
-            className="rounded-lg bg-amber-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+            className="rounded-lg bg-accent px-6 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
           >
             {t("error.critical.retry")}
           </button>
@@ -72,7 +72,7 @@ export default function AiErrorState({
         {onRetry && (
           <button
             onClick={onRetry}
-            className="flex-shrink-0 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700"
+            className="flex-shrink-0 rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-on-accent transition-colors hover:bg-accent-hover"
           >
             {t("common.retry")}
           </button>

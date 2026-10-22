@@ -62,7 +62,7 @@ export default function LandingPage() {
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 href="/register"
-                className="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+                className="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover"
                 style={{ borderRadius: "var(--radius-button)" }}
               >
                 {t("landing.cta_primary")}
@@ -111,7 +111,7 @@ export default function LandingPage() {
           <ol className="mt-8 grid gap-6 md:grid-cols-4">
             {STEP_KEYS.map((key, i) => (
               <li key={key} className="flex flex-col gap-2">
-                <span className="flex h-8 w-8 items-center justify-center bg-accent text-sm font-bold text-white" style={{ borderRadius: "var(--radius-default)" }}>
+                <span className="flex h-8 w-8 items-center justify-center bg-accent text-sm font-bold text-on-accent" style={{ borderRadius: "var(--radius-default)" }}>
                   {i + 1}
                 </span>
                 <h3 className="font-semibold text-foreground">{t(`landing.step.${key}.title`)}</h3>
@@ -122,7 +122,7 @@ export default function LandingPage() {
           <div className="mt-10">
             <Link
               href="/register"
-              className="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+              className="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover"
               style={{ borderRadius: "var(--radius-button)" }}
             >
               {t("landing.cta_primary")}

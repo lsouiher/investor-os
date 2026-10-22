@@ -213,7 +213,7 @@ export default function GrowthStrategyPage() {
               <button
                 onClick={handleCreate}
                 disabled={creating}
-                className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+                className="mt-6 inline-block rounded bg-accent px-6 py-2.5 font-medium text-on-accent hover:bg-accent-hover disabled:opacity-50"
               >
                 {creating ? t("growth.create.creating") : t("growth.create.action")}
               </button>
@@ -224,7 +224,7 @@ export default function GrowthStrategyPage() {
               <p className="mt-2 text-foreground-secondary">{t("growth.empty.description")}</p>
               <Link
                 href="/hub"
-                className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700"
+                className="mt-6 inline-block rounded bg-accent px-6 py-2.5 font-medium text-on-accent hover:bg-accent-hover"
               >
                 {t("growth.goto_hub")}
               </Link>

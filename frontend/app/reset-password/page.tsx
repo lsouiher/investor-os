@@ -104,7 +104,7 @@ function ResetPasswordForm() {
             <button
               type="submit"
               disabled={submitting}
-              className="mt-2 h-10 bg-accent text-sm font-semibold text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
+              className="mt-2 h-10 bg-accent text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
               style={{ borderRadius: "var(--radius-button)" }}
             >
               {submitting ? t("auth.reset.submitting") : t("auth.reset.submit")}

@@ -215,7 +215,7 @@ export default function SimulationPage() {
           </p>
           <a
             href="/hub"
-            className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
           >
             {t("simulation.goto_hub")}
           </a>
@@ -298,7 +298,7 @@ export default function SimulationPage() {
           <button
             onClick={runSimulation}
             disabled={simulating || config.remaining_simulations <= 0}
-            className="mt-6 w-full rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+            className="mt-6 w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {config.remaining_simulations <= 0
               ? t("simulation.no_remaining")
