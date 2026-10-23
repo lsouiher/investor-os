@@ -5,7 +5,7 @@
 **Status:** Draft
 **Short Name:** recs-import
 **Branch:** `003-recs-import`
-**Gate:** Implementation does not start before 2026-12-04, and only if this repo (`lsouiher/investor-os`) is the one kept (CLAUDE.md "Two repos, one product name"; `docs/recs-import-status.md` §3). This spec can be written and reviewed now; the same feature is already built in the candidate repo and must not be built in both before that date.
+**Gate:** Lifted by the owner on 2026-10-23: build now, in this repo, ahead of the 2026-12-04 repo decision. The original gate (no implementation before that date, and only if this repo is kept) is waived for this feature only. The candidate repo already has its own build and gets nothing new; no change is made there (CLAUDE.md "Two repos, one product name").
 
 ---
 
@@ -225,7 +225,7 @@ RECS users who want to keep a deal have nowhere to keep it: RECS has no accounts
 - The existing configured RECS address used by the "Calculators" link (already built and documented)
 - The existing signup-source capture and beta funnel report (v0.4.0)
 - The existing account-deletion script
-- The 2026-12-04 repo decision (see Gate)
+- None on the 2026-12-04 repo decision (gate lifted, see Gate)
 
 ---
 

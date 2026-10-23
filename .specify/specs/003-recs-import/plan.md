@@ -1,7 +1,7 @@
 # Implementation Plan: RECS Import
 
 **Branch:** `003-recs-import` | **Date:** 2026-10-23 | **Spec:** [spec.md](./spec.md)
-**Gate:** no implementation before 2026-12-04, and only if this repo is kept (spec Gate line).
+**Gate:** lifted by the owner on 2026-10-23; build now. Nothing is added to the candidate repo (spec Gate line).
 **Contract:** RECS `docs/spec.md` §10.8 (FR-10.8.1, FR-10.8.2, DM-7), `docs/decisions.md` D-108 (2), read-only.
 
 ## Summary

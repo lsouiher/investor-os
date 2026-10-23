@@ -10,8 +10,10 @@ requirement (RECS D-105, not §10.8).
 (`lsouiher/investoros`, local `Desktop/investoros`) built all of FR-10.8.2 in its Sprint 7 on
 2026-10-15 and verified the RECS round trip (§1.4). CLAUDE.md's "Two repos, one product name"
 rule applies: until the owner picks a repo on **2026-12-04**, the same feature is never built in
-both, so **nothing in §3 starts before that date, and only if this repo is the one kept.** Until
-then RECS's `VITE_INVESTORSMAP_URL` points at the candidate.
+both, so **nothing in §3 starts before that date, and only if this repo is the one kept.**
+**Superseded 2026-10-23:** the owner made an exception and the import is built here now, from
+`.specify/specs/003-recs-import/tasks.md` (which supersedes §3); the candidate gets nothing new.
+RECS's `VITE_INVESTORSMAP_URL` keeps pointing at the candidate until this build ships (T038).
 
 This note records what was checked, what the contract asks for item by item, the decisions
 taken on the open questions (§4), and the port plan (§3). It is read-only with respect to RECS
@@ -108,7 +110,7 @@ Everything below is **missing** unless marked otherwise.
 FR-10.8.3 (InvestorsMap computes on sent deals, P2) is out of scope: it depends on RECS's
 engine package (P2-10) and our deal pipeline (PRD V3.1). Nothing here should decode `d`.
 
-## 3. Port plan (not before 2026-12-04, and only if this repo is kept)
+## 3. Port plan (superseded by `.specify/specs/003-recs-import/tasks.md`, gate lifted 2026-10-23)
 
 Sized the way `.specify/specs/001-identity-platform/tasks.md` sizes tasks: one task is one
 file or one closely related set of files, `[P]` where it can run in parallel with its

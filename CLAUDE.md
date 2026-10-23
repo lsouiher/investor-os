@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Two Investor OS codebases exist, with no shared history. Confirm which one you are in with `git remote -v` before any change.
 
-- **This repo: `lsouiher/investor-os`, local `Projects/investorOS`. Role: PRIMARY.** Deployed on Railway (staging), working. New product features land here and only here. It carries the shared brand (`docs/brand.md`, v0.4) but NOT the RECS import (RECS Appendix A row 8, §10.8): that lives in the candidate.
+- **This repo: `lsouiher/investor-os`, local `Projects/investorOS`. Role: PRIMARY.** Deployed on Railway (staging), working. New product features land here and only here. It carries the shared brand (`docs/brand.md`, v0.4). The RECS import (RECS Appendix A row 8, §10.8) is being built here too, by owner exception on 2026-10-23 (spec `.specify/specs/003-recs-import/`), although the candidate already has it.
 - **The other: `lsouiher/investoros`, local `Desktop/investoros` (Railway service `investoros-mvp`). Role: CANDIDATE.** A from-scratch rewrite under evaluation; never edit it from a session in this repo. It has the RECS import (`/import`, `recs_deals`, hub list, Sprint 7 there, 2026-10-15) and gets only what a fair evaluation needs (deploy, brand), no new features.
-- **Decision date: 2026-12-04.** The owner picks one; the other is archived and its good parts ported one at a time. Until then, never build the same feature in both.
+- **Decision date: 2026-12-04.** The owner picks one; the other is archived and its good parts ported one at a time. Until then, never build the same feature in both, with one owner exception: the RECS import (2026-10-23). The rule that stands is that nothing new goes into the candidate.
 - RECS (`lsouiher/recs`) is a sibling product sharing `brand.md`; its `VITE_INVESTORSMAP_URL` points at whichever repo serves `/import`, today the candidate.
 
 ## Project

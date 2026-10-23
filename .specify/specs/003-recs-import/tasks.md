@@ -4,7 +4,7 @@
 **Generated:** 2026-10-23
 **Total Tasks:** 41 (T039–T041 added by /speckit-analyze remediation; numbered after T038 so existing references stay valid)
 **Inputs:** [spec.md](./spec.md), [plan.md](./plan.md), [research.md](./research.md), [data-model.md](./data-model.md), [contracts/](./contracts/), [quickstart.md](./quickstart.md)
-**Gate:** do not start before 2026-12-04, and only if this repo is kept (spec Gate line).
+**Gate:** lifted by the owner on 2026-10-23; start now. Never edit the candidate repo (spec Gate line).
 **Tests:** included. The constitution (VIII) requires co-located tests and the spec's success criteria 1, 4, 8 and 9 are verified by them. Write each story's tests first and see them fail.
 **Ported cases:** read the candidate's `Desktop/investoros/src/app/import/__tests__/` and `e2e/recs-import.spec.ts` for cases; never edit that repo.
 
