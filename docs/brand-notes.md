@@ -1,9 +1,10 @@
 # Brand notes: Investor OS on brand.md
 
-Working notes on carrying `docs/brand.md` (v0.4, copied unchanged from RECS) into Investor OS.
+Working notes on carrying `docs/brand.md` (v0.4 as corrected on 2026-10-23, copied unchanged
+from RECS) into Investor OS.
 v0.3 went in on branch `brand/brand-md-v03`; v0.4 on `brand/brand-md-v04`, cut from it. brand.md
 stays the source of truth and nothing here changes it. §3 records what v0.4 adopted from this
-file's proposals and two inconsistencies left in v0.4 itself, for the next revision in RECS.
+file's proposals and what the same-day correction settled.
 
 `frontend/app/globals.contrast.test.ts` holds the two in step: it fails if a `globals.css`
 value drifts from brand.md §2, or if a pair §2 names drops below its contrast bar.
@@ -95,10 +96,11 @@ the hub's `bg-ok/40` progress connector and the identity card's `from-accent/10`
 
 - **Tints and status on `surface-inverse`** started here and are brand.md tokens since v0.4
   (§3). Callout borders still use `border-accent/30` (and `danger/30`, `ok/30`), not a token.
-- **Dark-mode band edges (v0.4 §5).** Every inverse band takes `dark:border-border` on the
-  side facing the page: under the signed-out `SiteHeader` and the phone header, right of the
-  sidebar, above the phone tab bar. The tab bar's edge is on the `<nav>`, not the items,
-  since each item already has `border-t-2` (transparent, or amber when active).
+- **Dark-mode edges on inverse surfaces (v0.4 §5).** Every `surface-inverse` element takes
+  `dark:border-border` on each side facing the page: under the signed-out `SiteHeader` and the
+  phone header, right of the sidebar, above the phone tab bar, and all four sides of the
+  identity card. The tab bar's edge is on the `<nav>`, not the items, since each item already
+  has `border-t-2` (transparent, or amber when active).
 - **App icon (v0.4 §5).** `frontend/app/icon.svg` is §5's SVG as written. The create-next-app
   `favicon.ico` is deleted: Next 16 emits a `sizes="any"` link for each, and the browser could
   keep the old one.
@@ -165,20 +167,19 @@ font for; a real browser draws them.
 - The app icon: the amber square on a navy tile (§5). A wordmark lockup is still open (§7).
 - The three corrected ratios, and §7's link item is closed.
 
-### Left over in v0.4 (for the next revision, in RECS)
+### Settled by the same-day correction of v0.4
 
-- **§2's intro still says `#F59E0B` is 7.2:1 on navy.** The `accent-on-inverse` row in the same
-  section now says 7.9:1, which is what it measures (7.94).
-- **The `ok-on-inverse` row says light `ok` on navy is 2.6:1.** `#047857` on `#1A1A2E` measures
-  3.1:1 (3.11). 2.6:1 is the light `danger` figure (`#B91C1C`, 2.64), which the next row quotes
-  correctly. Either way light `ok` fails 4.5:1 there, so the token itself is not affected.
+Investor OS raised four points after the first v0.4 copy; RECS corrected brand.md the same day,
+before either product committed it, and this branch carries the corrected file:
 
-### Follow-up seen while mapping v0.4
-
-- The identity card is a `surface-inverse` card on the page, not a band, so §5's edge rule
-  does not cover it. In dark mode it is `#0F0F17` on `#0F0F17` with no border, so only its
-  content and the faint `from-accent/10` glow show its edge. Worth a line in §5 (a 1px
-  `border` on an inverse card in dark mode too), or Investor OS can treat it as a band.
+- §2's intro now gives `#F59E0B` on navy as 7.9:1, matching the `accent-on-inverse` row (it
+  measures 7.94; the first v0.4 said 7.2).
+- The `ok-on-inverse` row now gives light `ok` on navy as 3.1:1 (`#047857` on `#1A1A2E`, 3.11;
+  the first v0.4 said 2.6, which is the light `danger` figure).
+- §5's edge rule is about inverse surfaces, not bands: a card or hero takes the dark-mode edge
+  on all four sides. The identity card now has `dark:border dark:border-border`.
+- §5 says a decorative gradient or glow over an inverse surface is not a tint, so the identity
+  card's `from-accent/10` glow stays.
 
 ## 4. Contrast, before and after
 

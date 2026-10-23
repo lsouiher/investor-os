@@ -1,6 +1,6 @@
 # Brand and UI system — Investor OS and RECS
 
-v0.4, 2026-10-23 (v0.1 approved by Leo on the mockups; v0.2 adds §1's signature pairing; v0.4 adds the dark-mode edge on an inverse band, the app icon, `ink-faint`, the four tints, the two status colours for an inverse band and corrects three quoted ratios, from Investor OS's reconciliation; v0.3 lifts three light-mode pairs to their bars: `ink-muted` `#4B5563`, `on-accent` `#1A1A2E` with `accent-hover` `#F59E0B` so the hovered button keeps its text, and charts drawn on `surface` only, RECS's Q-37). One look for the whole ecosystem. Investor OS's current theme (`frontend/app/globals.css`) is the starting point; this document is the source of truth from here on, and both repos' token files are derived from it. Values below are hex so they paste into either repo's Tailwind `@theme`.
+v0.4, 2026-10-23, corrected the same day before either product committed it (v0.1 approved by Leo on the mockups; v0.2 adds §1's signature pairing; v0.4 adds the dark-mode edge on an inverse band, the app icon, `ink-faint`, the four tints, the two status colours for an inverse band and corrects three quoted ratios, from Investor OS's reconciliation; v0.3 lifts three light-mode pairs to their bars: `ink-muted` `#4B5563`, `on-accent` `#1A1A2E` with `accent-hover` `#F59E0B` so the hovered button keeps its text, and charts drawn on `surface` only, RECS's Q-37). One look for the whole ecosystem. Investor OS's current theme (`frontend/app/globals.css`) is the starting point; this document is the source of truth from here on, and both repos' token files are derived from it. Values below are hex so they paste into either repo's Tailwind `@theme`.
 
 ## 1. Feel
 
@@ -10,7 +10,7 @@ Dark navy and warm amber. Dense, numeric, calm: a tool a professional opens ever
 
 ## 2. Colour
 
-Every text colour below reaches 4.5:1 on the surface it is meant for. **Amber `#D97706` on white is 3.2:1, so it is never used for small text in light mode**; light-mode links and amber text use `accent-text`. On `surface-inverse` the accent is always the bright `#F59E0B` (7.2:1 on navy), whichever mode the page is in.
+Every text colour below reaches 4.5:1 on the surface it is meant for. **Amber `#D97706` on white is 3.2:1, so it is never used for small text in light mode**; light-mode links and amber text use `accent-text`. On `surface-inverse` the accent is always the bright `#F59E0B` (7.9:1 on navy), whichever mode the page is in.
 
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
@@ -35,7 +35,7 @@ Every text colour below reaches 4.5:1 on the surface it is meant for. **Amber `#
 | `warn` | `#B45309` | `#FBBF24` | watch, benchmark miss |
 | `danger` | `#B91C1C` | `#F87171` | fail, negative |
 | `info` | `#475569` | `#94A3B8` | neutral notes (slate, not blue: blue is not in the palette) |
-| `ok-on-inverse` | `#34D399` | `#34D399` | the `ok` status on `surface-inverse` (8.9:1 on navy); light `ok` there is 2.6:1 |
+| `ok-on-inverse` | `#34D399` | `#34D399` | the `ok` status on `surface-inverse` (8.9:1 on navy); light `ok` there is 3.1:1 |
 | `danger-on-inverse` | `#F87171` | `#F87171` | the `danger` status on `surface-inverse` (6.2:1 on navy); light `danger` there is 2.6:1 |
 | `accent-tint` | `#FFFBEB` | `#2A2418` | background of a selected row, an amber badge or a `warn` banner; `accent-text` on it 4.8:1 light, 9.2:1 dark |
 | `ok-tint` | `#ECFDF5` | `#16261F` | background of an `ok` badge or banner; `ok` on it 5.2:1 light, 8.2:1 dark |
@@ -73,7 +73,7 @@ Weights: 400 body, 500 labels and nav, 600 headings and key figures. No 700. Fig
 ## 5. Components
 
 - **Header bar**: `surface-inverse` in both modes, 56 high. Wordmark left in `ink-on-inverse` 600 with the amber mark; nav right in `sm` 500; the primary action (Sign in, or the account menu) last. 2px `accent-on-inverse` line under the active route.
-- **Inverse band in dark mode**: dark `surface-inverse` and dark `background` are both `#0F0F17`, so a band would vanish; an inverse band takes a 1px `border` edge on the side that faces the page (under a header, beside a sidebar, above a bottom bar). Light mode has no edge. The shared token values do not change for this: a darker navy is still too close to the page to read as a band.
+- **Inverse surfaces in dark mode**: dark `surface-inverse` and dark `background` are both `#0F0F17`, so an inverse element would vanish; in dark mode every `surface-inverse` element takes a 1px `border` edge on each side that faces the page: a band on its one open side (under a header, beside a sidebar, above a bottom bar), a card or hero on all four. Light mode has no edge. A decorative gradient or glow drawn over an inverse surface is not a tint and is not covered by the tint rules. The shared token values do not change for this: a darker navy is still too close to the page to read as a band.
 - **App icon and favicon**: the §1 mark as a 32-unit tile, `surface-inverse` light (`#1A1A2E`) under a 12-unit `accent-on-inverse` square, square corners, nothing else; the same file in both products and in both modes:
 
   ```svg
