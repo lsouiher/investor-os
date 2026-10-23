@@ -1,5 +1,7 @@
 "use client";
 
+// Drawn on surface-card only (brand.md §2), except the navy identity card, which passes
+// inverse so the series and labels switch to the on-inverse tokens.
 import { useMemo } from "react";
 
 export interface RadarData {
@@ -14,6 +16,7 @@ export interface RadarData {
 interface RadarChartProps {
   data: RadarData;
   size?: number;
+  inverse?: boolean;
 }
 
 const ALL_AXES: { key: keyof RadarData; label: string }[] = [
@@ -37,7 +40,9 @@ function polarToCartesian(
   };
 }
 
-export default function RadarChart({ data, size = 300 }: RadarChartProps) {
+export default function RadarChart({ data, size = 300, inverse = false }: RadarChartProps) {
+  const series = inverse ? "var(--accent-on-inverse)" : "var(--chart-1)";
+  const grid = inverse ? "rgb(255 255 255 / 0.15)" : "var(--border)";
   const axes = useMemo(
     () => ALL_AXES.filter((a) => data[a.key] != null),
     [data]
@@ -93,7 +98,7 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
             key={scale}
             d={ringPath}
             fill="none"
-            stroke="var(--border)"
+            stroke={grid}
             strokeWidth={1}
           />
         );
@@ -110,18 +115,18 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
             y1={center}
             x2={end.x}
             y2={end.y}
-            stroke="var(--border)"
+            stroke={grid}
             strokeWidth={1}
           />
         );
       })}
 
       {/* Data fill */}
-      <path d={dataPath} fill="var(--accent)" fillOpacity={0.3} stroke="var(--accent)" strokeWidth={2} />
+      <path d={dataPath} fill={series} fillOpacity={0.3} stroke={series} strokeWidth={2} />
 
       {/* Data dots */}
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p.x} cy={p.y} r={4} fill="var(--accent)" />
+        <circle key={i} cx={p.x} cy={p.y} r={4} fill={series} />
       ))}
 
       {/* Labels */}
@@ -138,7 +143,7 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
             y={pos.y}
             textAnchor={anchor}
             dominantBaseline="central"
-            className="fill-foreground-secondary text-xs font-medium"
+            className={`${inverse ? "fill-ink-muted-on-inverse" : "fill-foreground-secondary"} text-xs font-medium`}
           >
             {axis.label}
           </text>

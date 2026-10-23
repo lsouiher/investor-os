@@ -69,7 +69,7 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="text-3xl font-bold text-white">{animatedScore}</span>
-        <span className="text-xs text-gray-400">{t("identity_card.readiness")}</span>
+        <span className="text-xs text-ink-muted-on-inverse">{t("identity_card.readiness")}</span>
       </div>
     </div>
   );
@@ -97,7 +97,7 @@ export default function IdentityCard({
       <div className="relative flex h-full flex-col justify-between p-6 sm:p-8">
         {/* Top: archetype title */}
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          <p className="text-xs font-semibold uppercase tracking-widest text-ink-muted-on-inverse">
             {t("identity_card.label")}
           </p>
           <h2 className="mt-1 text-2xl font-bold sm:text-3xl" style={{ color: "var(--accent-on-inverse)" }}>
@@ -112,11 +112,11 @@ export default function IdentityCard({
           </div>
 
           <div className="hidden flex-shrink-0 sm:block">
-            <RadarChart data={radarData} size={160} />
+            <RadarChart data={radarData} size={160} inverse />
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-sm leading-relaxed text-gray-400">{headlineInsight}</p>
+            <p className="text-sm leading-relaxed text-ink-muted-on-inverse">{headlineInsight}</p>
           </div>
         </div>
 
@@ -127,7 +127,7 @@ export default function IdentityCard({
               <span className={`text-lg font-bold ${scoreColorClass(sub.value)}`}>
                 {sub.value}
               </span>
-              <span className="text-xs text-gray-400">{sub.label}</span>
+              <span className="text-xs text-ink-muted-on-inverse">{sub.label}</span>
             </div>
           ))}
         </div>
