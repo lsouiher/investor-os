@@ -18,15 +18,16 @@ interface IdentityCardProps {
 }
 
 function scoreColor(score: number): string {
-  if (score < 40) return "var(--score-red)";
-  if (score < 70) return "var(--score-amber)";
-  return "var(--score-emerald)";
+  if (score < 40) return "var(--danger-on-inverse)";
+  if (score < 70) return "var(--accent-on-inverse)";
+  return "var(--ok-on-inverse)";
 }
 
 function scoreColorClass(score: number): string {
-  if (score < 40) return "text-red-600";
-  if (score < 70) return "text-amber-600";
-  return "text-emerald-600";
+  // the card sits on surface-inverse
+  if (score < 40) return "text-danger-on-inverse";
+  if (score < 70) return "text-accent-on-inverse";
+  return "text-ok-on-inverse";
 }
 
 function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
@@ -68,8 +69,8 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-white">{animatedScore}</span>
-        <span className="text-xs text-gray-400">{t("identity_card.readiness")}</span>
+        <span className="text-3xl font-bold text-ink-on-inverse">{animatedScore}</span>
+        <span className="text-xs text-ink-muted-on-inverse">{t("identity_card.readiness")}</span>
       </div>
     </div>
   );
@@ -85,22 +86,22 @@ export default function IdentityCard({
   const { t } = useTranslation();
   return (
     <div
-      className="relative w-full overflow-hidden rounded-xl"
+      className="relative w-full overflow-hidden rounded-lg dark:border dark:border-border"
       style={{
         backgroundColor: "var(--surface-dark)",
         aspectRatio: "16 / 9",
       }}
     >
       {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-600/10 via-transparent to-purple-900/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent" />
 
       <div className="relative flex h-full flex-col justify-between p-6 sm:p-8">
         {/* Top: archetype title */}
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+          <p className="text-xs font-semibold uppercase tracking-widest text-ink-muted-on-inverse">
             {t("identity_card.label")}
           </p>
-          <h2 className="mt-1 text-2xl font-bold sm:text-3xl" style={{ color: "var(--accent)" }}>
+          <h2 className="mt-1 text-2xl font-bold sm:text-3xl" style={{ color: "var(--accent-on-inverse)" }}>
             {archetype}
           </h2>
         </div>
@@ -112,11 +113,11 @@ export default function IdentityCard({
           </div>
 
           <div className="hidden flex-shrink-0 sm:block">
-            <RadarChart data={radarData} size={160} />
+            <RadarChart data={radarData} size={160} inverse />
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-sm leading-relaxed text-gray-400">{headlineInsight}</p>
+            <p className="text-sm leading-relaxed text-ink-muted-on-inverse">{headlineInsight}</p>
           </div>
         </div>
 
@@ -127,7 +128,7 @@ export default function IdentityCard({
               <span className={`text-lg font-bold ${scoreColorClass(sub.value)}`}>
                 {sub.value}
               </span>
-              <span className="text-xs text-gray-400">{sub.label}</span>
+              <span className="text-xs text-ink-muted-on-inverse">{sub.label}</span>
             </div>
           ))}
         </div>

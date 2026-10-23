@@ -73,10 +73,10 @@ function CheckButton({ checked, onClick }: { checked: boolean; onClick: () => vo
     <button
       onClick={onClick}
       aria-pressed={checked}
-      className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
+      className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-none border transition-colors ${
         checked
-          ? "border-emerald-500 bg-emerald-500 text-white"
-          : "border-border hover:border-amber-400"
+          ? "border-ok bg-ok text-surface-card"
+          : "border-border hover:border-accent"
       }`}
     >
       {checked && (
@@ -259,14 +259,14 @@ export default function StrategyDetailPage() {
         <div>
           <Link
             href="/strategies"
-            className="mb-2 inline-block text-sm text-amber-600 dark:text-amber-400 hover:text-amber-700"
+            className="mb-2 inline-block text-sm text-accent-text hover:underline"
           >
             &larr; {t("strategy.all_strategies")}
           </Link>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-foreground-strong">{strategy.name}</h1>
             {strategy.is_active && (
-              <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+              <span className="rounded-full bg-ok-tint px-2 py-0.5 text-xs font-medium text-ok">
                 {t("strategies.active")}
               </span>
             )}
@@ -278,7 +278,7 @@ export default function StrategyDetailPage() {
             <button
               onClick={handleActivate}
               disabled={activating}
-              className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+              className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
             >
               {activating ? t("strategy.activating") : t("strategies.activate")}
             </button>
@@ -296,8 +296,8 @@ export default function StrategyDetailPage() {
       )}
 
       {planPending && (
-        <div className="flex items-center gap-3 rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4 text-sm text-amber-800 dark:text-amber-200">
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
+        <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent-tint p-4 text-sm text-accent-text">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
           {t("strategy.plan_pending")}
         </div>
       )}
@@ -313,7 +313,7 @@ export default function StrategyDetailPage() {
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-surface-subtle">
             <div
-              className="h-full rounded-full bg-amber-600 transition-all duration-500"
+              className="h-full rounded-full bg-accent transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -329,8 +329,8 @@ export default function StrategyDetailPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`border-b-2 pb-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? "border-amber-600 text-amber-600 dark:text-amber-400"
-                  : "border-transparent text-foreground-muted hover:text-foreground-secondary"
+                  ? "border-accent text-accent-text"
+                  : "border-transparent text-foreground-muted hover:text-foreground-strong"
               }`}
             >
               {tab.label}
@@ -351,7 +351,7 @@ export default function StrategyDetailPage() {
               <div className="min-w-0 flex-1">
                 <p
                   className={`text-sm font-medium ${
-                    item.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"
+                    item.is_completed ? "text-foreground-muted line-through" : "text-foreground-strong"
                   }`}
                 >
                   {item.title}
@@ -363,7 +363,7 @@ export default function StrategyDetailPage() {
             </div>
           ))}
           {actionItems.length === 0 && !planPending && (
-            <p className="py-8 text-center text-sm text-foreground-tertiary">
+            <p className="py-8 text-center text-sm text-foreground-muted">
               {t("strategy.empty.actions")}
             </p>
           )}
@@ -380,7 +380,7 @@ export default function StrategyDetailPage() {
             <div className="rounded-lg border border-border bg-surface-card p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-foreground-strong">{t("strategy.micro_plan.title")}</h3>
-                <span className="rounded-full bg-amber-50 dark:bg-amber-950 px-3 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+                <span className="rounded-full bg-accent-tint px-3 py-1 text-xs font-medium text-accent-text">
                   {getCountdown(strategy.micro_plan.expires_at, t)}
                 </span>
               </div>
@@ -391,13 +391,13 @@ export default function StrategyDetailPage() {
                 {microTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-start gap-3 rounded-md bg-surface-subtle px-4 py-3"
+                    className="flex items-start gap-3 rounded-lg bg-surface-subtle px-4 py-3"
                   >
                     <CheckButton checked={task.is_completed} onClick={() => toggleMicroTask(task.id)} />
                     <div className="min-w-0 flex-1">
                       <p
                         className={`text-sm ${
-                          task.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-secondary"
+                          task.is_completed ? "text-foreground-muted line-through" : "text-foreground-secondary"
                         }`}
                       >
                         {task.title}
@@ -407,7 +407,7 @@ export default function StrategyDetailPage() {
                       )}
                     </div>
                     {task.estimated_minutes != null && (
-                      <span className="flex-shrink-0 text-xs text-foreground-tertiary">
+                      <span className="flex-shrink-0 text-xs text-foreground-muted">
                         ~{task.estimated_minutes} min
                       </span>
                     )}
@@ -416,7 +416,7 @@ export default function StrategyDetailPage() {
               </div>
             </div>
           ) : (
-            <p className="py-8 text-center text-sm text-foreground-tertiary">
+            <p className="py-8 text-center text-sm text-foreground-muted">
               {planPending ? t("strategy.micro_plan.pending") : t("strategy.empty.micro_plan")}
             </p>
           )}

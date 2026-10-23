@@ -91,9 +91,9 @@ function toResult(res: SimulationResponse): SimulationResult {
 }
 
 function scoreColorClass(score: number): string {
-  if (score < 40) return "text-red-600";
-  if (score < 70) return "text-amber-600";
-  return "text-emerald-600";
+  if (score < 40) return "text-danger";
+  if (score < 70) return "text-accent-text";
+  return "text-ok";
 }
 
 interface SimulationJob {
@@ -215,7 +215,7 @@ export default function SimulationPage() {
           </p>
           <a
             href="/hub"
-            className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+            className="rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
           >
             {t("simulation.goto_hub")}
           </a>
@@ -237,7 +237,7 @@ export default function SimulationPage() {
         </div>
         <div className="text-right">
           <span className="text-sm text-foreground-muted">{t("simulation.remaining")}</span>
-          <p className="text-2xl font-bold text-amber-600">
+          <p className="text-2xl font-bold text-accent">
             {config.remaining_simulations}
           </p>
         </div>
@@ -249,7 +249,7 @@ export default function SimulationPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: Current identity */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-muted">
             {t("simulation.current")}
           </h3>
           <p className="mb-1 text-lg font-bold text-foreground-strong">
@@ -263,7 +263,7 @@ export default function SimulationPage() {
 
         {/* Center: Sliders */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-muted">
             {t("simulation.adjust")}
           </h3>
           <div className="space-y-5">
@@ -273,7 +273,7 @@ export default function SimulationPage() {
                   <label className="text-sm font-medium text-foreground-secondary">
                     {variable.label}
                   </label>
-                  <span className="text-sm font-bold text-amber-600">
+                  <span className="text-sm font-bold text-accent-text">
                     {sliderValues[variable.key] ?? variable.current}
                   </span>
                 </div>
@@ -286,9 +286,9 @@ export default function SimulationPage() {
                   onChange={(e) =>
                     handleSliderChange(variable.key, Number(e.target.value))
                   }
-                  className="w-full accent-amber-600"
+                  className="w-full accent-accent"
                 />
-                <div className="flex justify-between text-xs text-foreground-tertiary">
+                <div className="flex justify-between text-xs text-foreground-muted">
                   <span>{variable.min}</span>
                   <span>{variable.max}</span>
                 </div>
@@ -298,7 +298,7 @@ export default function SimulationPage() {
           <button
             onClick={runSimulation}
             disabled={simulating || config.remaining_simulations <= 0}
-            className="mt-6 w-full rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+            className="mt-6 w-full rounded-none bg-accent px-4 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {config.remaining_simulations <= 0
               ? t("simulation.no_remaining")
@@ -309,7 +309,7 @@ export default function SimulationPage() {
 
         {/* Right: Simulated result */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-muted">
             {t("simulation.simulated")}
           </h3>
           {result ? (
@@ -331,10 +331,10 @@ export default function SimulationPage() {
                     <span
                       className={
                         change.delta > 0
-                          ? "font-medium text-emerald-600"
+                          ? "font-medium text-ok"
                           : change.delta < 0
-                            ? "font-medium text-red-600"
-                            : "text-foreground-tertiary"
+                            ? "font-medium text-danger"
+                            : "text-foreground-muted"
                       }
                     >
                       {change.delta > 0 ? "+" : ""}
@@ -343,12 +343,12 @@ export default function SimulationPage() {
                   </div>
                 ))}
               </div>
-              <p className="mt-4 rounded-md bg-amber-50 dark:bg-amber-950 p-3 text-xs text-amber-800 dark:text-amber-200">
+              <p className="mt-4 rounded-lg bg-accent-tint p-3 text-xs text-accent-text">
                 {result.insight}
               </p>
             </>
           ) : (
-            <div className="flex h-48 items-center justify-center text-sm text-foreground-tertiary">
+            <div className="flex h-48 items-center justify-center text-sm text-foreground-muted">
               {t("simulation.no_results")}
             </div>
           )}

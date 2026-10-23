@@ -22,10 +22,10 @@ const LINK_ICONS: Record<string, string> = {
 };
 
 const LINK_COLORS: Record<string, string> = {
-  prerequisite: "text-blue-600 bg-blue-50",
-  enabling: "text-emerald-600 bg-emerald-50",
+  prerequisite: "text-info bg-info-tint",
+  enabling: "text-ok bg-ok-tint",
   constraint: "text-foreground-secondary bg-surface-subtle",
-  conflict: "text-amber-600 bg-amber-50",
+  conflict: "text-accent-text bg-accent-tint",
 };
 
 function usePathNamesShort() {
@@ -59,7 +59,7 @@ export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
         <span className="text-sm font-semibold text-foreground-secondary">
           {t("growth.cross_path_connections", { count: String(links.length) })}
         </span>
-        <span className={`text-foreground-tertiary transition-transform ${expanded ? "rotate-90" : ""}`}>
+        <span className={`text-foreground-muted transition-transform ${expanded ? "rotate-90" : ""}`}>
           ›
         </span>
       </button>
@@ -67,7 +67,7 @@ export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
         <div className="border-t border-border-muted px-5 py-3 space-y-3">
           {links.map((link) => (
             <div key={link.id} className="flex items-start gap-3">
-              <span className={`mt-0.5 rounded px-1.5 py-0.5 text-xs font-medium ${LINK_COLORS[link.type] || "text-foreground-secondary bg-surface-subtle"}`}>
+              <span className={`mt-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium ${LINK_COLORS[link.type] || "text-foreground-secondary bg-surface-subtle"}`}>
                 {LINK_ICONS[link.type] || "•"} {link.type}
               </span>
               <div className="flex-1">
@@ -78,7 +78,7 @@ export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
                 </div>
                 <div className="mt-0.5 text-xs text-foreground-muted">{link.description}</div>
                 {link.type === "conflict" && link.resolution && (
-                  <div className="mt-1 rounded bg-amber-50 dark:bg-amber-950 px-2 py-1 text-xs text-amber-700 dark:text-amber-300">
+                  <div className="mt-1 rounded-lg bg-accent-tint px-2 py-1 text-xs text-accent-text">
                     {t("growth.resolution")}: {link.resolution}
                   </div>
                 )}

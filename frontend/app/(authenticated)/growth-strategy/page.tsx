@@ -89,9 +89,9 @@ function useScoreTierLabel() {
 }
 
 function scoreTierColor(score: number): string {
-  if (score < 40) return "text-red-600";
-  if (score < 70) return "text-amber-600";
-  return "text-emerald-600";
+  if (score < 40) return "text-danger";
+  if (score < 70) return "text-accent-text";
+  return "text-ok";
 }
 
 export default function GrowthStrategyPage() {
@@ -209,11 +209,11 @@ export default function GrowthStrategyPage() {
             <>
               <h2 className="text-xl font-semibold text-foreground-strong">{t("growth.create.title")}</h2>
               <p className="mt-2 text-foreground-secondary">{t("growth.create.description")}</p>
-              {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
+              {error && <p className="mt-3 text-sm text-danger">{error}</p>}
               <button
                 onClick={handleCreate}
                 disabled={creating}
-                className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+                className="mt-6 inline-block rounded-none bg-accent px-6 py-2.5 font-medium text-on-accent hover:bg-accent-hover disabled:opacity-50"
               >
                 {creating ? t("growth.create.creating") : t("growth.create.action")}
               </button>
@@ -224,7 +224,7 @@ export default function GrowthStrategyPage() {
               <p className="mt-2 text-foreground-secondary">{t("growth.empty.description")}</p>
               <Link
                 href="/hub"
-                className="mt-6 inline-block rounded bg-amber-600 px-6 py-2.5 font-medium text-white hover:bg-amber-700"
+                className="mt-6 inline-block rounded-none bg-accent px-6 py-2.5 font-medium text-on-accent hover:bg-accent-hover"
               >
                 {t("growth.goto_hub")}
               </Link>
@@ -302,14 +302,14 @@ export default function GrowthStrategyPage() {
 
       {/* Next Best Action */}
       {strategy.next_best_action && (
-        <div className="rounded-lg border-2 border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-5 py-4">
-          <div className="text-xs font-medium uppercase text-amber-700 dark:text-amber-300">{t("growth.next_best_action")}</div>
+        <div className="rounded-lg border-2 border-accent/30 bg-accent-tint px-5 py-4">
+          <div className="text-xs font-medium uppercase text-accent-text">{t("growth.next_best_action")}</div>
           <div className="mt-1 font-medium text-foreground-strong">{strategy.next_best_action.title}</div>
-          <div className="mt-1 text-sm text-foreground-secondary">{strategy.next_best_action.reason}</div>
+          <div className="mt-1 text-sm text-accent-text">{strategy.next_best_action.reason}</div>
           {strategy.next_best_action.cross_path_impact.length > 0 && (
             <div className="mt-2 flex gap-2">
               {strategy.next_best_action.cross_path_impact.map((impact) => (
-                <span key={impact} className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-300">
+                <span key={impact} className="rounded-full bg-accent-tint px-2 py-0.5 text-xs text-accent-text">
                   {PATH_NAMES[impact] || impact}
                 </span>
               ))}
@@ -326,7 +326,7 @@ export default function GrowthStrategyPage() {
           </p>
           <button
             onClick={() => setShowFirstVisitHero(false)}
-            className="mt-1 text-xs text-foreground-tertiary hover:text-foreground-secondary"
+            className="mt-1 text-xs text-foreground-muted hover:text-foreground-strong"
           >
             {t("common.dismiss")}
           </button>
@@ -334,7 +334,7 @@ export default function GrowthStrategyPage() {
       )}
 
       {error && (
-        <div className="rounded border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-950 px-4 py-2 text-sm text-red-700 dark:text-red-300">
+        <div className="rounded-lg border border-danger/30 bg-danger-tint px-4 py-2 text-sm text-danger">
           {error}
         </div>
       )}
@@ -361,7 +361,7 @@ export default function GrowthStrategyPage() {
       {/* Stub paths (collapsed section) */}
       {stubPaths.length > 0 && (
         <details className="group">
-          <summary className="cursor-pointer text-sm font-medium text-foreground-muted hover:text-foreground-secondary">
+          <summary className="cursor-pointer text-sm font-medium text-foreground-muted hover:text-foreground-strong">
             {t("growth.future_paths")}
             <span className="ml-1 transition-transform group-open:rotate-90">›</span>
           </summary>
@@ -394,7 +394,7 @@ export default function GrowthStrategyPage() {
         </div>
         <div className="mt-2 h-2 w-full rounded-full bg-surface-subtle">
           <div
-            className="h-2 rounded-full bg-amber-500 transition-all"
+            className="h-2 rounded-full bg-accent transition-all"
             style={{ width: `${strategy.overall_progress}%` }}
           />
         </div>

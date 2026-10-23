@@ -175,9 +175,9 @@ export default function IdentityPage() {
           <AiErrorState severity="medium" message={error} onRetry={handleSynthesize} />
         )}
         <div className="flex flex-col items-center justify-center rounded-lg border border-border bg-surface-card px-6 py-16 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-950">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent-tint">
             <svg
-              className="h-7 w-7 text-amber-600 dark:text-amber-400"
+              className="h-7 w-7 text-accent"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -198,7 +198,7 @@ export default function IdentityPage() {
               <button
                 onClick={handleSynthesize}
                 disabled={synthesizing}
-                className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+                className="rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
               >
                 {t("identity.ready.action")}
               </button>
@@ -210,7 +210,7 @@ export default function IdentityPage() {
               </p>
               <Link
                 href="/hub"
-                className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+                className="rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
               >
                 {t("identity.goto_hub")}
               </Link>
@@ -235,7 +235,7 @@ export default function IdentityPage() {
         <button
           onClick={handleSynthesize}
           disabled={synthesizing}
-          className="rounded-lg border border-amber-600 px-4 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950 disabled:opacity-50"
+          className="rounded-none border border-accent px-4 py-2 text-sm font-medium text-accent-text transition-colors hover:bg-accent-tint disabled:opacity-50"
         >
           {t("identity.resynthesize")}
         </button>
@@ -267,17 +267,17 @@ export default function IdentityPage() {
               <button
                 key={n}
                 onClick={() => setFeedbackRating(n)}
-                className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-medium transition-colors ${
+                className={`flex h-10 w-10 items-center justify-center rounded-none border text-sm font-medium transition-colors ${
                   feedbackRating === n
-                    ? "border-amber-600 bg-amber-600 text-white"
-                    : "border-border text-foreground-secondary hover:border-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950"
+                    ? "border-accent bg-accent text-on-accent"
+                    : "border-border text-foreground-secondary hover:border-accent hover:bg-accent-tint hover:text-accent-text"
                 }`}
               >
                 {n}
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-foreground-tertiary">{t("identity.feedback_scale")}</p>
+          <p className="mt-2 text-xs text-foreground-muted">{t("identity.feedback_scale")}</p>
           {feedbackRating !== null && (
             <div className="mx-auto mt-4 flex max-w-md flex-col gap-2">
               <textarea
@@ -286,11 +286,11 @@ export default function IdentityPage() {
                 onChange={(e) => setFeedbackText(e.target.value.slice(0, 2000))}
                 placeholder={t("identity.feedback_placeholder")}
                 rows={3}
-                className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-amber-500"
+                className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
               />
               <button
                 onClick={handleFeedback}
-                className="self-center rounded bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+                className="self-center rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
               >
                 {t("identity.feedback_submit")}
               </button>
@@ -308,7 +308,7 @@ export default function IdentityPage() {
       <div className="flex justify-center">
         <Link
           href="/identity/history"
-          className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+          className="text-sm font-medium text-accent-text hover:underline"
         >
           {t("identity.view_history")}
         </Link>

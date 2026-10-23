@@ -105,15 +105,15 @@ export default function ExportButton({
       <button
         onClick={handleClick}
         disabled={isDownloading}
-        className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+        className={`inline-flex items-center gap-2 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
           isStale
-            ? "bg-amber-600 text-white hover:bg-amber-700"
-            : "bg-foreground-strong text-background hover:bg-foreground-secondary"
+            ? "bg-accent text-on-accent hover:bg-accent-hover"
+            : "border border-border text-foreground hover:bg-surface-subtle"
         } disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       >
         {isDownloading ? (
           <>
-            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             {t("export.downloading")}
           </>
         ) : (
@@ -137,7 +137,7 @@ export default function ExportButton({
       </button>
 
       {error && (
-        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="mt-2 text-sm text-danger">{error}</p>
       )}
 
       {showConsent && (
@@ -146,28 +146,28 @@ export default function ExportButton({
           role="dialog"
           aria-modal="true"
         >
-          <div className="mx-4 w-full max-w-md rounded-lg bg-surface-card p-6 shadow-xl">
+          <div className="mx-4 w-full max-w-md rounded-lg bg-surface-card p-6 shadow-dialog">
             <h2 className="text-lg font-semibold text-foreground-strong">
               {t("export.dialog_title")}
             </h2>
             <p className="mt-2 text-sm text-foreground-secondary">
               {t("export.description")}
             </p>
-            <div className="mt-3 rounded-md bg-amber-50 dark:bg-amber-950 p-3">
-              <p className="text-sm text-amber-800 dark:text-amber-200">
+            <div className="mt-3 rounded-lg bg-accent-tint p-3">
+              <p className="text-sm text-accent-text">
                 <strong>{t("export.sensitive_title")}</strong> {t("export.sensitive_text")}
               </p>
             </div>
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={handleConsentCancel}
-                className="rounded border border-border px-4 py-2 text-sm text-foreground-secondary hover:bg-surface-subtle"
+                className="rounded-none border border-border px-4 py-2 text-sm text-foreground-secondary hover:bg-surface-subtle"
               >
                 {t("common.cancel")}
               </button>
               <button
                 onClick={handleConsentConfirm}
-                className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
               >
                 {t("export.confirm")}
               </button>

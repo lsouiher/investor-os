@@ -64,9 +64,9 @@ const PATH_LABELS: Record<string, string> = {
 };
 
 const SEVERITY_STYLES: Record<string, string> = {
-  info: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
-  warning: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
-  success: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300",
+  info: "bg-info-tint text-info",
+  warning: "bg-accent-tint text-accent-text",
+  success: "bg-ok-tint text-ok",
 };
 
 function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
@@ -76,7 +76,7 @@ function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
   const progress = (score / 100) * circumference;
 
   const color =
-    score < 40 ? "#dc2626" : score < 70 ? "#d97706" : "#059669";
+    score < 40 ? "var(--danger)" : score < 70 ? "var(--chart-1)" : "var(--ok)";
 
   return (
     <div className="relative flex items-center justify-center" style={{ width: size, height: size / 2 + 12 }}>
@@ -84,7 +84,7 @@ function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
         <path
           d={`M ${strokeWidth / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${size - strokeWidth / 2} ${size / 2}`}
           fill="none"
-          stroke="#e5e7eb"
+          stroke="var(--border)"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
@@ -172,11 +172,11 @@ export default function DashboardPage() {
             {user?.email ? t("dashboard.welcome_user", { email: user.email }) : t("dashboard.welcome")}
           </p>
         </div>
-        <div className="rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-950 p-6 text-center">
-          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+        <div className="rounded-lg border border-danger/30 bg-danger-tint p-6 text-center">
+          <p className="text-sm text-danger">{error}</p>
           <button
             onClick={fetchDashboard}
-            className="mt-3 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+            className="mt-3 rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
           >
             {t("common.retry")}
           </button>
@@ -214,12 +214,12 @@ export default function DashboardPage() {
       {/* Identity snapshot */}
       <div className="rounded-lg border border-border bg-surface-card p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
             {t("dashboard.identity_section")}
           </h2>
           <Link
             href="/identity"
-            className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+            className="text-xs font-medium text-accent-text hover:underline"
           >
             {t("dashboard.view_full_identity")}
           </Link>
@@ -227,9 +227,9 @@ export default function DashboardPage() {
         <div className="mt-4 flex flex-wrap items-center gap-6">
           {/* Archetype badge */}
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-tint">
               <svg
-                className="h-5 w-5 text-amber-600 dark:text-amber-400"
+                className="h-5 w-5 text-accent"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -259,7 +259,7 @@ export default function DashboardPage() {
           {identity.score_history.length > 1 && (
             <div>
               <ScoreSparkline scores={identity.score_history} width={100} height={36} />
-              <p className="mt-1 text-xs text-foreground-tertiary">{t("dashboard.score_trend")}</p>
+              <p className="mt-1 text-xs text-foreground-muted">{t("dashboard.score_trend")}</p>
             </div>
           )}
         </div>
@@ -269,13 +269,13 @@ export default function DashboardPage() {
         {/* Active strategy progress */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
               {t("dashboard.active_strategy")}
             </h2>
             {active_strategy && (
               <Link
                 href={`/strategies/${active_strategy.id}`}
-                className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+                className="text-xs font-medium text-accent-text hover:underline"
               >
                 {t("common.view")}
               </Link>
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-surface-subtle">
                   <div
-                    className="h-full rounded-full bg-amber-600 transition-all duration-500"
+                    className="h-full rounded-full bg-accent transition-all duration-500"
                     style={{ width: `${active_strategy.progress?.percentage ?? 0}%` }}
                   />
                 </div>
@@ -308,7 +308,7 @@ export default function DashboardPage() {
               <p className="text-sm text-foreground-muted">{t("dashboard.no_strategy")}</p>
               <Link
                 href="/strategies"
-                className="mt-2 inline-block text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+                className="mt-2 inline-block text-sm font-medium text-accent-text hover:underline"
               >
                 {t("dashboard.browse_strategies")}
               </Link>
@@ -319,12 +319,12 @@ export default function DashboardPage() {
         {/* Priority tasks */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
               {t("dashboard.priority_tasks")}
             </h2>
             <Link
               href="/tasks"
-              className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+              className="text-xs font-medium text-accent-text hover:underline"
             >
               {t("dashboard.all_tasks")}
             </Link>
@@ -338,10 +338,10 @@ export default function DashboardPage() {
                 >
                   <button
                     onClick={() => toggleTask(task.id)}
-                    className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
+                    className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-none border transition-colors ${
                       task.completed
-                        ? "border-emerald-500 bg-emerald-500 text-white"
-                        : "border-border hover:border-amber-400"
+                        ? "border-ok bg-ok text-surface-card"
+                        : "border-border hover:border-accent"
                     }`}
                   >
                     {task.completed && (
@@ -353,7 +353,7 @@ export default function DashboardPage() {
                   <span
                     className={`text-sm ${
                       task.completed
-                        ? "text-foreground-tertiary line-through"
+                        ? "text-foreground-muted line-through"
                         : "text-foreground-secondary"
                     }`}
                   >
@@ -372,19 +372,19 @@ export default function DashboardPage() {
       {growth_strategy && (
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
               Growth Strategy
             </h2>
             <Link
               href="/growth-strategy"
-              className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+              className="text-xs font-medium text-accent-text hover:underline"
             >
               View Paths
             </Link>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {growth_strategy.paths.map((p) => (
-              <div key={p.path_type} className="rounded-md border border-border bg-surface-subtle px-3 py-2">
+              <div key={p.path_type} className="rounded-lg border border-border bg-surface-subtle px-3 py-2">
                 <p className="truncate text-xs font-medium text-foreground-secondary">{PATH_LABELS[p.path_type] ?? p.path_type}</p>
                 <p className="mt-0.5 text-xs text-foreground-muted">
                   {p.status === "locked" ? "Locked" : p.status === "generating" ? "Generating…" : `${p.progress}%`}
@@ -393,10 +393,10 @@ export default function DashboardPage() {
             ))}
           </div>
           {growth_strategy.next_best_action && (
-            <div className="mt-4 rounded-md border border-amber-100 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">Next best action</p>
+            <div className="mt-4 rounded-lg border border-accent/30 bg-accent-tint px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Next best action</p>
               <p className="mt-1 text-sm font-medium text-foreground-strong">{growth_strategy.next_best_action.title}</p>
-              <p className="mt-0.5 text-xs text-foreground-secondary">{growth_strategy.next_best_action.reason}</p>
+              <p className="mt-0.5 text-xs text-accent-text">{growth_strategy.next_best_action.reason}</p>
             </div>
           )}
           {growth_strategy.export_is_stale && (
@@ -407,7 +407,7 @@ export default function DashboardPage() {
 
       {/* Intelligence feed */}
       <div className="rounded-lg border border-border bg-surface-card p-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
           {t("dashboard.intelligence_feed")}
         </h2>
         {intelligence_feed.length > 0 ? (
@@ -415,17 +415,17 @@ export default function DashboardPage() {
             {intelligence_feed.map((insight, i) => (
               <div
                 key={`${insight.type}-${i}`}
-                className="rounded-md border border-border bg-surface-subtle px-4 py-3"
+                className="rounded-lg border border-border bg-surface-subtle px-4 py-3"
               >
                 <div className="flex items-center gap-2">
-                  <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${SEVERITY_STYLES[insight.severity] ?? SEVERITY_STYLES.info}`}>
+                  <span className={`rounded-full px-1.5 py-0.5 text-xs font-medium ${SEVERITY_STYLES[insight.severity] ?? SEVERITY_STYLES.info}`}>
                     {insight.type.replace("_", " ")}
                   </span>
                   <span className="text-sm font-medium text-foreground-strong">{insight.title}</span>
                 </div>
                 <p className="mt-1 text-sm text-foreground-secondary">{insight.message}</p>
                 {insight.action_url && (
-                  <Link href={insight.action_url} className="mt-1 inline-block text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700">
+                  <Link href={insight.action_url} className="mt-1 inline-block text-xs font-medium text-accent-text hover:underline">
                     Take action →
                   </Link>
                 )}

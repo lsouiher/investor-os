@@ -53,15 +53,15 @@ const AUDIT_ORDER = [
 
 function ScoreBadge({ score }: { score: number }) {
   const colorClass =
-    score < 40 ? "text-red-600" : score < 70 ? "text-amber-600" : "text-emerald-600";
+    score < 40 ? "text-danger" : score < 70 ? "text-accent-text" : "text-ok";
   return <span className={`text-sm font-semibold ${colorClass}`}>{score}/100</span>;
 }
 
 function StepIcon({ status }: { status: "completed" | "current" | "not_started" }) {
   if (status === "completed") {
     return (
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-        <svg className="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-ok-tint">
+        <svg className="h-5 w-5 text-ok" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
@@ -69,8 +69,8 @@ function StepIcon({ status }: { status: "completed" | "current" | "not_started" 
   }
   if (status === "current") {
     return (
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
-        <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-tint">
+        <svg className="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
       </div>
@@ -78,7 +78,7 @@ function StepIcon({ status }: { status: "completed" | "current" | "not_started" 
   }
   return (
     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-subtle">
-      <div className="h-2.5 w-2.5 rounded-full bg-foreground-tertiary" />
+      <div className="h-2.5 w-2.5 rounded-full bg-ink-faint" />
     </div>
   );
 }
@@ -139,7 +139,7 @@ export default function IdentityHubPage() {
           <div className="h-2 bg-border-muted rounded w-full" />
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-20 bg-surface-subtle rounded" />
+              <div key={i} className="h-20 bg-surface-subtle rounded-lg" />
             ))}
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function IdentityHubPage() {
         <p className="text-sm text-foreground-muted">{t("hub.auth_error")}</p>
         <button
           onClick={() => router.push("/login")}
-          className="mt-3 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+          className="mt-3 rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
         >
           {t("hub.goto_login")}
         </button>
@@ -181,7 +181,7 @@ export default function IdentityHubPage() {
         </div>
         <div className="w-full bg-border-muted h-2.5 rounded-full overflow-hidden">
           <div
-            className="bg-amber-600 h-2.5 transition-all duration-500 rounded-full"
+            className="bg-accent h-2.5 transition-all duration-500 rounded-full"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -203,7 +203,7 @@ export default function IdentityHubPage() {
                 {!isLast && (
                   <div
                     className={`w-0.5 flex-1 min-h-[24px] ${
-                      status === "completed" ? "bg-emerald-200 dark:bg-emerald-800" : "bg-border-muted"
+                      status === "completed" ? "bg-ok/40" : "bg-border-muted"
                     }`}
                   />
                 )}
@@ -214,7 +214,7 @@ export default function IdentityHubPage() {
                 <div
                   className={`bg-surface-card rounded-lg border p-6 transition-all ${
                     isRecommended
-                      ? "border-amber-300 shadow-sm"
+                      ? "border-accent"
                       : "border-border"
                   }`}
                 >
@@ -227,7 +227,7 @@ export default function IdentityHubPage() {
                         <ScoreBadge score={audit.sub_score} />
                       )}
                       {audit?.status === "in_progress" && (
-                        <span className="text-xs bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 px-2 py-0.5 border border-amber-200 dark:border-amber-700">
+                        <span className="text-xs bg-accent-tint text-accent-text px-2 py-0.5 border border-accent/30">
                           {t("audit.status.in_progress")}
                         </span>
                       )}
@@ -236,7 +236,7 @@ export default function IdentityHubPage() {
                     {status === "completed" && (
                       <button
                         onClick={() => router.push(`/audits/${auditDef.type}`)}
-                        className="text-sm text-foreground-muted hover:text-foreground-secondary underline"
+                        className="text-sm text-foreground-muted hover:text-foreground-strong underline"
                       >
                         {t("audit.action.update")}
                       </button>
@@ -250,12 +250,12 @@ export default function IdentityHubPage() {
                         {t(auditDef.descriptionKey)}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-foreground-tertiary">
+                        <span className="text-xs text-foreground-muted">
                           ~{auditDef.estimatedMinutes} min
                         </span>
                         <button
                           onClick={() => router.push(`/audits/${auditDef.type}`)}
-                          className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm"
+                          className="bg-accent text-on-accent hover:bg-accent-hover px-6 py-3 rounded-none font-medium text-sm"
                         >
                           {audit?.status === "in_progress" ? t("audit.action.continue") : t("audit.action.start")}
                         </button>
@@ -265,7 +265,7 @@ export default function IdentityHubPage() {
 
                   {/* Collapsed content for non-recommended, non-completed */}
                   {!isRecommended && status === "not_started" && (
-                    <p className="mt-1 text-xs text-foreground-tertiary">
+                    <p className="mt-1 text-xs text-foreground-muted">
                       ~{auditDef.estimatedMinutes} min
                     </p>
                   )}
@@ -278,7 +278,7 @@ export default function IdentityHubPage() {
                       </p>
                       <button
                         onClick={() => router.push(`/audits/${auditDef.type}`)}
-                        className="text-sm text-amber-600 hover:text-amber-700 font-medium underline"
+                        className="text-sm text-accent-text font-medium underline"
                       >
                         {t("audit.action.continue")}
                       </button>
@@ -294,26 +294,26 @@ export default function IdentityHubPage() {
       {/* Footer */}
       {completedCount < 5 && (
         <div className="mt-8 text-center">
-          <p className="text-sm text-foreground-tertiary">
+          <p className="text-sm text-foreground-muted">
             {t("hub.complete_all")}
           </p>
         </div>
       )}
 
       {completedCount === 5 && (
-        <div className="mt-8 bg-surface-card rounded-lg border border-emerald-200 dark:border-emerald-700 p-6 text-center">
+        <div className="mt-8 bg-surface-card rounded-lg border border-ok/30 p-6 text-center">
           <div className="inline-flex items-center gap-2 mb-2">
-            <svg className="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-5 w-5 text-ok" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="font-semibold text-emerald-700 dark:text-emerald-300">{t("hub.all_complete")}</span>
+            <span className="font-semibold text-ok">{t("hub.all_complete")}</span>
           </div>
           <p className="text-sm text-foreground-secondary mb-4">
             {t("hub.synthesis_ready")}
           </p>
           <button
             onClick={() => router.push("/identity")}
-            className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm"
+            className="bg-accent text-on-accent hover:bg-accent-hover px-6 py-3 rounded-none font-medium text-sm"
           >
             {t("hub.view_identity")}
           </button>

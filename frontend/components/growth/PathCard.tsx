@@ -30,10 +30,11 @@ function usePathNames() {
 }
 
 const PATH_COLORS: Record<string, string> = {
-  portfolio: "border-l-amber-500",
-  income_capital: "border-l-emerald-500",
-  skills_knowledge: "border-l-blue-500",
-  time_operations: "border-l-purple-500",
+  // chart series in layout order (brand.md §2), then info; the name always sits beside it
+  portfolio: "border-l-chart-1",
+  income_capital: "border-l-chart-3",
+  skills_knowledge: "border-l-chart-2",
+  time_operations: "border-l-info",
 };
 
 const PATH_ICONS: Record<string, string> = {
@@ -44,9 +45,9 @@ const PATH_ICONS: Record<string, string> = {
 };
 
 function scoreTierClass(progress: number): string {
-  if (progress < 40) return "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300";
-  if (progress < 70) return "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300";
-  return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300";
+  if (progress < 40) return "bg-danger-tint text-danger";
+  if (progress < 70) return "bg-accent-tint text-accent-text";
+  return "bg-ok-tint text-ok";
 }
 
 export default function PathCard({
@@ -64,7 +65,7 @@ export default function PathCard({
   const { t } = useTranslation();
   const PATH_NAMES = usePathNames();
   const name = PATH_NAMES[pathType] || pathType;
-  const accentColor = PATH_COLORS[pathType] || "border-l-gray-400";
+  const accentColor = PATH_COLORS[pathType] || "border-l-border";
   const icon = PATH_ICONS[pathType] || "📌";
 
   // Coming Soon stub
@@ -80,7 +81,7 @@ export default function PathCard({
             <span className="text-lg">{icon}</span>
             <span className="font-medium text-foreground-secondary">{name}</span>
           </div>
-          <span className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
+          <span className="rounded-full bg-accent-tint px-2 py-0.5 text-xs font-medium text-accent-text">
             {t("growth.path.coming_soon")}
           </span>
         </div>
@@ -93,7 +94,7 @@ export default function PathCard({
     return (
       <Link
         href={`/growth-strategy/${pathType}`}
-        className={`block rounded-lg border border-border border-l-2 ${accentColor} bg-surface-card px-6 py-4 transition-shadow hover:shadow-sm`}
+        className={`block rounded-lg border border-border border-l-2 ${accentColor} bg-surface-card px-6 py-4 transition-colors hover:bg-surface-subtle`}
         role="article"
         aria-label={`${name} - ${progress}% complete`}
       >
@@ -103,19 +104,19 @@ export default function PathCard({
             <span className="font-semibold text-foreground-strong">{name}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className={`rounded px-2 py-0.5 text-xs font-medium ${scoreTierClass(progress)}`}>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${scoreTierClass(progress)}`}>
               {progress}%
             </span>
             <span className="text-sm text-foreground-muted">
               {completedActionItems}/{actionItemCount} {t("growth_path.action_items")}
             </span>
-            <span className="text-foreground-tertiary">→</span>
+            <span className="text-foreground-muted">→</span>
           </div>
         </div>
         {/* Progress bar */}
         <div className="mt-3 h-1.5 w-full rounded-full bg-surface-subtle">
           <div
-            className="h-1.5 rounded-full bg-amber-500 transition-all"
+            className="h-1.5 rounded-full bg-accent transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -139,7 +140,7 @@ export default function PathCard({
             <span className="text-lg">{icon}</span>
             <span className="font-semibold text-foreground-strong">{name}</span>
           </div>
-          <span className="text-sm text-amber-600">{t("growth.path.generating")}</span>
+          <span className="text-sm text-accent-text">{t("growth.path.generating")}</span>
         </div>
         {/* Shimmer animation */}
         <div className="mt-3 h-8 w-full animate-pulse rounded bg-gradient-to-r from-surface-subtle via-border-muted to-surface-subtle" />
@@ -162,7 +163,7 @@ export default function PathCard({
           </div>
           <button
             onClick={onGenerate}
-            className="rounded bg-amber-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
+            className="rounded-none bg-accent px-4 py-1.5 text-sm font-medium text-on-accent hover:bg-accent-hover"
           >
             {t("growth.path.generate")}
           </button>
@@ -186,7 +187,7 @@ export default function PathCard({
         {onGenerate && (
           <button
             onClick={onGenerate}
-            className="rounded border border-border px-3 py-1 text-xs text-foreground-muted hover:border-foreground-tertiary"
+            className="rounded-none border border-border px-3 py-1 text-xs text-foreground-muted hover:border-ink-faint"
           >
             {t("growth.path.generate_now")}
           </button>
@@ -196,7 +197,7 @@ export default function PathCard({
         <p className="mt-2 text-xs text-foreground-muted">{unlockCriteria}</p>
       )}
       {unlockProgress && (
-        <p className="mt-1 text-xs text-foreground-tertiary">{unlockProgress}</p>
+        <p className="mt-1 text-xs text-foreground-muted">{unlockProgress}</p>
       )}
     </div>
   );

@@ -21,9 +21,9 @@ interface IdentityVersion {
 }
 
 function scoreColorClass(score: number): string {
-  if (score < 40) return "text-red-600";
-  if (score < 70) return "text-amber-600";
-  return "text-emerald-600";
+  if (score < 40) return "text-danger";
+  if (score < 70) return "text-accent-text";
+  return "text-ok";
 }
 
 export default function IdentityHistoryPage() {
@@ -90,7 +90,7 @@ export default function IdentityHistoryPage() {
         </div>
         <Link
           href="/identity"
-          className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+          className="text-sm font-medium text-accent-text hover:underline"
         >
           {t("identity_history.back")}
         </Link>
@@ -128,7 +128,7 @@ export default function IdentityHistoryPage() {
               }}
               className={`flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors ${
                 isSelected
-                  ? "border-amber-400 bg-amber-50 dark:bg-amber-950"
+                  ? "border-accent bg-accent-tint"
                   : "border-border bg-surface-card hover:border-border"
               }`}
             >
@@ -136,7 +136,7 @@ export default function IdentityHistoryPage() {
               <div className="flex flex-col items-center">
                 <div
                   className={`h-3 w-3 rounded-full ${
-                    isSelected ? "bg-amber-600" : "bg-foreground-tertiary"
+                    isSelected ? "bg-accent" : "bg-ink-faint"
                   }`}
                 />
                 {idx < versions.length - 1 && (
@@ -149,11 +149,11 @@ export default function IdentityHistoryPage() {
                   <span className="text-sm font-semibold text-foreground-strong">
                     v{version.version}
                   </span>
-                  <span className="text-xs text-foreground-tertiary">
+                  <span className={`text-xs ${isSelected ? "text-accent-text" : "text-foreground-muted"}`}>
                     {new Date(version.generated_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-sm text-foreground-secondary">{version.archetype}</p>
+                <p className={`text-sm ${isSelected ? "text-accent-text" : "text-foreground-secondary"}`}>{version.archetype}</p>
               </div>
 
               <span className={`text-lg font-bold ${scoreColorClass(version.readiness_score)}`}>
@@ -174,14 +174,14 @@ export default function IdentityHistoryPage() {
             {/* Version A */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-foreground-tertiary">
+                <span className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                   v{versionA.version}
                 </span>
                 <span className={`text-xl font-bold ${scoreColorClass(versionA.readiness_score)}`}>
                   {versionA.readiness_score}
                 </span>
               </div>
-              <p className="text-sm font-medium" style={{ color: "#D97706" }}>
+              <p className="text-sm font-medium text-accent-text">
                 {versionA.archetype}
               </p>
               <RadarChart data={versionA.radar_data} size={200} />
@@ -192,21 +192,21 @@ export default function IdentityHistoryPage() {
             {versionB ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground-tertiary">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                     v{versionB.version}
                   </span>
                   <span className={`text-xl font-bold ${scoreColorClass(versionB.readiness_score)}`}>
                     {versionB.readiness_score}
                   </span>
                 </div>
-                <p className="text-sm font-medium" style={{ color: "#D97706" }}>
+                <p className="text-sm font-medium text-accent-text">
                   {versionB.archetype}
                 </p>
                 <RadarChart data={versionB.radar_data} size={200} />
                 <p className="text-xs text-foreground-muted">{versionB.headline_insight}</p>
               </div>
             ) : (
-              <div className="flex items-center justify-center text-sm text-foreground-tertiary">
+              <div className="flex items-center justify-center text-sm text-foreground-muted">
                 {t("identity_history.select_second")}
               </div>
             )}
@@ -221,7 +221,7 @@ export default function IdentityHistoryPage() {
           </p>
           <Link
             href="/hub"
-            className="mt-4 inline-block rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-amber-700"
+            className="mt-4 inline-block rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent hover:bg-accent-hover"
           >
             {t("identity_history.goto_hub")}
           </Link>

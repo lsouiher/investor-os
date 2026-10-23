@@ -87,11 +87,11 @@ export default function BlueprintDownload({
       <button
         onClick={handleDownload}
         disabled={loading}
-        className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle disabled:opacity-50"
+        className="flex items-center gap-2 rounded-none border border-border px-4 py-2 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle disabled:opacity-50"
       >
         {loading ? (
           <>
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-border border-t-amber-600" />
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-border border-t-accent" />
             {t("blueprint.downloading")}
           </>
         ) : (
@@ -113,7 +113,7 @@ export default function BlueprintDownload({
           </>
         )}
       </button>
-      {error && <p className="text-xs text-red-500 dark:text-red-400">{error}</p>}
+      {error && <p className="text-xs text-danger">{error}</p>}
     </div>
   );
 }

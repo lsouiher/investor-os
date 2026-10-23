@@ -159,7 +159,7 @@ export default function AuditFormShell({
         {/* Progress bar */}
         <div className="w-full bg-border h-2 rounded-full overflow-hidden">
           <div
-            className="bg-amber-600 h-2 transition-all duration-300"
+            className="bg-accent h-2 transition-all duration-300"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -180,14 +180,14 @@ export default function AuditFormShell({
               disabled={!canJump}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm whitespace-nowrap border-b-2 transition-colors ${
                 isCurrent
-                  ? "border-amber-600 text-amber-700 font-medium"
+                  ? "border-accent text-accent-text font-medium"
                   : isCompleted
-                  ? "border-emerald-500 text-emerald-700 cursor-pointer hover:bg-surface-subtle"
-                  : "border-transparent text-foreground-tertiary cursor-not-allowed"
+                  ? "border-ok text-ok cursor-pointer hover:bg-surface-subtle"
+                  : "border-transparent text-ink-faint cursor-not-allowed"
               }`}
             >
               {isCompleted && !isCurrent && (
-                <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-4 h-4 text-ok" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               )}
@@ -206,7 +206,7 @@ export default function AuditFormShell({
         <div className="space-y-5">
           {currentSection.fields.map((field) => {
             const fieldError = validationErrors[field.name];
-            const errorBorderClass = fieldError ? "border-red-400 dark:border-red-600" : "border-border";
+            const errorBorderClass = fieldError ? "border-danger" : "border-border";
             return (
             <div key={field.name}>
               <label
@@ -215,7 +215,7 @@ export default function AuditFormShell({
               >
                 {field.label}
                 {field.required && (
-                  <span className="text-red-500 dark:text-red-400 ml-0.5">*</span>
+                  <span className="text-danger ml-0.5">*</span>
                 )}
               </label>
 
@@ -226,7 +226,7 @@ export default function AuditFormShell({
                   onChange={(e) =>
                     updateField(currentSection.id, field.name, e.target.value)
                   }
-                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong bg-surface-card focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
+                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong bg-surface-card focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent`}
                 >
                   <option value="">Select...</option>
                   {field.options?.map((opt) => (
@@ -244,7 +244,7 @@ export default function AuditFormShell({
                   }
                   placeholder={field.placeholder}
                   rows={3}
-                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
+                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               ) : field.type === "number" ? (
                 <input
@@ -255,7 +255,7 @@ export default function AuditFormShell({
                     updateField(currentSection.id, field.name, e.target.value)
                   }
                   placeholder={field.placeholder}
-                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
+                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               ) : (
                 <input
@@ -266,11 +266,11 @@ export default function AuditFormShell({
                     updateField(currentSection.id, field.name, e.target.value)
                   }
                   placeholder={field.placeholder}
-                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
+                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               )}
               {fieldError && (
-                <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldError}</p>
+                <p className="mt-1 text-xs text-danger">{fieldError}</p>
               )}
             </div>
             );
@@ -286,7 +286,7 @@ export default function AuditFormShell({
           disabled={isFirstPage}
           className={`px-6 py-3 text-sm font-medium border border-border ${
             isFirstPage
-              ? "text-foreground-tertiary cursor-not-allowed"
+              ? "text-ink-faint cursor-not-allowed"
               : "text-foreground-secondary hover:bg-surface-subtle"
           }`}
         >
@@ -295,7 +295,7 @@ export default function AuditFormShell({
 
         <div className="flex items-center gap-3">
           {saving && (
-            <span className="text-xs text-foreground-tertiary">Saving...</span>
+            <span className="text-xs text-foreground-muted">Saving...</span>
           )}
 
           {isLastPage ? (
@@ -303,7 +303,7 @@ export default function AuditFormShell({
               type="button"
               onClick={handleComplete}
               disabled={saving}
-              className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
+              className="bg-accent text-on-accent hover:bg-accent-hover px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
             >
               Complete Audit
             </button>
@@ -312,7 +312,7 @@ export default function AuditFormShell({
               type="button"
               onClick={handleNext}
               disabled={saving}
-              className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
+              className="bg-accent text-on-accent hover:bg-accent-hover px-6 py-3 rounded-none font-medium text-sm disabled:opacity-50"
             >
               Next: {sections[currentPage + 1]?.title}
             </button>

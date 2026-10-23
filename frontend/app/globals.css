@@ -2,32 +2,85 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Tokens follow docs/brand.md §2 (v0.4), the brand shared with RECS. Values are
+ * checked against it by globals.contrast.test.ts; change brand.md first.
+ *
+ * brand.md token        Investor OS variable      Tailwind utility
+ * background            --background              bg-background
+ * surface               --surface-card            bg-surface-card
+ * surface-subtle        --surface-subtle          bg-surface-subtle
+ * surface-inverse       --surface-dark            bg-surface-dark
+ * border                --border                  border-border
+ * border-muted          --border-muted            border-border-muted
+ * ink                   --foreground              text-foreground
+ * ink-strong            --foreground-strong       text-foreground-strong
+ * ink-muted             --foreground-muted        text-foreground-muted
+ * ink-on-inverse        --ink-on-inverse          text-ink-on-inverse
+ * ink-muted-on-inverse  --ink-muted-on-inverse    text-ink-muted-on-inverse
+ * ink-faint             --ink-faint               placeholder:text-ink-faint, bg-ink-faint
+ * accent                --accent                  bg-accent, ring-accent
+ * accent-on-inverse     --accent-on-inverse       bg-accent-on-inverse
+ * accent-hover          --accent-hover            hover:bg-accent-hover
+ * accent-text           --accent-text             text-accent-text
+ * on-accent             --on-accent               text-on-accent
+ * ok / warn / danger    --ok / --warn / --danger  text-ok, text-warn, text-danger
+ * info                  --info                    text-info
+ * ok-/danger-on-inverse --ok-/--danger-on-inverse text-ok-on-inverse, text-danger-on-inverse
+ * accent-/ok-/danger-/info-tint  --*-tint         bg-accent-tint, bg-ok-tint, ...
+ * chart-1..3            --chart-1..3              (SVG fill/stroke via var())
+ *
+ * A tint carries its own status colour's text (accent-text on accent-tint), never
+ * ink-muted. ink-faint is never readable text: placeholders, disabled controls and
+ * decorative dots only.
+ *
+ * Not in brand.md (Investor OS only): --foreground-secondary (= ink-muted in
+ * light, #D1D5DB dark).
+ */
+
 :root {
   color-scheme: light;
 
   /* Brand */
   --accent: #D97706;
-  --accent-hover: #B45309;
+  --accent-hover: #F59E0B; /* brand.md v0.3: on-accent on it is 7.9:1; navy on #B45309 was 3.4:1 */
+  --accent-text: #B45309; /* amber text and links: #D97706 on white is 3.2:1 */
+  --accent-on-inverse: #F59E0B;
+  --accent-tint: #FFFBEB; /* amber callouts and badges; accent-text on it is 4.8:1 */
+  --on-accent: #1A1A2E; /* text on an accent fill, navy in both modes (5.4:1 light, 7.9:1 dark) */
 
   /* Surfaces */
   --background: #FAFAFA;
   --surface-card: #FFFFFF;
   --surface-dark: #1A1A2E;
-  --surface-subtle: #F9FAFB;
+  --surface-subtle: #F3F4F6;
   --foreground: #171717;
-  --foreground-muted: #6B7280;
+  --foreground-muted: #4B5563; /* brand.md v0.3: 6.9:1 on surface-subtle, 7.6:1 on white */
   --foreground-strong: #111827;
   --foreground-secondary: #4B5563;
-  --foreground-tertiary: #9CA3AF;
+  --ink-faint: #9CA3AF; /* 2.5:1 on white: never readable text */
+  --ink-on-inverse: #F9FAFB;
+  --ink-muted-on-inverse: #A1A1B5;
 
   /* Borders */
   --border: #E5E7EB;
   --border-muted: #F3F4F6;
 
-  /* Score colors */
-  --score-red: #DC2626;
-  --score-amber: #D97706;
-  --score-emerald: #059669;
+  /* Status */
+  --ok: #047857;
+  --warn: #B45309;
+  --danger: #B91C1C;
+  --info: #475569;
+  --ok-tint: #ECFDF5; /* ok on it 5.2:1 */
+  --danger-tint: #FEF2F2; /* danger on it 5.9:1 */
+  --info-tint: #F1F5F9; /* info on it 6.9:1 */
+  --ok-on-inverse: #34D399; /* 8.9:1 on surface-inverse; light ok there is 3.1:1 */
+  --danger-on-inverse: #F87171; /* 6.2:1; light danger there is 2.6:1 */
+
+  /* Charts, drawn on surface-card only */
+  --chart-1: var(--accent);
+  --chart-2: #334155;
+  --chart-3: var(--ok);
 
   /* Spacing grid */
   --grid: 4px;
@@ -36,10 +89,11 @@
   --max-content: 1200px;
   --sidebar-width: 240px;
 
-  /* Radii */
-  --radius-default: 4px;
-  --radius-card: 8px;
-  --radius-button: 0px;
+  /* Radii (brand.md §4) */
+  --radius-default: 4px; /* inputs */
+  --radius-card: 8px; /* cards and dialogs */
+  --radius-button: 0px; /* controls and buttons */
+  --radius-pill: 999px;
 }
 
 .dark {
@@ -53,10 +107,27 @@
   --foreground-muted: #9CA3AF;
   --foreground-strong: #F9FAFB;
   --foreground-secondary: #D1D5DB;
-  --foreground-tertiary: #6B7280;
+  --ink-faint: #6B7280;
 
   --border: #2D2D44;
   --border-muted: #1F1F35;
+
+  /* brand.md §2 dark column: the bright amber as the fill, the light accent as its hover,
+     so on-accent (navy) keeps 4.5:1 on both (7.9:1 and 5.4:1); on #B45309 it was 3.4:1 */
+  --accent: #F59E0B;
+  --accent-hover: #D97706;
+  --accent-text: #FBBF24;
+  --accent-tint: #2A2418;
+
+  --ok: #34D399;
+  --warn: #FBBF24;
+  --danger: #F87171;
+  --info: #94A3B8;
+  --ok-tint: #16261F;
+  --danger-tint: #2E1A1E;
+  --info-tint: #1C2130;
+
+  --chart-2: #CBD5E1;
 }
 
 @theme inline {
@@ -65,17 +136,33 @@
   --color-foreground-muted: var(--foreground-muted);
   --color-foreground-strong: var(--foreground-strong);
   --color-foreground-secondary: var(--foreground-secondary);
-  --color-foreground-tertiary: var(--foreground-tertiary);
+  --color-ink-faint: var(--ink-faint);
+  --color-ink-on-inverse: var(--ink-on-inverse);
+  --color-ink-muted-on-inverse: var(--ink-muted-on-inverse);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-text: var(--accent-text);
+  --color-accent-on-inverse: var(--accent-on-inverse);
+  --color-accent-tint: var(--accent-tint);
+  --color-on-accent: var(--on-accent);
   --color-surface-card: var(--surface-card);
   --color-surface-dark: var(--surface-dark);
   --color-surface-subtle: var(--surface-subtle);
   --color-border: var(--border);
   --color-border-muted: var(--border-muted);
-  --color-score-red: var(--score-red);
-  --color-score-amber: var(--score-amber);
-  --color-score-emerald: var(--score-emerald);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-ok-tint: var(--ok-tint);
+  --color-danger-tint: var(--danger-tint);
+  --color-info-tint: var(--info-tint);
+  --color-ok-on-inverse: var(--ok-on-inverse);
+  --color-danger-on-inverse: var(--danger-on-inverse);
+  --shadow-dialog: 0 10px 30px rgb(0 0 0 / 0.25); /* brand.md §4: the only shadow */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

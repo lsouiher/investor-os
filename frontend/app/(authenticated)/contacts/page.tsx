@@ -41,12 +41,12 @@ function lastContactedBadge(lastContacted: string | null, t: (key: string, param
   );
   const label = t("contacts.last_contacted.days_ago", { days: String(days) });
   if (days <= 7) {
-    return { label, className: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" };
+    return { label, className: "bg-ok-tint text-ok" };
   }
   if (days <= 30) {
-    return { label, className: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300" };
+    return { label, className: "bg-accent-tint text-accent-text" };
   }
-  return { label, className: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300" };
+  return { label, className: "bg-danger-tint text-danger" };
 }
 
 export default function ContactsPage() {
@@ -177,7 +177,7 @@ function ContactsPageContent() {
             setEditingContact(null);
             setShowForm(true);
           }}
-          className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+          className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
         >
           {t("contacts.add")}
         </button>
@@ -193,7 +193,7 @@ function ContactsPageContent() {
             onClick={() => setActiveFilter(role.key)}
             className={`flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               activeFilter === role.key
-                ? "bg-amber-600 text-white"
+                ? "bg-accent text-on-accent"
                 : "bg-surface-subtle text-foreground-secondary hover:bg-border"
             }`}
           >
@@ -213,7 +213,7 @@ function ContactsPageContent() {
               className="flex w-full items-center gap-4 rounded-lg border border-border bg-surface-card p-4 text-left transition-colors hover:border-border"
             >
               {/* Avatar */}
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-sm font-bold text-amber-700 dark:text-amber-300">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-accent-tint text-sm font-bold text-accent-text">
                 {contact.name.charAt(0).toUpperCase()}
               </div>
 
@@ -223,7 +223,7 @@ function ContactsPageContent() {
                   <p className="text-sm font-semibold text-foreground-strong">
                     {contact.name}
                   </p>
-                  <span className="rounded bg-surface-subtle px-1.5 py-0.5 text-xs text-foreground-muted">
+                  <span className="rounded-full bg-surface-subtle px-1.5 py-0.5 text-xs text-foreground-muted">
                     {contact.role_type}
                   </span>
                 </div>
@@ -235,8 +235,8 @@ function ContactsPageContent() {
               {/* Gap filled by this contact */}
               {contact.network_gap_filled && (
                 <div className="text-right">
-                  <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">{t("contacts.fills_gap")}</p>
-                  <p className="text-xs text-foreground-tertiary">{t(`contacts.role.${contact.network_gap_filled}`)}</p>
+                  <p className="text-xs font-medium text-ok">{t("contacts.fills_gap")}</p>
+                  <p className="text-xs text-foreground-muted">{t(`contacts.role.${contact.network_gap_filled}`)}</p>
                 </div>
               )}
 
@@ -251,7 +251,7 @@ function ContactsPageContent() {
         })}
 
         {filteredContacts.length === 0 && (
-          <p className="py-8 text-center text-sm text-foreground-tertiary">
+          <p className="py-8 text-center text-sm text-foreground-muted">
             {t("contacts.empty_filter")}
           </p>
         )}

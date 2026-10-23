@@ -18,14 +18,14 @@ function EmptyWrapper({
 }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-lg border border-border bg-surface-card px-6 py-16 text-center">
-      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-950">
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent-tint">
         {icon}
       </div>
       <h3 className="mb-2 text-lg font-semibold text-foreground-strong">{title}</h3>
       <p className="mb-6 max-w-sm text-sm text-foreground-muted">{description}</p>
       <Link
         href={actionHref}
-        className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+        className="rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
       >
         {actionLabel}
       </Link>
@@ -35,7 +35,7 @@ function EmptyWrapper({
 
 const IdentityIcon = (
   <svg
-    className="h-7 w-7 text-amber-600"
+    className="h-7 w-7 text-accent"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -48,7 +48,7 @@ const IdentityIcon = (
 
 const StrategyIcon = (
   <svg
-    className="h-7 w-7 text-amber-600"
+    className="h-7 w-7 text-accent"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -62,7 +62,7 @@ const StrategyIcon = (
 
 const ContactsIcon = (
   <svg
-    className="h-7 w-7 text-amber-600"
+    className="h-7 w-7 text-accent"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -80,7 +80,7 @@ const ContactsIcon = (
 
 const TasksIcon = (
   <svg
-    className="h-7 w-7 text-amber-600"
+    className="h-7 w-7 text-accent"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"

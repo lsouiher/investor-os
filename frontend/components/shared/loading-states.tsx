@@ -18,7 +18,7 @@ export function SkeletonCard({ lines = 3 }: { lines?: number }) {
 export function SpinnerOverlay({ label }: { label?: string }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-card/80 backdrop-blur-sm">
-      <div className="h-10 w-10 animate-spin rounded-full border-4 border-border border-t-amber-600" />
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-border border-t-accent" />
       {label && (
         <p className="mt-4 text-sm font-medium text-foreground-secondary">{label}</p>
       )}

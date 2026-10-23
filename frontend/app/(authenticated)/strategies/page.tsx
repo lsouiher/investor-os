@@ -21,9 +21,9 @@ interface Strategy {
 }
 
 function scoreColorClass(score: number): string {
-  if (score < 40) return "text-red-600 bg-red-50";
-  if (score < 70) return "text-amber-600 bg-amber-50";
-  return "text-emerald-600 bg-emerald-50";
+  if (score < 40) return "text-danger bg-danger-tint";
+  if (score < 70) return "text-accent-text bg-accent-tint";
+  return "text-ok bg-ok-tint";
 }
 
 export default function StrategiesPage() {
@@ -113,7 +113,7 @@ export default function StrategiesPage() {
         <p className="mt-1 text-sm text-foreground-muted">
           {t("strategies.subtitle")}
         </p>
-        <p className="mt-2 text-xs text-foreground-tertiary">{t("strategies.disclaimer")}</p>
+        <p className="mt-2 text-xs text-foreground-muted">{t("strategies.disclaimer")}</p>
       </div>
 
       {error && (
@@ -121,15 +121,15 @@ export default function StrategiesPage() {
       )}
 
       {/* Primary strategy -- expanded */}
-      <div className="rounded-lg border border-amber-200 dark:border-amber-700 bg-surface-card p-6">
+      <div className="rounded-lg border border-accent/30 bg-surface-card p-6">
         <div className="mb-4 flex items-start justify-between">
           <div>
             <div className="mb-1 flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+              <span className="text-xs font-semibold uppercase tracking-wider text-accent-text">
                 {t("strategies.top_match")}
               </span>
               {primary.is_active && (
-                <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                <span className="rounded-full bg-ok-tint px-2 py-0.5 text-xs font-medium text-ok">
                   {t("strategies.active")}
                 </span>
               )}
@@ -147,14 +147,14 @@ export default function StrategiesPage() {
 
         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-ok">
               {t("strategies.pros")}
             </h4>
             <ul className="space-y-1">
               {primary.pros.map((pro, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-foreground-secondary">
                   <svg
-                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500"
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-ok"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -168,14 +168,14 @@ export default function StrategiesPage() {
             </ul>
           </div>
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-red-500 dark:text-red-400">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-danger">
               {t("strategies.cons")}
             </h4>
             <ul className="space-y-1">
               {primary.cons.map((con, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-foreground-secondary">
                   <svg
-                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-400"
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-danger"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -194,14 +194,14 @@ export default function StrategiesPage() {
           {!primary.is_active && (
             <button
               onClick={() => handleActivate(primary.id)}
-              className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+              className="rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
             >
               {t("strategies.activate")}
             </button>
           )}
           <Link
             href={`/strategies/${primary.id}`}
-            className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle"
+            className="rounded-none border border-border px-5 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle"
           >
             {t("strategies.view_details")}
           </Link>
@@ -221,7 +221,7 @@ export default function StrategiesPage() {
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-foreground-strong">{strategy.name}</h3>
               {strategy.is_active && (
-                <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                <span className="rounded-full bg-ok-tint px-2 py-0.5 text-xs font-medium text-ok">
                   {t("strategies.active")}
                 </span>
               )}
@@ -237,7 +237,7 @@ export default function StrategiesPage() {
           </span>
           <Link
             href={`/strategies/${strategy.id}`}
-            className="flex-shrink-0 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+            className="flex-shrink-0 text-sm font-medium text-accent-text hover:underline"
           >
             {t("common.view")}
           </Link>

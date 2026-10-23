@@ -87,6 +87,7 @@ the prompt seed run when the container starts. A deploy takes 3–5 minutes.
 |---|---|
 | `NEXT_PUBLIC_API_URL` | `https://api.yourdomain.com/api/v1` (the `/api/v1` suffix matters) |
 | `NEXT_PUBLIC_FEEDBACK_EMAIL` | the address for the "Send feedback" link |
+| `NEXT_PUBLIC_RECS_URL` | the RECS base URL for the "Calculators" link (empty hides it) |
 
 ## What happens on deploy
 

@@ -63,9 +63,9 @@ function usePathNames() {
 }
 
 function scoreTierClass(score: number): string {
-  if (score < 40) return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
-  if (score < 70) return "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300";
-  return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300";
+  if (score < 40) return "bg-danger-tint text-danger";
+  if (score < 70) return "bg-accent-tint text-accent-text";
+  return "bg-ok-tint text-ok";
 }
 
 export default function PathDetailPage() {
@@ -151,12 +151,12 @@ export default function PathDetailPage() {
     <div className="mx-auto max-w-3xl space-y-6 py-8">
       {/* Header */}
       <div>
-        <Link href="/growth-strategy" className="text-sm text-foreground-muted hover:text-foreground-secondary">
+        <Link href="/growth-strategy" className="text-sm text-foreground-muted hover:text-foreground-strong">
           &larr; {t("growth_path.back")}
         </Link>
         <div className="mt-2 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground-strong">{name}</h1>
-          <span className={`rounded px-3 py-1 text-sm font-medium ${scoreTierClass(path.progress)}`}>
+          <span className={`rounded-full px-3 py-1 text-sm font-medium ${scoreTierClass(path.progress)}`}>
             {path.progress}{t("growth_path.complete")}
           </span>
         </div>
@@ -168,7 +168,7 @@ export default function PathDetailPage() {
       {/* Progress bar */}
       <div className="h-2 w-full rounded-full bg-surface-subtle">
         <div
-          className="h-2 rounded-full bg-amber-500 transition-all"
+          className="h-2 rounded-full bg-accent transition-all"
           style={{ width: `${path.progress}%` }}
         />
       </div>
@@ -179,7 +179,7 @@ export default function PathDetailPage() {
           <h2 className="text-sm font-semibold uppercase text-foreground-muted">{t("growth_path.active_strategy")}</h2>
           <div className="mt-2 flex items-center justify-between">
             <span className="font-medium text-foreground-strong">{path.strategy.name}</span>
-            <span className={`rounded px-2 py-0.5 text-xs font-medium ${scoreTierClass(path.strategy.fit_score)}`}>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${scoreTierClass(path.strategy.fit_score)}`}>
               {path.strategy.fit_score}% fit
             </span>
           </div>
@@ -212,7 +212,7 @@ export default function PathDetailPage() {
               { label: "Year 10", value: scalingPlan.year_10_vision },
             ].map(({ label, value }) => (
               <div key={label}>
-                <span className="text-xs font-medium text-amber-600">{label}</span>
+                <span className="text-xs font-medium text-accent-text">{label}</span>
                 <p className="mt-0.5 text-sm text-foreground-secondary">{value}</p>
               </div>
             ))}
@@ -229,7 +229,7 @@ export default function PathDetailPage() {
               if (typeof value === "string") {
                 return (
                   <div key={key}>
-                    <h3 className="text-xs font-medium uppercase text-foreground-tertiary">
+                    <h3 className="text-xs font-medium uppercase text-foreground-muted">
                       {key.replace(/_/g, " ")}
                     </h3>
                     <p className="mt-1 text-sm text-foreground-secondary">{value}</p>
@@ -239,7 +239,7 @@ export default function PathDetailPage() {
               if (Array.isArray(value)) {
                 return (
                   <div key={key}>
-                    <h3 className="text-xs font-medium uppercase text-foreground-tertiary">
+                    <h3 className="text-xs font-medium uppercase text-foreground-muted">
                       {key.replace(/_/g, " ")}
                     </h3>
                     <ul className="mt-1 space-y-1">
@@ -268,7 +268,7 @@ export default function PathDetailPage() {
             {sortedActions.map((item) => (
               <label
                 key={item.id}
-                className={`flex cursor-pointer items-start gap-3 rounded-md px-3 py-2.5 transition-colors ${
+                className={`flex cursor-pointer items-start gap-3 rounded-none px-3 py-2.5 transition-colors ${
                   item.is_completed ? "bg-surface-subtle" : "hover:bg-surface-subtle"
                 }`}
               >
@@ -276,18 +276,18 @@ export default function PathDetailPage() {
                   type="checkbox"
                   checked={item.is_completed}
                   onChange={() => handleToggleAction(item.id, !item.is_completed)}
-                  className="mt-0.5 h-5 w-5 rounded border-border text-amber-600 focus:ring-amber-500"
+                  className="mt-0.5 h-5 w-5 rounded-none border-border text-accent focus:ring-accent"
                 />
                 <div className="flex-1">
-                  <div className={`text-sm font-medium ${item.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"}`}>
+                  <div className={`text-sm font-medium ${item.is_completed ? "text-foreground-muted line-through" : "text-foreground-strong"}`}>
                     {item.title}
                   </div>
                   {item.description && (
                     <div className="mt-0.5 text-xs text-foreground-muted">{item.description}</div>
                   )}
                   <div className="mt-1 flex gap-2">
-                    <span className="text-xs text-foreground-tertiary">{item.timeframe}</span>
-                    <span className={`rounded px-1.5 py-0.5 text-xs ${scoreTierClass(item.priority_score)}`}>
+                    <span className="text-xs text-foreground-muted">{item.timeframe}</span>
+                    <span className={`rounded-full px-1.5 py-0.5 text-xs ${scoreTierClass(item.priority_score)}`}>
                       {t("growth_path.priority", { score: String(item.priority_score) })}
                     </span>
                   </div>
@@ -300,7 +300,7 @@ export default function PathDetailPage() {
 
       {/* Metadata */}
       {path.generated_at && (
-        <div className="text-xs text-foreground-tertiary">
+        <div className="text-xs text-foreground-muted">
           {t("growth_path.generated_at", { date: new Date(path.generated_at).toLocaleDateString(), version: String(path.version) })}
           {path.generation_cooldown_until && new Date(path.generation_cooldown_until) > new Date() && (
             <span> · {t("growth_path.regeneration_after", { time: new Date(path.generation_cooldown_until).toLocaleTimeString() })}</span>

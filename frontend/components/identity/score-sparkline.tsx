@@ -1,5 +1,7 @@
 "use client";
 
+// Drawn on surface-card only (brand.md §2): chart-1 is 3.2:1 there, 2.9:1 on surface-subtle.
+
 interface ScoreSparklineProps {
   scores: number[];
   width?: number;
@@ -14,7 +16,7 @@ export default function ScoreSparkline({
   if (scores.length === 0) {
     return (
       <div
-        className="flex items-center justify-center text-xs text-foreground-tertiary"
+        className="flex items-center justify-center text-xs text-foreground-muted"
         style={{ width, height }}
       >
         --
@@ -25,7 +27,7 @@ export default function ScoreSparkline({
   if (scores.length === 1) {
     return (
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-        <circle cx={width / 2} cy={height / 2} r={3} fill="var(--accent)" />
+        <circle cx={width / 2} cy={height / 2} r={3} fill="var(--chart-1)" />
       </svg>
     );
   }
@@ -53,12 +55,12 @@ export default function ScoreSparkline({
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
       {/* Area fill */}
-      <path d={areaPath} fill="var(--accent)" fillOpacity={0.15} />
+      <path d={areaPath} fill="var(--chart-1)" fillOpacity={0.15} />
       {/* Line */}
       <polyline
         points={polyline}
         fill="none"
-        stroke="var(--accent)"
+        stroke="var(--chart-1)"
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -73,7 +75,7 @@ export default function ScoreSparkline({
             ((scores[scores.length - 1] - min) / range) * chartHeight
           }
           r={3}
-          fill="var(--accent)"
+          fill="var(--chart-1)"
         />
       )}
     </svg>

@@ -82,14 +82,14 @@ export default function ContactFormModal({
       onClick={handleOverlayClick}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
     >
-      <div className="w-full max-w-md rounded-lg border border-border bg-surface-card p-6 shadow-xl">
+      <div className="w-full max-w-md rounded-lg border border-border bg-surface-card p-6 shadow-dialog">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground-strong">
             {contact ? t("contacts.form.edit_title") : t("contacts.form.add_title")}
           </h2>
           <button
             onClick={onClose}
-            className="text-foreground-tertiary hover:text-foreground-secondary"
+            className="text-foreground-muted hover:text-foreground-strong"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -99,7 +99,7 @@ export default function ContactFormModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="rounded-lg bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-700 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+            <div className="rounded-lg bg-danger-tint border border-danger/30 px-4 py-3 text-sm text-danger">
               {error}
             </div>
           )}
@@ -112,7 +112,7 @@ export default function ContactFormModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t("contacts.form.name_placeholder")}
             />
           </div>
@@ -125,7 +125,7 @@ export default function ContactFormModal({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t("contacts.form.email_placeholder")}
             />
           </div>
@@ -138,7 +138,7 @@ export default function ContactFormModal({
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t("contacts.form.phone_placeholder")}
             />
           </div>
@@ -150,7 +150,7 @@ export default function ContactFormModal({
             <select
               value={roleType}
               onChange={(e) => setRoleType(e.target.value)}
-              className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground-strong focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             >
               {ROLE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -168,7 +168,7 @@ export default function ContactFormModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className="w-full rounded-lg border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t("contacts.form.notes_placeholder")}
             />
           </div>
@@ -177,14 +177,14 @@ export default function ContactFormModal({
             <button
               type="submit"
               disabled={saving || !name.trim()}
-              className="flex-1 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+              className="flex-1 rounded-none bg-accent px-4 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
             >
               {saving ? t("contacts.form.saving") : contact ? t("contacts.form.update") : t("contacts.form.submit")}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle"
+              className="rounded-none border border-border px-4 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle"
             >
               {t("common.cancel")}
             </button>

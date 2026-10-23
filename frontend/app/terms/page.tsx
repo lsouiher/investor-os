@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiteHeader } from "@/components/shared/site-header";
 
 const CONTACT = process.env.NEXT_PUBLIC_FEEDBACK_EMAIL ?? "";
 const EFFECTIVE = "September 2026";
@@ -7,15 +8,15 @@ const EFFECTIVE = "September 2026";
 // readable on a phone in two minutes. English only for the beta.
 export default function TermsPage() {
   return (
-    <div className="flex-1 bg-background px-4 py-10">
-      <article className="mx-auto max-w-2xl">
-        <p className="text-sm font-semibold tracking-widest uppercase text-accent">InvestorOS</p>
-        <h1 className="mt-2 text-3xl font-bold text-foreground">Beta terms &amp; privacy</h1>
+    <div className="flex-1 bg-background">
+      <SiteHeader />
+      <article className="mx-auto max-w-2xl px-4 py-10">
+        <h1 className="text-3xl font-bold text-foreground">Beta terms &amp; privacy</h1>
         <p className="mt-1 text-sm text-foreground-muted">Effective {EFFECTIVE}</p>
 
         <Section title="What this is">
           <p>
-            InvestorOS is a planning tool for real estate investors, in beta. You answer five short
+            Investor OS is a planning tool for real estate investors, in beta. You answer five short
             audits about your finances, time, skills, risk and goals; it builds an investor identity
             (an archetype and a readiness score), suggests strategies that fit, and lays out plans.
             It is free during the beta. Features will change, some say &ldquo;Coming Soon&rdquo;, and you
@@ -25,7 +26,7 @@ export default function TermsPage() {
 
         <Section title="Not financial, legal or tax advice">
           <p>
-            Everything InvestorOS produces is generated from your own answers to help you think. It
+            Everything Investor OS produces is generated from your own answers to help you think. It
             is not financial, investment, legal or tax advice, it does not know your full situation,
             and it can be wrong. Check any decision with a licensed professional before you act on
             it. You are responsible for your investments.
@@ -67,7 +68,7 @@ export default function TermsPage() {
 
         <Section title="Deleting your data">
           <p>
-            Ask and it&rsquo;s gone: email {CONTACT ? <a className="text-accent underline" href={`mailto:${CONTACT}`}>{CONTACT}</a> : "the address in the app footer"} from the
+            Ask and it&rsquo;s gone: email {CONTACT ? <a className="text-accent-text underline" href={`mailto:${CONTACT}`}>{CONTACT}</a> : "the address in the app footer"} from the
             address on your account. We erase your audit answers and generated results right away
             and deactivate the account; backups roll off within 30 days.
           </p>
@@ -86,12 +87,12 @@ export default function TermsPage() {
           <p>
             We may update these terms as the beta evolves; the effective date above changes when we
             do. Questions, feedback, deletion requests:{" "}
-            {CONTACT ? <a className="text-accent underline" href={`mailto:${CONTACT}`}>{CONTACT}</a> : "use the feedback link in the app"}.
+            {CONTACT ? <a className="text-accent-text underline" href={`mailto:${CONTACT}`}>{CONTACT}</a> : "use the feedback link in the app"}.
           </p>
         </Section>
 
         <p className="mt-10 text-sm text-foreground-muted">
-          <Link href="/" className="text-accent underline underline-offset-2">Back to InvestorOS</Link>
+          <Link href="/" className="text-accent-text underline underline-offset-2">Back to Investor OS</Link>
         </p>
       </article>
     </div>

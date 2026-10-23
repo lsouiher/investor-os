@@ -17,9 +17,9 @@ export default function AiErrorState({
   if (severity === "critical") {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
-        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-danger-tint">
           <svg
-            className="h-8 w-8 text-red-600 dark:text-red-400"
+            className="h-8 w-8 text-danger"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -41,7 +41,7 @@ export default function AiErrorState({
         {onRetry && (
           <button
             onClick={onRetry}
-            className="rounded-lg bg-amber-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+            className="rounded-none bg-accent px-6 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
           >
             {t("error.critical.retry")}
           </button>
@@ -52,9 +52,9 @@ export default function AiErrorState({
 
   if (severity === "medium") {
     return (
-      <div className="flex items-center gap-3 rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-4 py-3">
+      <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent-tint px-4 py-3">
         <svg
-          className="h-5 w-5 flex-shrink-0 text-amber-600"
+          className="h-5 w-5 flex-shrink-0 text-accent"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -66,13 +66,13 @@ export default function AiErrorState({
             d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <p className="flex-1 text-sm text-amber-800 dark:text-amber-200">
+        <p className="flex-1 text-sm text-accent-text">
           {message || t("error.medium.message")}
         </p>
         {onRetry && (
           <button
             onClick={onRetry}
-            className="flex-shrink-0 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-700"
+            className="flex-shrink-0 rounded-none bg-accent px-3 py-1.5 text-xs font-medium text-on-accent transition-colors hover:bg-accent-hover"
           >
             {t("common.retry")}
           </button>
@@ -101,7 +101,7 @@ export default function AiErrorState({
       {onRetry && (
         <button
           onClick={onRetry}
-          className="font-medium text-amber-600 underline hover:text-amber-700"
+          className="font-medium text-accent-text underline"
         >
           {t("common.retry")}
         </button>

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { rememberSignupSource } from "@/lib/signup-source";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { SiteHeader } from "@/components/shared/site-header";
 import { useTranslation } from "@/lib/i18n";
 
 // Landing page for a stranger who just got an email or scanned a QR at a conference: what
@@ -27,6 +27,7 @@ const EXAMPLE = {
   ],
 };
 
+
 export default function LandingPage() {
   const { t } = useTranslation();
 
@@ -37,22 +38,17 @@ export default function LandingPage() {
 
   return (
     <div className="flex-1 bg-background">
-      {/* Top bar */}
-      <header className="mx-auto flex w-full max-w-[var(--max-content)] items-center justify-between px-4 py-5 sm:px-6">
-        <p className="text-sm font-semibold tracking-widest uppercase text-accent">{t("nav.brand")}</p>
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm font-medium text-foreground-muted hover:text-foreground">
-            {t("landing.cta_login")}
-          </Link>
-          <ThemeToggle />
-        </div>
-      </header>
+      <SiteHeader>
+        <Link href="/login" className="text-sm font-medium text-ink-on-inverse hover:text-accent-on-inverse">
+          {t("landing.cta_login")}
+        </Link>
+      </SiteHeader>
 
       <main className="mx-auto w-full max-w-[var(--max-content)] px-4 sm:px-6">
         {/* Hero */}
         <section className="grid items-center gap-10 py-12 md:grid-cols-[1.2fr_1fr] md:py-20">
           <div className="flex flex-col gap-6">
-            <p className="inline-flex w-fit items-center gap-2 bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent" style={{ borderRadius: "var(--radius-default)" }}>
+            <p className="inline-flex w-fit items-center gap-2 bg-accent-tint px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent-text" style={{ borderRadius: "var(--radius-default)" }}>
               {t("landing.eyebrow")}
             </p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
@@ -62,7 +58,7 @@ export default function LandingPage() {
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 href="/register"
-                className="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+                className="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover"
                 style={{ borderRadius: "var(--radius-button)" }}
               >
                 {t("landing.cta_primary")}
@@ -97,7 +93,7 @@ export default function LandingPage() {
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {PATH_KEYS.map((key) => (
               <div key={key} className="flex flex-col gap-3 border border-border bg-surface-card p-6" style={{ borderRadius: "var(--radius-card)" }}>
-                <p className="text-xs font-semibold uppercase tracking-wider text-accent">{t(`landing.path.${key}.label`)}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">{t(`landing.path.${key}.label`)}</p>
                 <h3 className="text-lg font-semibold text-foreground">{t(`landing.path.${key}.title`)}</h3>
                 <p className="text-sm leading-relaxed text-foreground-muted">{t(`landing.path.${key}.description`)}</p>
               </div>
@@ -111,7 +107,7 @@ export default function LandingPage() {
           <ol className="mt-8 grid gap-6 md:grid-cols-4">
             {STEP_KEYS.map((key, i) => (
               <li key={key} className="flex flex-col gap-2">
-                <span className="flex h-8 w-8 items-center justify-center bg-accent text-sm font-bold text-white" style={{ borderRadius: "var(--radius-default)" }}>
+                <span className="flex h-8 w-8 items-center justify-center bg-accent text-sm font-bold text-on-accent" style={{ borderRadius: "var(--radius-default)" }}>
                   {i + 1}
                 </span>
                 <h3 className="font-semibold text-foreground">{t(`landing.step.${key}.title`)}</h3>
@@ -122,7 +118,7 @@ export default function LandingPage() {
           <div className="mt-10">
             <Link
               href="/register"
-              className="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+              className="inline-flex h-12 items-center justify-center bg-accent px-8 text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover"
               style={{ borderRadius: "var(--radius-button)" }}
             >
               {t("landing.cta_primary")}
@@ -133,7 +129,7 @@ export default function LandingPage() {
         {/* Built by */}
         <section className="border-t border-border py-16">
           <div className="grid gap-6 md:grid-cols-[auto_1fr] md:items-start">
-            <div className="flex h-16 w-16 items-center justify-center bg-accent/10 text-xl font-bold text-accent" style={{ borderRadius: "var(--radius-card)" }}>
+            <div className="flex h-16 w-16 items-center justify-center bg-accent-tint text-xl font-bold text-accent-text" style={{ borderRadius: "var(--radius-card)" }}>
               L
             </div>
             <div>
@@ -155,7 +151,7 @@ export default function LandingPage() {
               </div>
             ))}
           </dl>
-          <p className="mt-10 text-xs text-foreground-tertiary">{t("landing.disclaimer")}</p>
+          <p className="mt-10 text-xs text-foreground-muted">{t("landing.disclaimer")}</p>
         </section>
       </main>
 
@@ -174,8 +170,8 @@ export default function LandingPage() {
 
 function ExampleCard({ t }: { t: (key: string, params?: Record<string, string | number>) => string }) {
   return (
-    <div className="relative mx-auto w-full max-w-sm border border-border bg-surface-card p-6 shadow-sm" style={{ borderRadius: "var(--radius-card)" }}>
-      <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wider text-foreground-tertiary">
+    <div className="relative mx-auto w-full max-w-sm border border-border bg-surface-card p-6" style={{ borderRadius: "var(--radius-card)" }}>
+      <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wider text-foreground-muted">
         {t("landing.example_label")}
       </span>
       <p className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">{t("identity_card.label")}</p>

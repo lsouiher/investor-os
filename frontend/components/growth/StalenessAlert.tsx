@@ -17,10 +17,10 @@ export default function StalenessAlert({
   if (!isStale) return null;
 
   return (
-    <div className="w-full rounded-md border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-4 py-3">
+    <div className="w-full rounded-lg border border-accent/30 bg-accent-tint px-4 py-3">
       <div className="flex items-start gap-3">
         <svg
-          className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600"
+          className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
@@ -33,11 +33,11 @@ export default function StalenessAlert({
           />
         </svg>
         <div className="flex-1">
-          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+          <p className="text-sm font-medium text-accent-text">
             {t("export.staleness.message")}
           </p>
           {changedSinceExport.length > 0 && (
-            <ul className="mt-1 list-inside list-disc text-sm text-amber-700 dark:text-amber-300">
+            <ul className="mt-1 list-inside list-disc text-sm text-accent-text">
               {changedSinceExport.map((change, i) => (
                 <li key={i}>{change}</li>
               ))}
@@ -45,7 +45,7 @@ export default function StalenessAlert({
           )}
           <button
             onClick={onDownloadFresh}
-            className="mt-2 text-sm font-medium text-amber-900 underline hover:text-amber-700"
+            className="mt-2 text-sm font-medium text-accent-text underline"
           >
             {t("export.staleness.download_fresh")}
           </button>

@@ -37,8 +37,8 @@ function impactOf(task: Task): Impact {
 const IMPACT_TO_SCORE: Record<Impact, number> = { high: 80, medium: 50, low: 20 };
 
 const IMPACT_STYLES: Record<string, string> = {
-  high: "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300",
-  medium: "bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300",
+  high: "bg-danger-tint text-danger",
+  medium: "bg-accent-tint text-accent-text",
   low: "bg-surface-subtle text-foreground-secondary",
 };
 
@@ -134,7 +134,7 @@ export default function TasksPage() {
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+          className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
         >
           {showAddForm ? t("common.cancel") : t("tasks.add")}
         </button>
@@ -146,7 +146,7 @@ export default function TasksPage() {
       {showAddForm && (
         <form
           onSubmit={addTask}
-          className="rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4"
+          className="rounded-lg border border-accent/30 bg-accent-tint p-4"
         >
           <div className="space-y-3">
             <input
@@ -155,17 +155,17 @@ export default function TasksPage() {
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder={t("tasks.form.title_placeholder")}
               required
-              className="w-full rounded-lg border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
             <input
               type="text"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
               placeholder={t("tasks.form.description_placeholder")}
-              className="w-full rounded-lg border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-foreground-secondary">{t("tasks.form.impact_label")}</label>
+              <label className="text-sm font-medium text-accent-text">{t("tasks.form.impact_label")}</label>
               {(["high", "medium", "low"] as const).map((level) => (
                 <button
                   key={level}
@@ -173,7 +173,7 @@ export default function TasksPage() {
                   onClick={() => setNewImpact(level)}
                   className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
                     newImpact === level
-                      ? "bg-amber-600 text-white"
+                      ? "bg-accent text-on-accent"
                       : "bg-surface-card text-foreground-secondary hover:bg-surface-subtle"
                   }`}
                 >
@@ -184,7 +184,7 @@ export default function TasksPage() {
             <button
               type="submit"
               disabled={!newTitle.trim()}
-              className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:opacity-50"
+              className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
             >
               {t("tasks.add")}
             </button>
@@ -202,10 +202,10 @@ export default function TasksPage() {
           >
             <button
               onClick={() => toggleTask(task.id)}
-              className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
+              className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-none border transition-colors ${
                 task.is_completed
-                  ? "border-emerald-500 bg-emerald-500 text-white"
-                  : "border-border hover:border-amber-400"
+                  ? "border-ok bg-ok text-surface-card"
+                  : "border-border hover:border-accent"
               }`}
             >
               {task.is_completed && (
@@ -218,20 +218,20 @@ export default function TasksPage() {
               <div className="flex items-center gap-2">
                 <p
                   className={`text-sm font-medium ${
-                    task.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"
+                    task.is_completed ? "text-foreground-muted line-through" : "text-foreground-strong"
                   }`}
                 >
                   {task.title}
                 </p>
                 <span
-                  className={`rounded px-1.5 py-0.5 text-xs font-medium ${
+                  className={`rounded-full px-1.5 py-0.5 text-xs font-medium ${
                     IMPACT_STYLES[impactOf(task)]
                   }`}
                 >
                   {t(`tasks.impact.${impactOf(task)}`)}
                 </span>
                 {task.source !== "manual" && (
-                  <span className="rounded bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
+                  <span className="rounded-full bg-info-tint px-1.5 py-0.5 text-xs text-info">
                     {t(`tasks.source.${task.source}`)}
                   </span>
                 )}
