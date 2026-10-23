@@ -236,7 +236,7 @@ function ContactsPageContent() {
               {contact.network_gap_filled && (
                 <div className="text-right">
                   <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">{t("contacts.fills_gap")}</p>
-                  <p className="text-xs text-foreground-tertiary">{t(`contacts.role.${contact.network_gap_filled}`)}</p>
+                  <p className="text-xs text-foreground-muted">{t(`contacts.role.${contact.network_gap_filled}`)}</p>
                 </div>
               )}
 
@@ -251,7 +251,7 @@ function ContactsPageContent() {
         })}
 
         {filteredContacts.length === 0 && (
-          <p className="py-8 text-center text-sm text-foreground-tertiary">
+          <p className="py-8 text-center text-sm text-foreground-muted">
             {t("contacts.empty_filter")}
           </p>
         )}

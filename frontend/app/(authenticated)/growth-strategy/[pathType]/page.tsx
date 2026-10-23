@@ -151,7 +151,7 @@ export default function PathDetailPage() {
     <div className="mx-auto max-w-3xl space-y-6 py-8">
       {/* Header */}
       <div>
-        <Link href="/growth-strategy" className="text-sm text-foreground-muted hover:text-foreground-secondary">
+        <Link href="/growth-strategy" className="text-sm text-foreground-muted hover:text-foreground-strong">
           &larr; {t("growth_path.back")}
         </Link>
         <div className="mt-2 flex items-center justify-between">
@@ -229,7 +229,7 @@ export default function PathDetailPage() {
               if (typeof value === "string") {
                 return (
                   <div key={key}>
-                    <h3 className="text-xs font-medium uppercase text-foreground-tertiary">
+                    <h3 className="text-xs font-medium uppercase text-foreground-muted">
                       {key.replace(/_/g, " ")}
                     </h3>
                     <p className="mt-1 text-sm text-foreground-secondary">{value}</p>
@@ -239,7 +239,7 @@ export default function PathDetailPage() {
               if (Array.isArray(value)) {
                 return (
                   <div key={key}>
-                    <h3 className="text-xs font-medium uppercase text-foreground-tertiary">
+                    <h3 className="text-xs font-medium uppercase text-foreground-muted">
                       {key.replace(/_/g, " ")}
                     </h3>
                     <ul className="mt-1 space-y-1">
@@ -279,14 +279,14 @@ export default function PathDetailPage() {
                   className="mt-0.5 h-5 w-5 rounded border-border text-accent focus:ring-accent"
                 />
                 <div className="flex-1">
-                  <div className={`text-sm font-medium ${item.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"}`}>
+                  <div className={`text-sm font-medium ${item.is_completed ? "text-foreground-muted line-through" : "text-foreground-strong"}`}>
                     {item.title}
                   </div>
                   {item.description && (
                     <div className="mt-0.5 text-xs text-foreground-muted">{item.description}</div>
                   )}
                   <div className="mt-1 flex gap-2">
-                    <span className="text-xs text-foreground-tertiary">{item.timeframe}</span>
+                    <span className="text-xs text-foreground-muted">{item.timeframe}</span>
                     <span className={`rounded px-1.5 py-0.5 text-xs ${scoreTierClass(item.priority_score)}`}>
                       {t("growth_path.priority", { score: String(item.priority_score) })}
                     </span>
@@ -300,7 +300,7 @@ export default function PathDetailPage() {
 
       {/* Metadata */}
       {path.generated_at && (
-        <div className="text-xs text-foreground-tertiary">
+        <div className="text-xs text-foreground-muted">
           {t("growth_path.generated_at", { date: new Date(path.generated_at).toLocaleDateString(), version: String(path.version) })}
           {path.generation_cooldown_until && new Date(path.generation_cooldown_until) > new Date() && (
             <span> · {t("growth_path.regeneration_after", { time: new Date(path.generation_cooldown_until).toLocaleTimeString() })}</span>

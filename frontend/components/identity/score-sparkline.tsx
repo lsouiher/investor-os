@@ -14,7 +14,7 @@ export default function ScoreSparkline({
   if (scores.length === 0) {
     return (
       <div
-        className="flex items-center justify-center text-xs text-foreground-tertiary"
+        className="flex items-center justify-center text-xs text-foreground-muted"
         style={{ width, height }}
       >
         --

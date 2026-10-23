@@ -132,7 +132,7 @@ function AuthenticatedShell({
             </button>
           </div>
           {/* Beta footer: a way to talk to the person behind it, and the terms everyone signed up under */}
-          <div className="mt-3 flex items-center gap-3 text-[11px] text-foreground-tertiary">
+          <div className="mt-3 flex items-center gap-3 text-[11px] text-foreground-muted">
             {FEEDBACK_EMAIL && (
               <a
                 href={`mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(t("nav.feedback_subject"))}`}

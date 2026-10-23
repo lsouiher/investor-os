@@ -295,7 +295,7 @@ export default function AuditFormShell({
 
         <div className="flex items-center gap-3">
           {saving && (
-            <span className="text-xs text-foreground-tertiary">Saving...</span>
+            <span className="text-xs text-foreground-muted">Saving...</span>
           )}
 
           {isLastPage ? (

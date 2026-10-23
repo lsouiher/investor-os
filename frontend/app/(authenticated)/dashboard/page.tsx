@@ -214,7 +214,7 @@ export default function DashboardPage() {
       {/* Identity snapshot */}
       <div className="rounded-lg border border-border bg-surface-card p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
             {t("dashboard.identity_section")}
           </h2>
           <Link
@@ -259,7 +259,7 @@ export default function DashboardPage() {
           {identity.score_history.length > 1 && (
             <div>
               <ScoreSparkline scores={identity.score_history} width={100} height={36} />
-              <p className="mt-1 text-xs text-foreground-tertiary">{t("dashboard.score_trend")}</p>
+              <p className="mt-1 text-xs text-foreground-muted">{t("dashboard.score_trend")}</p>
             </div>
           )}
         </div>
@@ -269,7 +269,7 @@ export default function DashboardPage() {
         {/* Active strategy progress */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
               {t("dashboard.active_strategy")}
             </h2>
             {active_strategy && (
@@ -319,7 +319,7 @@ export default function DashboardPage() {
         {/* Priority tasks */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
               {t("dashboard.priority_tasks")}
             </h2>
             <Link
@@ -353,7 +353,7 @@ export default function DashboardPage() {
                   <span
                     className={`text-sm ${
                       task.completed
-                        ? "text-foreground-tertiary line-through"
+                        ? "text-foreground-muted line-through"
                         : "text-foreground-secondary"
                     }`}
                   >
@@ -372,7 +372,7 @@ export default function DashboardPage() {
       {growth_strategy && (
         <div className="rounded-lg border border-border bg-surface-card p-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
               Growth Strategy
             </h2>
             <Link
@@ -407,7 +407,7 @@ export default function DashboardPage() {
 
       {/* Intelligence feed */}
       <div className="rounded-lg border border-border bg-surface-card p-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-foreground-muted">
           {t("dashboard.intelligence_feed")}
         </h2>
         {intelligence_feed.length > 0 ? (

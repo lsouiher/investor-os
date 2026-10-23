@@ -51,7 +51,7 @@ export default function RadarChart({ data, size = 300 }: RadarChartProps) {
   if (axes.length === 0) {
     return (
       <div
-        className="flex items-center justify-center text-sm text-foreground-tertiary"
+        className="flex items-center justify-center text-sm text-foreground-muted"
         style={{ width: size, height: size }}
       >
         No data available

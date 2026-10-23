@@ -236,7 +236,7 @@ export default function IdentityHubPage() {
                     {status === "completed" && (
                       <button
                         onClick={() => router.push(`/audits/${auditDef.type}`)}
-                        className="text-sm text-foreground-muted hover:text-foreground-secondary underline"
+                        className="text-sm text-foreground-muted hover:text-foreground-strong underline"
                       >
                         {t("audit.action.update")}
                       </button>
@@ -250,7 +250,7 @@ export default function IdentityHubPage() {
                         {t(auditDef.descriptionKey)}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-foreground-tertiary">
+                        <span className="text-xs text-foreground-muted">
                           ~{auditDef.estimatedMinutes} min
                         </span>
                         <button
@@ -265,7 +265,7 @@ export default function IdentityHubPage() {
 
                   {/* Collapsed content for non-recommended, non-completed */}
                   {!isRecommended && status === "not_started" && (
-                    <p className="mt-1 text-xs text-foreground-tertiary">
+                    <p className="mt-1 text-xs text-foreground-muted">
                       ~{auditDef.estimatedMinutes} min
                     </p>
                   )}
@@ -294,7 +294,7 @@ export default function IdentityHubPage() {
       {/* Footer */}
       {completedCount < 5 && (
         <div className="mt-8 text-center">
-          <p className="text-sm text-foreground-tertiary">
+          <p className="text-sm text-foreground-muted">
             {t("hub.complete_all")}
           </p>
         </div>

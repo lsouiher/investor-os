@@ -63,7 +63,7 @@ export default function UnlockCelebration({ pathType, onDismiss }: UnlockCelebra
       </div>
       <button
         onClick={() => { setVisible(false); onDismiss(); }}
-        className="absolute right-2 top-2 text-foreground-tertiary hover:text-foreground-secondary"
+        className="absolute right-2 top-2 text-foreground-muted hover:text-foreground-strong"
         aria-label={t("common.dismiss")}
       >
         ×

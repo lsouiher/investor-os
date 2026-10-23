@@ -59,7 +59,7 @@ export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
         <span className="text-sm font-semibold text-foreground-secondary">
           {t("growth.cross_path_connections", { count: String(links.length) })}
         </span>
-        <span className={`text-foreground-tertiary transition-transform ${expanded ? "rotate-90" : ""}`}>
+        <span className={`text-foreground-muted transition-transform ${expanded ? "rotate-90" : ""}`}>
           ›
         </span>
       </button>

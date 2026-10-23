@@ -28,7 +28,8 @@
  * chart-1..3            --chart-1..3              (SVG fill/stroke via var())
  *
  * Not in brand.md (Investor OS only): --foreground-secondary (= ink-muted in
- * light), --foreground-tertiary (placeholders and disabled only, see
+ * light), --foreground-tertiary (placeholders, disabled controls and decorative
+ * fills only: 2.5:1 on white, never readable text; see
  * docs/brand-notes.md), --accent-tint (amber-tinted callout and badge
  * background), --score-* (readiness score on the navy identity card).
  */

@@ -249,7 +249,7 @@ export default function SimulationPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left: Current identity */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-muted">
             {t("simulation.current")}
           </h3>
           <p className="mb-1 text-lg font-bold text-foreground-strong">
@@ -263,7 +263,7 @@ export default function SimulationPage() {
 
         {/* Center: Sliders */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-muted">
             {t("simulation.adjust")}
           </h3>
           <div className="space-y-5">
@@ -288,7 +288,7 @@ export default function SimulationPage() {
                   }
                   className="w-full accent-accent"
                 />
-                <div className="flex justify-between text-xs text-foreground-tertiary">
+                <div className="flex justify-between text-xs text-foreground-muted">
                   <span>{variable.min}</span>
                   <span>{variable.max}</span>
                 </div>
@@ -309,7 +309,7 @@ export default function SimulationPage() {
 
         {/* Right: Simulated result */}
         <div className="rounded-lg border border-border bg-surface-card p-6">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-tertiary">
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground-muted">
             {t("simulation.simulated")}
           </h3>
           {result ? (
@@ -334,7 +334,7 @@ export default function SimulationPage() {
                           ? "font-medium text-emerald-600"
                           : change.delta < 0
                             ? "font-medium text-red-600"
-                            : "text-foreground-tertiary"
+                            : "text-foreground-muted"
                       }
                     >
                       {change.delta > 0 ? "+" : ""}
@@ -348,7 +348,7 @@ export default function SimulationPage() {
               </p>
             </>
           ) : (
-            <div className="flex h-48 items-center justify-center text-sm text-foreground-tertiary">
+            <div className="flex h-48 items-center justify-center text-sm text-foreground-muted">
               {t("simulation.no_results")}
             </div>
           )}

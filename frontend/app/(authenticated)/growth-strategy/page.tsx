@@ -326,7 +326,7 @@ export default function GrowthStrategyPage() {
           </p>
           <button
             onClick={() => setShowFirstVisitHero(false)}
-            className="mt-1 text-xs text-foreground-tertiary hover:text-foreground-secondary"
+            className="mt-1 text-xs text-foreground-muted hover:text-foreground-strong"
           >
             {t("common.dismiss")}
           </button>
@@ -361,7 +361,7 @@ export default function GrowthStrategyPage() {
       {/* Stub paths (collapsed section) */}
       {stubPaths.length > 0 && (
         <details className="group">
-          <summary className="cursor-pointer text-sm font-medium text-foreground-muted hover:text-foreground-secondary">
+          <summary className="cursor-pointer text-sm font-medium text-foreground-muted hover:text-foreground-strong">
             {t("growth.future_paths")}
             <span className="ml-1 transition-transform group-open:rotate-90">›</span>
           </summary>

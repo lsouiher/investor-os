@@ -218,7 +218,7 @@ export default function TasksPage() {
               <div className="flex items-center gap-2">
                 <p
                   className={`text-sm font-medium ${
-                    task.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"
+                    task.is_completed ? "text-foreground-muted line-through" : "text-foreground-strong"
                   }`}
                 >
                   {task.title}

@@ -277,7 +277,7 @@ export default function IdentityPage() {
               </button>
             ))}
           </div>
-          <p className="mt-2 text-xs text-foreground-tertiary">{t("identity.feedback_scale")}</p>
+          <p className="mt-2 text-xs text-foreground-muted">{t("identity.feedback_scale")}</p>
           {feedbackRating !== null && (
             <div className="mx-auto mt-4 flex max-w-md flex-col gap-2">
               <textarea

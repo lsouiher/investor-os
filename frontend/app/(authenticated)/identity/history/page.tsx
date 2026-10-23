@@ -149,7 +149,7 @@ export default function IdentityHistoryPage() {
                   <span className="text-sm font-semibold text-foreground-strong">
                     v{version.version}
                   </span>
-                  <span className="text-xs text-foreground-tertiary">
+                  <span className="text-xs text-foreground-muted">
                     {new Date(version.generated_at).toLocaleDateString()}
                   </span>
                 </div>
@@ -174,7 +174,7 @@ export default function IdentityHistoryPage() {
             {/* Version A */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-foreground-tertiary">
+                <span className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                   v{versionA.version}
                 </span>
                 <span className={`text-xl font-bold ${scoreColorClass(versionA.readiness_score)}`}>
@@ -192,7 +192,7 @@ export default function IdentityHistoryPage() {
             {versionB ? (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground-tertiary">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
                     v{versionB.version}
                   </span>
                   <span className={`text-xl font-bold ${scoreColorClass(versionB.readiness_score)}`}>
@@ -206,7 +206,7 @@ export default function IdentityHistoryPage() {
                 <p className="text-xs text-foreground-muted">{versionB.headline_insight}</p>
               </div>
             ) : (
-              <div className="flex items-center justify-center text-sm text-foreground-tertiary">
+              <div className="flex items-center justify-center text-sm text-foreground-muted">
                 {t("identity_history.select_second")}
               </div>
             )}

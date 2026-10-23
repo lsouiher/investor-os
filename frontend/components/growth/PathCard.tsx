@@ -109,7 +109,7 @@ export default function PathCard({
             <span className="text-sm text-foreground-muted">
               {completedActionItems}/{actionItemCount} {t("growth_path.action_items")}
             </span>
-            <span className="text-foreground-tertiary">→</span>
+            <span className="text-foreground-muted">→</span>
           </div>
         </div>
         {/* Progress bar */}
@@ -196,7 +196,7 @@ export default function PathCard({
         <p className="mt-2 text-xs text-foreground-muted">{unlockCriteria}</p>
       )}
       {unlockProgress && (
-        <p className="mt-1 text-xs text-foreground-tertiary">{unlockProgress}</p>
+        <p className="mt-1 text-xs text-foreground-muted">{unlockProgress}</p>
       )}
     </div>
   );

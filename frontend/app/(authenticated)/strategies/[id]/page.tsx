@@ -330,7 +330,7 @@ export default function StrategyDetailPage() {
               className={`border-b-2 pb-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
                   ? "border-accent text-accent-text"
-                  : "border-transparent text-foreground-muted hover:text-foreground-secondary"
+                  : "border-transparent text-foreground-muted hover:text-foreground-strong"
               }`}
             >
               {tab.label}
@@ -351,7 +351,7 @@ export default function StrategyDetailPage() {
               <div className="min-w-0 flex-1">
                 <p
                   className={`text-sm font-medium ${
-                    item.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"
+                    item.is_completed ? "text-foreground-muted line-through" : "text-foreground-strong"
                   }`}
                 >
                   {item.title}
@@ -363,7 +363,7 @@ export default function StrategyDetailPage() {
             </div>
           ))}
           {actionItems.length === 0 && !planPending && (
-            <p className="py-8 text-center text-sm text-foreground-tertiary">
+            <p className="py-8 text-center text-sm text-foreground-muted">
               {t("strategy.empty.actions")}
             </p>
           )}
@@ -397,7 +397,7 @@ export default function StrategyDetailPage() {
                     <div className="min-w-0 flex-1">
                       <p
                         className={`text-sm ${
-                          task.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-secondary"
+                          task.is_completed ? "text-foreground-muted line-through" : "text-foreground-secondary"
                         }`}
                       >
                         {task.title}
@@ -407,7 +407,7 @@ export default function StrategyDetailPage() {
                       )}
                     </div>
                     {task.estimated_minutes != null && (
-                      <span className="flex-shrink-0 text-xs text-foreground-tertiary">
+                      <span className="flex-shrink-0 text-xs text-foreground-muted">
                         ~{task.estimated_minutes} min
                       </span>
                     )}
@@ -416,7 +416,7 @@ export default function StrategyDetailPage() {
               </div>
             </div>
           ) : (
-            <p className="py-8 text-center text-sm text-foreground-tertiary">
+            <p className="py-8 text-center text-sm text-foreground-muted">
               {planPending ? t("strategy.micro_plan.pending") : t("strategy.empty.micro_plan")}
             </p>
           )}

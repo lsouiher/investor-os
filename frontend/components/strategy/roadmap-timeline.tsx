@@ -25,7 +25,7 @@ export default function RoadmapTimeline({
 
   if (sorted.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-foreground-tertiary">
+      <p className="py-8 text-center text-sm text-foreground-muted">
         {t("roadmap.empty")}
       </p>
     );
@@ -51,7 +51,7 @@ export default function RoadmapTimeline({
                     ? "border-emerald-500 bg-emerald-500 text-white"
                     : isPast
                       ? "border-red-300 bg-surface-card text-red-400 hover:border-red-400"
-                      : "border-border bg-surface-card text-foreground-tertiary hover:border-accent hover:text-accent-text"
+                      : "border-border bg-surface-card text-foreground-muted hover:border-accent hover:text-accent-text"
                 }`}
                 title={milestone.is_completed ? t("roadmap.completed") : t("roadmap.mark_complete")}
               >
@@ -77,13 +77,13 @@ export default function RoadmapTimeline({
               <div className="flex items-center gap-2">
                 <h4
                   className={`text-sm font-semibold ${
-                    milestone.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"
+                    milestone.is_completed ? "text-foreground-muted line-through" : "text-foreground-strong"
                   }`}
                 >
                   {milestone.title}
                 </h4>
                 {milestone.target_date && (
-                  <span className="text-xs text-foreground-tertiary">
+                  <span className="text-xs text-foreground-muted">
                     {new Date(milestone.target_date).toLocaleDateString()}
                   </span>
                 )}
