@@ -183,7 +183,7 @@ export default function AuditFormShell({
                   ? "border-accent text-accent-text font-medium"
                   : isCompleted
                   ? "border-ok text-ok cursor-pointer hover:bg-surface-subtle"
-                  : "border-transparent text-foreground-tertiary cursor-not-allowed"
+                  : "border-transparent text-ink-faint cursor-not-allowed"
               }`}
             >
               {isCompleted && !isCurrent && (
@@ -286,7 +286,7 @@ export default function AuditFormShell({
           disabled={isFirstPage}
           className={`px-6 py-3 text-sm font-medium border border-border ${
             isFirstPage
-              ? "text-foreground-tertiary cursor-not-allowed"
+              ? "text-ink-faint cursor-not-allowed"
               : "text-foreground-secondary hover:bg-surface-subtle"
           }`}
         >

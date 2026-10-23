@@ -1,6 +1,6 @@
 # Brand and UI system — Investor OS and RECS
 
-v0.3, 2026-10-22 (v0.1 approved by Leo on the mockups; v0.2 adds §1's signature pairing; v0.3 lifts three light-mode pairs to their bars: `ink-muted` `#4B5563`, `on-accent` `#1A1A2E` with `accent-hover` `#F59E0B` so the hovered button keeps its text, and charts drawn on `surface` only, RECS's Q-37). One look for the whole ecosystem. Investor OS's current theme (`frontend/app/globals.css`) is the starting point; this document is the source of truth from here on, and both repos' token files are derived from it. Values below are hex so they paste into either repo's Tailwind `@theme`.
+v0.4, 2026-10-23 (v0.1 approved by Leo on the mockups; v0.2 adds §1's signature pairing; v0.4 adds the dark-mode edge on an inverse band, the app icon, `ink-faint`, the four tints, the two status colours for an inverse band and corrects three quoted ratios, from Investor OS's reconciliation; v0.3 lifts three light-mode pairs to their bars: `ink-muted` `#4B5563`, `on-accent` `#1A1A2E` with `accent-hover` `#F59E0B` so the hovered button keeps its text, and charts drawn on `surface` only, RECS's Q-37). One look for the whole ecosystem. Investor OS's current theme (`frontend/app/globals.css`) is the starting point; this document is the source of truth from here on, and both repos' token files are derived from it. Values below are hex so they paste into either repo's Tailwind `@theme`.
 
 ## 1. Feel
 
@@ -10,7 +10,7 @@ Dark navy and warm amber. Dense, numeric, calm: a tool a professional opens ever
 
 ## 2. Colour
 
-Every text colour below reaches 4.5:1 on the surface it is meant for. **Amber `#D97706` on white is 3.4:1, so it is never used for small text in light mode**; light-mode links and amber text use `accent-text`. On `surface-inverse` the accent is always the bright `#F59E0B` (7.2:1 on navy), whichever mode the page is in.
+Every text colour below reaches 4.5:1 on the surface it is meant for. **Amber `#D97706` on white is 3.2:1, so it is never used for small text in light mode**; light-mode links and amber text use `accent-text`. On `surface-inverse` the accent is always the bright `#F59E0B` (7.2:1 on navy), whichever mode the page is in.
 
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
@@ -24,9 +24,10 @@ Every text colour below reaches 4.5:1 on the surface it is meant for. **Amber `#
 | `ink-strong` | `#111827` | `#F9FAFB` | headings, key figures |
 | `ink-muted` | `#4B5563` | `#9CA3AF` | labels, captions (6.9:1 on `surface-subtle` in light mode) |
 | `ink-on-inverse` | `#F9FAFB` | `#F9FAFB` | text on `surface-inverse` |
-| `ink-muted-on-inverse` | `#A1A1B5` | `#A1A1B5` | labels on `surface-inverse` (6.9:1 on navy) |
+| `ink-muted-on-inverse` | `#A1A1B5` | `#A1A1B5` | labels on `surface-inverse` (6.7:1 on navy) |
+| `ink-faint` | `#9CA3AF` | `#6B7280` | placeholders, disabled controls and decorative dots only, never readable text (2.5:1 on white, 3.5:1 on dark `surface`) |
 | `accent` | `#D97706` | `#F59E0B` | primary button fill, focus ring, active tab, chart series 1 |
-| `accent-on-inverse` | `#F59E0B` | `#F59E0B` | the mark, active-route line and amber figures on `surface-inverse` |
+| `accent-on-inverse` | `#F59E0B` | `#F59E0B` | the mark, active-route line, amber figures and the `warn` status on `surface-inverse` (7.9:1 on navy, 8.9:1 on dark `background`) |
 | `accent-hover` | `#F59E0B` | `#D97706` | primary button hover (`on-accent` on it: 7.9:1 light, 5.4:1 dark) |
 | `accent-text` | `#B45309` | `#FBBF24` | links, amber text, selected labels |
 | `on-accent` | `#1A1A2E` | `#1A1A2E` | text on an accent fill: navy on amber in both modes (5.4:1 light, 7.9:1 dark); white on `#D97706` is 3.2:1 |
@@ -34,8 +35,14 @@ Every text colour below reaches 4.5:1 on the surface it is meant for. **Amber `#
 | `warn` | `#B45309` | `#FBBF24` | watch, benchmark miss |
 | `danger` | `#B91C1C` | `#F87171` | fail, negative |
 | `info` | `#475569` | `#94A3B8` | neutral notes (slate, not blue: blue is not in the palette) |
+| `ok-on-inverse` | `#34D399` | `#34D399` | the `ok` status on `surface-inverse` (8.9:1 on navy); light `ok` there is 2.6:1 |
+| `danger-on-inverse` | `#F87171` | `#F87171` | the `danger` status on `surface-inverse` (6.2:1 on navy); light `danger` there is 2.6:1 |
+| `accent-tint` | `#FFFBEB` | `#2A2418` | background of a selected row, an amber badge or a `warn` banner; `accent-text` on it 4.8:1 light, 9.2:1 dark |
+| `ok-tint` | `#ECFDF5` | `#16261F` | background of an `ok` badge or banner; `ok` on it 5.2:1 light, 8.2:1 dark |
+| `danger-tint` | `#FEF2F2` | `#2E1A1E` | background of a `danger` badge or banner; `danger` on it 5.9:1 light, 5.9:1 dark |
+| `info-tint` | `#F1F5F9` | `#1C2130` | background of an `info` badge or banner; `info` on it 6.9:1 light, 6.3:1 dark |
 
-Status is never the only signal: pair with the word or an icon (RECS AC-9 stays).
+Status is never the only signal: pair with the word or an icon (RECS AC-9 stays). A tint carries its own status colour's text, never `ink-muted`; `warn` uses `accent-tint`. On `surface-inverse` the status colours are the three `-on-inverse` tokens, in both modes.
 
 Charts, in layout order: `chart-1` = `accent`, `chart-2` = `#334155` light / `#CBD5E1` dark (slate), `chart-3` = `ok`. Charts are drawn on `surface` only, never on `surface-subtle` (light `accent` on it is 2.9:1); each series reaches 3:1 on `surface`; a legend names every series.
 
@@ -66,7 +73,14 @@ Weights: 400 body, 500 labels and nav, 600 headings and key figures. No 700. Fig
 ## 5. Components
 
 - **Header bar**: `surface-inverse` in both modes, 56 high. Wordmark left in `ink-on-inverse` 600 with the amber mark; nav right in `sm` 500; the primary action (Sign in, or the account menu) last. 2px `accent-on-inverse` line under the active route.
-- **Wordmarks**: text only for now. "Investor OS" and "RECS" set in Geist 600, letter-spacing −0.01em, with a 10px `accent-on-inverse` square before the name as the shared mark. Secondary line in `ink-muted`: "Real Estate Creative Systems".
+- **Inverse band in dark mode**: dark `surface-inverse` and dark `background` are both `#0F0F17`, so a band would vanish; an inverse band takes a 1px `border` edge on the side that faces the page (under a header, beside a sidebar, above a bottom bar). Light mode has no edge. The shared token values do not change for this: a darker navy is still too close to the page to read as a band.
+- **App icon and favicon**: the §1 mark as a 32-unit tile, `surface-inverse` light (`#1A1A2E`) under a 12-unit `accent-on-inverse` square, square corners, nothing else; the same file in both products and in both modes:
+
+  ```svg
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><rect width="32" height="32" fill="#1A1A2E"/><rect x="10" y="10" width="12" height="12" fill="#F59E0B"/></svg>
+  ```
+
+- **Wordmarks**: text only for now. "Investor OS" and "RECS" set in Geist 600, letter-spacing −0.01em, with a 10px `accent-on-inverse` square before the name as the shared mark (the app icon above is the same mark on its tile). Secondary line in `ink-muted`: "Real Estate Creative Systems".
 - **Primary button**: `accent` fill, `on-accent` text, radius 0, 36 high, `sm` 500. One per view. **Secondary**: 1px `border`, `ink` text, transparent. **Ghost**: text only, `accent-text`.
 - **Summary strip (RECS)**: a band on `surface-inverse` under the page title, in both modes; each item a `xs` uppercase label in `ink-muted-on-inverse` over a `2xl` mono figure in `ink-on-inverse`; status colour on the figure only when the deal check has a verdict for it; the amber of the band is the mark and the active item, not every figure.
 - **Section (RECS)**: a card on `surface`, title `lg` 600 with the collapse chevron, 24 padding; tables inside are edge-to-edge in the card.
@@ -82,6 +96,5 @@ Short, plain, numeric. Labels are nouns ("Cash needed"), buttons are verbs ("Sav
 
 ## 7. Open
 
-- A logo mark beyond the amber square.
-- Whether Investor OS adopts the `accent-text` rule for its light-mode links (today it uses `#D97706` text in places, which fails AA).
+- A logo mark beyond the amber square and its tile (the tile is the app icon from v0.4; a wordmark lockup is still open).
 - Whether dark should be the default when the browser states no preference. Not decided; the signature pairing shows in both modes either way.

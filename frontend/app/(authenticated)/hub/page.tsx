@@ -78,7 +78,7 @@ function StepIcon({ status }: { status: "completed" | "current" | "not_started" 
   }
   return (
     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-subtle">
-      <div className="h-2.5 w-2.5 rounded-full bg-foreground-tertiary" />
+      <div className="h-2.5 w-2.5 rounded-full bg-ink-faint" />
     </div>
   );
 }

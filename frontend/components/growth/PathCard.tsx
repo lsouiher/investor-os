@@ -187,7 +187,7 @@ export default function PathCard({
         {onGenerate && (
           <button
             onClick={onGenerate}
-            className="rounded-none border border-border px-3 py-1 text-xs text-foreground-muted hover:border-foreground-tertiary"
+            className="rounded-none border border-border px-3 py-1 text-xs text-foreground-muted hover:border-ink-faint"
           >
             {t("growth.path.generate_now")}
           </button>

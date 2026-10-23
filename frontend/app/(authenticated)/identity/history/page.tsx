@@ -136,7 +136,7 @@ export default function IdentityHistoryPage() {
               <div className="flex flex-col items-center">
                 <div
                   className={`h-3 w-3 rounded-full ${
-                    isSelected ? "bg-accent" : "bg-foreground-tertiary"
+                    isSelected ? "bg-accent" : "bg-ink-faint"
                   }`}
                 />
                 {idx < versions.length - 1 && (

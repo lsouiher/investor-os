@@ -155,14 +155,14 @@ export default function TasksPage() {
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder={t("tasks.form.title_placeholder")}
               required
-              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
             <input
               type="text"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
               placeholder={t("tasks.form.description_placeholder")}
-              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium text-foreground-secondary">{t("tasks.form.impact_label")}</label>
