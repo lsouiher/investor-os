@@ -71,6 +71,12 @@ status-on-inverse pair in §2 below. `--score-red/amber/emerald` are gone; their
 | growth path stripes `border-l-emerald/blue/purple-500`, fallback `border-l-gray-400` | `border-l-chart-3`/`chart-2`/`info`, fallback `border-l-border` (portfolio stays `chart-1`) |
 | export consent confirm `bg-gray-900 text-white` | the primary button (`bg-accent text-on-accent`, square) |
 | identity card `to-purple-900/10` gradient, `text-white` score | `to-transparent`, `text-ink-on-inverse` |
+| secondary/ghost buttons, checkboxes, the 1–5 rating buttons, selectable rows (`rounded`/`-md`/`-lg`/`-full`) | `rounded-none` (§4: controls and buttons 0) |
+| panels and callouts at `rounded-md` (6px), the identity card at `rounded-xl` (12px), one banner at `rounded` | `rounded-lg` (8px, §4: cards) |
+| small badges and tags at `rounded` (4px) | `rounded-full` (§4: pills 999) |
+| card `shadow-sm` (auth cards, landing example card, hub, hover lifts) | none; auth cards get a 1px `border`, hovers change colour instead |
+| dialog `shadow-xl`/`shadow-lg` | `shadow-dialog` = §4's `0 10px 30px rgb(0 0 0 / .25)` (new `@theme` token) |
+| growth export button `bg-foreground-strong text-background` (black in light, white in dark) | the §5 secondary: `border border-border text-foreground` |
 
 `grep -rnoE '[a-z:]*amber-[0-9]+' frontend/app frontend/components` returns nothing, and
 neither does the same grep for `red|emerald|gray|blue|purple|green|yellow`.
@@ -121,11 +127,19 @@ neither does the same grep for `red|emerald|gray|blue|purple|green|yellow`.
 
 Left as they were (follow-ups, not regressions):
 
-- Other radii: secondary buttons and some badges still use `rounded-md`/`rounded-lg`, and the
-  identity card uses `rounded-xl`.
 - Code comments, the backend `package.json` description and the Dockerfile headers still say
   "InvestorOS"; every string a user sees (page title, copy, locales, the PDF blueprint, the
   growth export and the reset email) says "Investor OS".
+
+Kept on purpose: the contacts and tasks filter chips stay pills (`rounded-full`), being
+pills, and the roadmap's milestone nodes stay circles, being timeline markers rather than
+checkboxes. Loading skeletons for text lines keep 4px.
+
+Seen in the browser: every signed-in page (dashboard, hub, identity, history, strategies,
+strategy detail, tasks, contacts, simulation, growth strategy, an audit) in light and dark
+at 1280px, and dashboard and identity at 390px, with a seeded user against the mock AI. That
+pass caught the export button above. Path icons are emoji, which the headless browser had no
+font for; a real browser draws them.
 
 ## 3. Proposed for v0.4
 
