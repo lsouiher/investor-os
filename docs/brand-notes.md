@@ -1,9 +1,9 @@
 # Brand notes: Investor OS on brand.md
 
-Working notes on carrying `docs/brand.md` (v0.3, copied unchanged from RECS) into Investor OS,
-branch `brand/brand-md-v03`. brand.md stays the source of truth and nothing here changes it.
-The items under "Proposed for v0.4" are for the next brand.md revision, which gets made in
-RECS first.
+Working notes on carrying `docs/brand.md` (v0.4, copied unchanged from RECS) into Investor OS.
+v0.3 went in on branch `brand/brand-md-v03`; v0.4 on `brand/brand-md-v04`, cut from it. brand.md
+stays the source of truth and nothing here changes it. §3 records what v0.4 adopted from this
+file's proposals and two inconsistencies left in v0.4 itself, for the next revision in RECS.
 
 `frontend/app/globals.contrast.test.ts` holds the two in step: it fails if a `globals.css`
 value drifts from brand.md §2, or if a pair §2 names drops below its contrast bar.
@@ -25,12 +25,17 @@ value drifts from brand.md §2, or if a pair §2 names drops below its contrast 
 | `ink-muted` | `--foreground-muted` | `#4B5563` | `#9CA3AF` | none (v0.3 commit) |
 | `ink-on-inverse` | `--ink-on-inverse` | `#F9FAFB` | `#F9FAFB` | new |
 | `ink-muted-on-inverse` | `--ink-muted-on-inverse` | `#A1A1B5` | `#A1A1B5` | new |
+| `ink-faint` | `--ink-faint` | `#9CA3AF` | `#6B7280` | v0.4: renamed from `--foreground-tertiary` |
 | `accent` | `--accent` | `#D97706` | `#F59E0B` | none (v0.3 commit) |
 | `accent-on-inverse` | `--accent-on-inverse` | `#F59E0B` | `#F59E0B` | new |
 | `accent-hover` | `--accent-hover` | `#F59E0B` | `#D97706` | none (v0.3 commit) |
 | `accent-text` | `--accent-text` | `#B45309` | `#FBBF24` | new |
 | `on-accent` | `--on-accent` | `#1A1A2E` | `#1A1A2E` | none (v0.3 commit) |
 | `ok` / `warn` / `danger` / `info` | same names | §2 values | §2 values | new |
+| `ok-on-inverse` / `danger-on-inverse` | same names | `#34D399` / `#F87171` | same | v0.4 names them |
+| `accent-tint` / `danger-tint` | same names | §2 values | §2 values | v0.4 names them |
+| `ok-tint` | `--ok-tint` | `#ECFDF5` | `#16261F` | v0.4: dark was `#172A24` |
+| `info-tint` | `--info-tint` | `#F1F5F9` | `#1C2130` | v0.4: dark was `#1E2433` |
 | `chart-1..3` | `--chart-1..3` | accent / `#334155` / ok | accent / `#CBD5E1` / ok | new |
 
 Each has a Tailwind `@theme` colour (`text-accent-text`, `bg-surface-dark`, `text-ok`...).
@@ -38,8 +43,8 @@ Radii follow §4: `--radius-button` 0, `--radius-default` 4 (inputs), `--radius-
 new `--radius-pill` 999.
 
 Kept, not in brand.md: `--foreground-secondary` (same as `ink-muted` in light, `#D1D5DB`
-dark), `--foreground-tertiary` (see v0.4 below). Added, not in brand.md: the tints and the
-status-on-inverse pair in §2 below. `--score-red/amber/emerald` are gone; their users now take
+dark). Since v0.4 every other Investor OS colour variable is a brand.md token, and the drift
+test maps all of them. `--score-red/amber/emerald` are gone; their users now take
 `danger`/`accent`/`ok`, or the on-inverse pair on the identity card.
 
 ### Classes
@@ -57,6 +62,9 @@ status-on-inverse pair in §2 below. `--score-red/amber/emerald` are gone; their
 | `focus:ring-amber-500`, `focus:border-amber-500` | `focus:ring-accent`, `focus:border-accent` |
 | `accent-amber-600` (range input), `from-amber-600/10` | `accent-accent`, `from-accent/10` |
 | `text-foreground-tertiary` on readable text (51 places) | `text-foreground-muted` |
+| the remaining `foreground-tertiary` (v0.4, 11 places) | `ink-faint`: placeholders in `tasks/page.tsx` and `contact-form.tsx`, the two disabled states in `audit-form-shell.tsx`, status dots in `hub/page.tsx` and `identity/history/page.tsx`, one hover border in `PathCard.tsx` |
+| `bg-accent/10` (landing eyebrow, "built by" tile), `bg-danger-tint/30` (two badges) | `bg-accent-tint`, `bg-danger-tint` (v0.4) |
+| `foreground-secondary`/`-muted` text on `accent-tint` (next-best-action reasons ×3, tasks form impact label, selected history row, hovered rating buttons) | `text-accent-text` (v0.4: a tint carries its own status colour's text) |
 | primary buttons `rounded`/`rounded-md`/`rounded-lg`; text inputs `rounded-lg` | `rounded-none`; `rounded` (4px) |
 | `text-red-500/600/700` (+ `dark:text-red-300/400`), `text-score-red` | `text-danger` |
 | `text-emerald-500/600/700` (+ `dark:text-emerald-300/400`) | `text-ok` |
@@ -79,20 +87,21 @@ status-on-inverse pair in §2 below. `--score-red/amber/emerald` are gone; their
 | growth export button `bg-foreground-strong text-background` (black in light, white in dark) | the §5 secondary: `border border-border text-foreground` |
 
 `grep -rnoE '[a-z:]*amber-[0-9]+' frontend/app frontend/components` returns nothing, and
-neither does the same grep for `red|emerald|gray|blue|purple|green|yellow`.
+neither does the same grep for `red|emerald|gray|blue|purple|green|yellow` (rechecked for v0.4),
+or for `foreground-tertiary`. The two opacity fills left carry no text, so they are not tints:
+the hub's `bg-ok/40` progress connector and the identity card's `from-accent/10` glow on navy.
 
 ## 2. Changes beyond brand.md's letter
 
-- **`--accent-tint`** (`#FFFBEB` light, `#2A2418` dark): brand.md has no tinted background,
-  and Investor OS uses one for amber callouts and badges. `accent-text` on it is 4.8:1 and
-  9.2:1. Callout borders use `border-accent/30`, not a new token.
-- **Status tints**, the same idea for the other three status colours: `--ok-tint`
-  (`#ECFDF5` / `#172A24`), `--danger-tint` (`#FEF2F2` / `#2E1A1E`), `--info-tint`
-  (`#F1F5F9` / `#1E2433`). Each status colour reads 4.5:1 on its own tint in both modes
-  (ok 5.2 / 7.8, danger 5.9 / 5.9, info 6.9 / 6.0); the contrast test asserts it.
-- **Status on `surface-inverse`**: `--ok-on-inverse` `#34D399` and `--danger-on-inverse`
-  `#F87171`, the same in both modes (brand.md's dark `ok`/`danger`), for scores on the navy
-  identity card: 8.9:1 and 6.2:1 on navy. See the v0.4 item below.
+- **Tints and status on `surface-inverse`** started here and are brand.md tokens since v0.4
+  (§3). Callout borders still use `border-accent/30` (and `danger/30`, `ok/30`), not a token.
+- **Dark-mode band edges (v0.4 §5).** Every inverse band takes `dark:border-border` on the
+  side facing the page: under the signed-out `SiteHeader` and the phone header, right of the
+  sidebar, above the phone tab bar. The tab bar's edge is on the `<nav>`, not the items,
+  since each item already has `border-t-2` (transparent, or amber when active).
+- **App icon (v0.4 §5).** `frontend/app/icon.svg` is §5's SVG as written. The create-next-app
+  `favicon.ico` is deleted: Next 16 emits a `sizes="any"` link for each, and the browser could
+  keep the old one.
 - **The sidebar is the header bar on its side.** §5 describes a horizontal header with a line
   *under* the active route. Investor OS's signed-in shell has a left sidebar on desktop and a
   bottom tab bar on phones. Both are on `surface-inverse` now. The active line sits on the
@@ -116,8 +125,8 @@ neither does the same grep for `red|emerald|gray|blue|purple|green|yellow`.
   brand.md spends colour on status, not decoration, and has no blue or purple; the stripes
   now take the chart series in layout order and then `info`. The path name and icon always
   sit beside the stripe.
-- **Disabled controls keep `foreground-tertiary`.** These are the two `cursor-not-allowed`
-  states in the audit form. WCAG 1.4.3 exempts inactive components.
+- **Disabled controls take `ink-faint`** (was `foreground-tertiary`). These are the two
+  `cursor-not-allowed` states in the audit form. WCAG 1.4.3 exempts inactive components.
 - **Dead hovers.** `text-foreground-muted hover:text-foreground-secondary` changed nothing in
   light mode, because both are `#4B5563`. These hovers now go to `foreground-strong`.
 - **Calculators link.** It opens RECS in a new tab, and it appears in the sidebar nav, the
@@ -141,70 +150,35 @@ at 1280px, and dashboard and identity at 390px, with a seeded user against the m
 pass caught the export button above. Path icons are emoji, which the headless browser had no
 font for; a real browser draws them.
 
-## 3. Proposed for v0.4
+## 3. brand.md v0.4
 
-### `foreground-tertiary`: never readable text
+### Adopted from the v0.3 proposals
 
-Investor OS has a fourth text grey that brand.md does not name: `--foreground-tertiary`.
-It is `#9CA3AF` in light (2.5:1 on white, 2.4:1 on the page) and `#6B7280` in dark (3.5:1 on
-`surface`). It was used for 51 pieces of readable text: section headings, dates, empty-state
-messages, disclaimers, completed (struck-through) items and the sidebar footer links.
+- `ink-faint` (`#9CA3AF` / `#6B7280`) for placeholders, disabled controls and decorative dots,
+  never readable text. Investor OS renamed `--foreground-tertiary` to it rather than mapping
+  the old name.
+- The four tints and `ok-/danger-on-inverse`, plus the rule that a tint carries its own status
+  colour's text, never `ink-muted`. v0.4 changes two dark tints: `ok-tint` `#16261F` (ok on it
+  8.2:1, was 7.8 on `#172A24`) and `info-tint` `#1C2130` (info 6.3:1, was 6.0 on `#1E2433`).
+- The dark band: v0.4 keeps the shared token values and adds a 1px `border` edge on the side
+  of an inverse band that faces the page (§5). The default stays "follow the system".
+- The app icon: the amber square on a navy tile (§5). A wordmark lockup is still open (§7).
+- The three corrected ratios, and §7's link item is closed.
 
-**Chosen fix:** move readable text to `ink-muted` (`--foreground-muted`, 7.6:1 light and
-6.7:1 dark on `surface`) instead of raising the token. brand.md has three text greys. A fourth
-one that passed 4.5:1 on `surface-subtle` would land within a few points of `ink-muted`, so it
-would not read as a separate step anyway. The token stays, documented in `globals.css` for
-placeholders, disabled controls and decorative fills (status dots) only.
+### Left over in v0.4 (for the next revision, in RECS)
 
-**Proposal:** add `ink-faint` to §2 with that restricted use, so both products name the same
-grey for placeholders and disabled states and nobody reaches for it for text:
+- **§2's intro still says `#F59E0B` is 7.2:1 on navy.** The `accent-on-inverse` row in the same
+  section now says 7.9:1, which is what it measures (7.94).
+- **The `ok-on-inverse` row says light `ok` on navy is 2.6:1.** `#047857` on `#1A1A2E` measures
+  3.1:1 (3.11). 2.6:1 is the light `danger` figure (`#B91C1C`, 2.64), which the next row quotes
+  correctly. Either way light `ok` fails 4.5:1 there, so the token itself is not affected.
 
-| Token | Light | Dark | Use |
-| --- | --- | --- | --- |
-| `ink-faint` | `#9CA3AF` | `#6B7280` | placeholders, disabled controls, decorative dots; never readable text |
+### Follow-up seen while mapping v0.4
 
-### Dark default, and the dark band
-
-Investor OS follows `prefers-color-scheme` and goes light when the browser states no
-preference (§7's open question). Settling this needs a related fix first. In dark mode,
-`surface-inverse` (`#0F0F17`) is the same value as `background` (`#0F0F17`), so the header
-band and sidebar disappear into the page (seen on the landing page). The signature pairing
-then only shows through the amber mark and the active line.
-
-**Proposal:**
-
-- Give dark `surface-inverse` a value of its own, or require a 1px `border` under the band in
-  dark mode.
-- Keep "follow the system, light when unstated". Light mode now carries the pairing at full
-  strength (a white page under a navy band), so a dark default would gain nothing.
-
-### Logo
-
-The mark is the 10px amber square, rendered in CSS (`components/shared/wordmark.tsx`). The
-favicon is still the create-next-app default.
-
-**Proposal:** formalise the square plus wordmark as an SVG in both repos, and ship an amber
-square on navy as the favicon and app icon. Leave anything beyond the square open until there
-is a reason to spend on it.
-
-### Smaller corrections to §2's text
-
-- `ink-muted-on-inverse` on navy is 6.7:1, not 6.9:1.
-- `#D97706` on white is 3.2:1, not 3.4:1.
-- `accent-on-inverse` on navy is 7.9:1, not 7.2:1.
-
-The tokens all pass. Only the quoted ratios are off.
-
-### Two additions
-
-- **Status colours on `surface-inverse`.** Investor OS needs them on the identity card, and
-  RECS will need them on the summary strip ("status colour on the figure"). The light
-  `danger` (`#B91C1C`) is about 2.6:1 on navy. Proposal: `ok-on-inverse` `#34D399` and
-  `danger-on-inverse` `#F87171` (the dark-mode values, as Investor OS now ships them), and
-  `accent-on-inverse` for watch/warn. Also name the tints (`ok-tint`, `danger-tint`,
-  `info-tint`, `accent-tint`) in §2.
-- **§7, the link rule:** Investor OS has now adopted `accent-text` for light-mode links and
-  amber text, so this item can close.
+- The identity card is a `surface-inverse` card on the page, not a band, so §5's edge rule
+  does not cover it. In dark mode it is `#0F0F17` on `#0F0F17` with no border, so only its
+  content and the faint `from-accent/10` glow show its edge. Worth a line in §5 (a 1px
+  `border` on an inverse card in dark mode too), or Investor OS can treat it as a band.
 
 ## 4. Contrast, before and after
 
@@ -258,7 +232,7 @@ how the tokens were used, which is what the next table shows.
 | Score text, dark (same classes, no dark pair, on `#1A1A2E`) | 3.5 ✗ / 4.5 | 6.2 / 8.9 |
 | Identity card sub-scores on navy, light (red-600 / emerald-600) | 3.5 ✗ / 4.5 | 6.2 / 8.9 (on-inverse) |
 | Error banner text (red-700 on red-50 → danger on danger-tint), light / dark | 5.9 / 8.5 | 5.9 / 5.9 |
-| Success badge text (emerald-700 on emerald-100 → ok on ok-tint), light | 4.8 | 5.2 |
+| Success badge text (emerald-700 on emerald-100 → ok on ok-tint), light / dark | 4.8 / — | 5.2 / 8.2 |
 | Completed checkbox tick (white on emerald-500) | 2.5 ✗ | 5.5 light / 8.9 dark |
 
 The callouts lose some contrast in return for sitting on brand tokens. Both modes still clear
