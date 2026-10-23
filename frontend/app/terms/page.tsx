@@ -16,7 +16,7 @@ export default function TermsPage() {
 
         <Section title="What this is">
           <p>
-            InvestorOS is a planning tool for real estate investors, in beta. You answer five short
+            Investor OS is a planning tool for real estate investors, in beta. You answer five short
             audits about your finances, time, skills, risk and goals; it builds an investor identity
             (an archetype and a readiness score), suggests strategies that fit, and lays out plans.
             It is free during the beta. Features will change, some say &ldquo;Coming Soon&rdquo;, and you
@@ -26,7 +26,7 @@ export default function TermsPage() {
 
         <Section title="Not financial, legal or tax advice">
           <p>
-            Everything InvestorOS produces is generated from your own answers to help you think. It
+            Everything Investor OS produces is generated from your own answers to help you think. It
             is not financial, investment, legal or tax advice, it does not know your full situation,
             and it can be wrong. Check any decision with a licensed professional before you act on
             it. You are responsible for your investments.
@@ -92,7 +92,7 @@ export default function TermsPage() {
         </Section>
 
         <p className="mt-10 text-sm text-foreground-muted">
-          <Link href="/" className="text-accent-text underline underline-offset-2">Back to InvestorOS</Link>
+          <Link href="/" className="text-accent-text underline underline-offset-2">Back to Investor OS</Link>
         </p>
       </article>
     </div>

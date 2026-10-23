@@ -25,11 +25,11 @@ export async function sendPasswordResetEmail(to: string, token: string): Promise
   }
 
   const { error } = await resend.emails.send({
-    from: process.env.EMAIL_FROM || 'InvestorOS <onboarding@resend.dev>',
+    from: process.env.EMAIL_FROM || 'Investor OS <onboarding@resend.dev>',
     to,
-    subject: 'Reset your InvestorOS password',
+    subject: 'Reset your Investor OS password',
     text: [
-      'Someone asked to reset the password for this InvestorOS account.',
+      'Someone asked to reset the password for this Investor OS account.',
       '',
       `Reset it here (the link works for one hour): ${resetUrl}`,
       '',

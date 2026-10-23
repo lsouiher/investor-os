@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "InvestorOS — Build Your Investor Identity",
+  title: "Investor OS — Build Your Investor Identity",
   description:
     "Complete 5 short audits to discover your archetype, readiness score, and personalized investment strategies.",
 };

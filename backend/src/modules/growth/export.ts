@@ -89,7 +89,7 @@ strategy_progress: ${strategy.overallProgress}
 growth_score: ${strategy.growthScore}
 ---
 
-# InvestorOS Growth Strategy Export
+# Investor OS Growth Strategy Export
 
 ${narrativeSummary}
 
