@@ -1,8 +1,7 @@
 # Brand notes: Investor OS on brand.md
 
 Working notes on carrying `docs/brand.md` (v0.4 as corrected on 2026-10-23, copied unchanged
-from RECS) into Investor OS.
-v0.3 went in on branch `brand/brand-md-v03`; v0.4 on `brand/brand-md-v04`, cut from it. brand.md
+from RECS) into Investor OS. v0.3 and v0.4 reached master together in PR #9. brand.md
 stays the source of truth and nothing here changes it. §3 records what v0.4 adopted from this
 file's proposals and what the same-day correction settled.
 
