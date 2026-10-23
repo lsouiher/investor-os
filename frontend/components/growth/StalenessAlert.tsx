@@ -17,7 +17,7 @@ export default function StalenessAlert({
   if (!isStale) return null;
 
   return (
-    <div className="w-full rounded-md border border-accent/30 bg-accent-tint px-4 py-3">
+    <div className="w-full rounded-lg border border-accent/30 bg-accent-tint px-4 py-3">
       <div className="flex items-start gap-3">
         <svg
           className="mt-0.5 h-5 w-5 flex-shrink-0 text-accent"

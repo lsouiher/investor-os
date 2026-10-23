@@ -309,7 +309,7 @@ export default function GrowthStrategyPage() {
           {strategy.next_best_action.cross_path_impact.length > 0 && (
             <div className="mt-2 flex gap-2">
               {strategy.next_best_action.cross_path_impact.map((impact) => (
-                <span key={impact} className="rounded bg-accent-tint px-2 py-0.5 text-xs text-accent-text">
+                <span key={impact} className="rounded-full bg-accent-tint px-2 py-0.5 text-xs text-accent-text">
                   {PATH_NAMES[impact] || impact}
                 </span>
               ))}
@@ -334,7 +334,7 @@ export default function GrowthStrategyPage() {
       )}
 
       {error && (
-        <div className="rounded border border-danger/30 bg-danger-tint px-4 py-2 text-sm text-danger">
+        <div className="rounded-lg border border-danger/30 bg-danger-tint px-4 py-2 text-sm text-danger">
           {error}
         </div>
       )}

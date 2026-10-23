@@ -86,7 +86,7 @@ export default function IdentityCard({
   const { t } = useTranslation();
   return (
     <div
-      className="relative w-full overflow-hidden rounded-xl"
+      className="relative w-full overflow-hidden rounded-lg"
       style={{
         backgroundColor: "var(--surface-dark)",
         aspectRatio: "16 / 9",

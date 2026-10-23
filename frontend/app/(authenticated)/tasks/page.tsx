@@ -202,7 +202,7 @@ export default function TasksPage() {
           >
             <button
               onClick={() => toggleTask(task.id)}
-              className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
+              className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-none border transition-colors ${
                 task.is_completed
                   ? "border-ok bg-ok text-surface-card"
                   : "border-border hover:border-accent"
@@ -224,14 +224,14 @@ export default function TasksPage() {
                   {task.title}
                 </p>
                 <span
-                  className={`rounded px-1.5 py-0.5 text-xs font-medium ${
+                  className={`rounded-full px-1.5 py-0.5 text-xs font-medium ${
                     IMPACT_STYLES[impactOf(task)]
                   }`}
                 >
                   {t(`tasks.impact.${impactOf(task)}`)}
                 </span>
                 {task.source !== "manual" && (
-                  <span className="rounded bg-info-tint px-1.5 py-0.5 text-xs text-info">
+                  <span className="rounded-full bg-info-tint px-1.5 py-0.5 text-xs text-info">
                     {t(`tasks.source.${task.source}`)}
                   </span>
                 )}

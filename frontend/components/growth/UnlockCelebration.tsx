@@ -46,7 +46,7 @@ export default function UnlockCelebration({ pathType, onDismiss }: UnlockCelebra
     <div
       role="alert"
       aria-live="polite"
-      className={`fixed right-4 top-4 z-50 w-80 rounded-lg border-2 border-accent bg-surface-card p-4 shadow-lg ${
+      className={`fixed right-4 top-4 z-50 w-80 rounded-lg border-2 border-accent bg-surface-card p-4 shadow-dialog ${
         prefersReducedMotion ? "" : "animate-slide-in-right"
       }`}
     >

@@ -170,7 +170,7 @@ export default function LandingPage() {
 
 function ExampleCard({ t }: { t: (key: string, params?: Record<string, string | number>) => string }) {
   return (
-    <div className="relative mx-auto w-full max-w-sm border border-border bg-surface-card p-6 shadow-sm" style={{ borderRadius: "var(--radius-card)" }}>
+    <div className="relative mx-auto w-full max-w-sm border border-border bg-surface-card p-6" style={{ borderRadius: "var(--radius-card)" }}>
       <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wider text-foreground-muted">
         {t("landing.example_label")}
       </span>

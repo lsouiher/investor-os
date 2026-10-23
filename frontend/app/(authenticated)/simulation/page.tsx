@@ -343,7 +343,7 @@ export default function SimulationPage() {
                   </div>
                 ))}
               </div>
-              <p className="mt-4 rounded-md bg-accent-tint p-3 text-xs text-accent-text">
+              <p className="mt-4 rounded-lg bg-accent-tint p-3 text-xs text-accent-text">
                 {result.insight}
               </p>
             </>

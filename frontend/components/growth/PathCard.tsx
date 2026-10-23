@@ -81,7 +81,7 @@ export default function PathCard({
             <span className="text-lg">{icon}</span>
             <span className="font-medium text-foreground-secondary">{name}</span>
           </div>
-          <span className="rounded bg-accent-tint px-2 py-0.5 text-xs font-medium text-accent-text">
+          <span className="rounded-full bg-accent-tint px-2 py-0.5 text-xs font-medium text-accent-text">
             {t("growth.path.coming_soon")}
           </span>
         </div>
@@ -94,7 +94,7 @@ export default function PathCard({
     return (
       <Link
         href={`/growth-strategy/${pathType}`}
-        className={`block rounded-lg border border-border border-l-2 ${accentColor} bg-surface-card px-6 py-4 transition-shadow hover:shadow-sm`}
+        className={`block rounded-lg border border-border border-l-2 ${accentColor} bg-surface-card px-6 py-4 transition-colors hover:bg-surface-subtle`}
         role="article"
         aria-label={`${name} - ${progress}% complete`}
       >
@@ -104,7 +104,7 @@ export default function PathCard({
             <span className="font-semibold text-foreground-strong">{name}</span>
           </div>
           <div className="flex items-center gap-3">
-            <span className={`rounded px-2 py-0.5 text-xs font-medium ${scoreTierClass(progress)}`}>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${scoreTierClass(progress)}`}>
               {progress}%
             </span>
             <span className="text-sm text-foreground-muted">
@@ -187,7 +187,7 @@ export default function PathCard({
         {onGenerate && (
           <button
             onClick={onGenerate}
-            className="rounded border border-border px-3 py-1 text-xs text-foreground-muted hover:border-foreground-tertiary"
+            className="rounded-none border border-border px-3 py-1 text-xs text-foreground-muted hover:border-foreground-tertiary"
           >
             {t("growth.path.generate_now")}
           </button>

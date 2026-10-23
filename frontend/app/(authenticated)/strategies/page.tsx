@@ -201,7 +201,7 @@ export default function StrategiesPage() {
           )}
           <Link
             href={`/strategies/${primary.id}`}
-            className="rounded-lg border border-border px-5 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle"
+            className="rounded-none border border-border px-5 py-2.5 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle"
           >
             {t("strategies.view_details")}
           </Link>

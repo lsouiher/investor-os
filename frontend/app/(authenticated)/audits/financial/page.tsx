@@ -362,7 +362,7 @@ export default function FinancialAuditPage() {
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-border rounded w-1/3" />
           <div className="h-2 bg-border rounded w-full" />
-          <div className="h-64 bg-surface-subtle rounded" />
+          <div className="h-64 bg-surface-subtle rounded-lg" />
         </div>
       </div>
     );

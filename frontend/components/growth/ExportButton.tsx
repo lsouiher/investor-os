@@ -105,7 +105,7 @@ export default function ExportButton({
       <button
         onClick={handleClick}
         disabled={isDownloading}
-        className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+        className={`inline-flex items-center gap-2 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
           isStale
             ? "bg-accent text-on-accent hover:bg-accent-hover"
             : "bg-foreground-strong text-background hover:bg-foreground-secondary"
@@ -146,14 +146,14 @@ export default function ExportButton({
           role="dialog"
           aria-modal="true"
         >
-          <div className="mx-4 w-full max-w-md rounded-lg bg-surface-card p-6 shadow-xl">
+          <div className="mx-4 w-full max-w-md rounded-lg bg-surface-card p-6 shadow-dialog">
             <h2 className="text-lg font-semibold text-foreground-strong">
               {t("export.dialog_title")}
             </h2>
             <p className="mt-2 text-sm text-foreground-secondary">
               {t("export.description")}
             </p>
-            <div className="mt-3 rounded-md bg-accent-tint p-3">
+            <div className="mt-3 rounded-lg bg-accent-tint p-3">
               <p className="text-sm text-accent-text">
                 <strong>{t("export.sensitive_title")}</strong> {t("export.sensitive_text")}
               </p>
@@ -161,7 +161,7 @@ export default function ExportButton({
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={handleConsentCancel}
-                className="rounded border border-border px-4 py-2 text-sm text-foreground-secondary hover:bg-surface-subtle"
+                className="rounded-none border border-border px-4 py-2 text-sm text-foreground-secondary hover:bg-surface-subtle"
               >
                 {t("common.cancel")}
               </button>

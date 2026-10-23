@@ -235,7 +235,7 @@ export default function IdentityPage() {
         <button
           onClick={handleSynthesize}
           disabled={synthesizing}
-          className="rounded-lg border border-accent px-4 py-2 text-sm font-medium text-accent-text transition-colors hover:bg-accent-tint disabled:opacity-50"
+          className="rounded-none border border-accent px-4 py-2 text-sm font-medium text-accent-text transition-colors hover:bg-accent-tint disabled:opacity-50"
         >
           {t("identity.resynthesize")}
         </button>
@@ -267,7 +267,7 @@ export default function IdentityPage() {
               <button
                 key={n}
                 onClick={() => setFeedbackRating(n)}
-                className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-medium transition-colors ${
+                className={`flex h-10 w-10 items-center justify-center rounded-none border text-sm font-medium transition-colors ${
                   feedbackRating === n
                     ? "border-accent bg-accent text-on-accent"
                     : "border-border text-foreground-secondary hover:border-accent hover:bg-accent-tint"

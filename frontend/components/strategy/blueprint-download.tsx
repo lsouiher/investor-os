@@ -87,7 +87,7 @@ export default function BlueprintDownload({
       <button
         onClick={handleDownload}
         disabled={loading}
-        className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle disabled:opacity-50"
+        className="flex items-center gap-2 rounded-none border border-border px-4 py-2 text-sm font-medium text-foreground-secondary transition-colors hover:bg-surface-subtle disabled:opacity-50"
       >
         {loading ? (
           <>

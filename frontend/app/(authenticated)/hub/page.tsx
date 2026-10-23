@@ -139,7 +139,7 @@ export default function IdentityHubPage() {
           <div className="h-2 bg-border-muted rounded w-full" />
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-20 bg-surface-subtle rounded" />
+              <div key={i} className="h-20 bg-surface-subtle rounded-lg" />
             ))}
           </div>
         </div>
@@ -214,7 +214,7 @@ export default function IdentityHubPage() {
                 <div
                   className={`bg-surface-card rounded-lg border p-6 transition-all ${
                     isRecommended
-                      ? "border-accent shadow-sm"
+                      ? "border-accent"
                       : "border-border"
                   }`}
                 >

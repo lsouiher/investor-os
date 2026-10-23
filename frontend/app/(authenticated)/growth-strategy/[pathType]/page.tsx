@@ -156,7 +156,7 @@ export default function PathDetailPage() {
         </Link>
         <div className="mt-2 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground-strong">{name}</h1>
-          <span className={`rounded px-3 py-1 text-sm font-medium ${scoreTierClass(path.progress)}`}>
+          <span className={`rounded-full px-3 py-1 text-sm font-medium ${scoreTierClass(path.progress)}`}>
             {path.progress}{t("growth_path.complete")}
           </span>
         </div>
@@ -179,7 +179,7 @@ export default function PathDetailPage() {
           <h2 className="text-sm font-semibold uppercase text-foreground-muted">{t("growth_path.active_strategy")}</h2>
           <div className="mt-2 flex items-center justify-between">
             <span className="font-medium text-foreground-strong">{path.strategy.name}</span>
-            <span className={`rounded px-2 py-0.5 text-xs font-medium ${scoreTierClass(path.strategy.fit_score)}`}>
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${scoreTierClass(path.strategy.fit_score)}`}>
               {path.strategy.fit_score}% fit
             </span>
           </div>
@@ -268,7 +268,7 @@ export default function PathDetailPage() {
             {sortedActions.map((item) => (
               <label
                 key={item.id}
-                className={`flex cursor-pointer items-start gap-3 rounded-md px-3 py-2.5 transition-colors ${
+                className={`flex cursor-pointer items-start gap-3 rounded-none px-3 py-2.5 transition-colors ${
                   item.is_completed ? "bg-surface-subtle" : "hover:bg-surface-subtle"
                 }`}
               >
@@ -276,7 +276,7 @@ export default function PathDetailPage() {
                   type="checkbox"
                   checked={item.is_completed}
                   onChange={() => handleToggleAction(item.id, !item.is_completed)}
-                  className="mt-0.5 h-5 w-5 rounded border-border text-accent focus:ring-accent"
+                  className="mt-0.5 h-5 w-5 rounded-none border-border text-accent focus:ring-accent"
                 />
                 <div className="flex-1">
                   <div className={`text-sm font-medium ${item.is_completed ? "text-foreground-muted line-through" : "text-foreground-strong"}`}>
@@ -287,7 +287,7 @@ export default function PathDetailPage() {
                   )}
                   <div className="mt-1 flex gap-2">
                     <span className="text-xs text-foreground-muted">{item.timeframe}</span>
-                    <span className={`rounded px-1.5 py-0.5 text-xs ${scoreTierClass(item.priority_score)}`}>
+                    <span className={`rounded-full px-1.5 py-0.5 text-xs ${scoreTierClass(item.priority_score)}`}>
                       {t("growth_path.priority", { score: String(item.priority_score) })}
                     </span>
                   </div>

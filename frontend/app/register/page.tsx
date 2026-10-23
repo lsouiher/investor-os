@@ -70,7 +70,7 @@ function RegisterForm() {
       <SiteHeader />
       <div className="flex flex-1 items-center justify-center px-4 py-10">
         <div
-          className="w-full max-w-md bg-surface-card p-8 shadow-sm"
+          className="w-full max-w-md border border-border bg-surface-card p-8"
           style={{ borderRadius: "var(--radius-card)" }}
         >
           <div className="mb-8 text-center">

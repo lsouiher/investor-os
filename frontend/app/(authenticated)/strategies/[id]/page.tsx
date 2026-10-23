@@ -73,7 +73,7 @@ function CheckButton({ checked, onClick }: { checked: boolean; onClick: () => vo
     <button
       onClick={onClick}
       aria-pressed={checked}
-      className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
+      className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-none border transition-colors ${
         checked
           ? "border-ok bg-ok text-surface-card"
           : "border-border hover:border-accent"
@@ -391,7 +391,7 @@ export default function StrategyDetailPage() {
                 {microTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-start gap-3 rounded-md bg-surface-subtle px-4 py-3"
+                    className="flex items-start gap-3 rounded-lg bg-surface-subtle px-4 py-3"
                   >
                     <CheckButton checked={task.is_completed} onClick={() => toggleMicroTask(task.id)} />
                     <div className="min-w-0 flex-1">

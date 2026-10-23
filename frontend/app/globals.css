@@ -160,6 +160,7 @@
   --color-info-tint: var(--info-tint);
   --color-ok-on-inverse: var(--ok-on-inverse);
   --color-danger-on-inverse: var(--danger-on-inverse);
+  --shadow-dialog: 0 10px 30px rgb(0 0 0 / 0.25); /* brand.md §4: the only shadow */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

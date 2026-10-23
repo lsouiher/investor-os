@@ -27,7 +27,7 @@ export default function ManualUnlockDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true">
-      <div className="mx-4 w-full max-w-md rounded-lg bg-surface-card p-6 shadow-xl">
+      <div className="mx-4 w-full max-w-md rounded-lg bg-surface-card p-6 shadow-dialog">
         <h2 className="text-lg font-semibold text-foreground-strong">{t("growth.unlock.title", { name })}</h2>
         <p className="mt-2 text-sm text-foreground-secondary">
           {t("growth.unlock.criteria_prefix")} <strong>{unlockCriteria}</strong>
@@ -38,7 +38,7 @@ export default function ManualUnlockDialog({
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="rounded border border-border px-4 py-2 text-sm text-foreground-secondary hover:bg-surface-subtle"
+            className="rounded-none border border-border px-4 py-2 text-sm text-foreground-secondary hover:bg-surface-subtle"
           >
             {t("common.cancel")}
           </button>

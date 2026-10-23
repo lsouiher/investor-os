@@ -88,7 +88,7 @@ export default function RoadmapTimeline({
                   </span>
                 )}
                 {!milestone.is_completed && isPast && (
-                  <span className="rounded bg-danger-tint px-1.5 py-0.5 text-xs font-medium text-danger">
+                  <span className="rounded-full bg-danger-tint px-1.5 py-0.5 text-xs font-medium text-danger">
                     {t("roadmap.overdue")}
                   </span>
                 )}

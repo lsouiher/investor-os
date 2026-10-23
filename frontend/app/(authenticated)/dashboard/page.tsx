@@ -338,7 +338,7 @@ export default function DashboardPage() {
                 >
                   <button
                     onClick={() => toggleTask(task.id)}
-                    className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
+                    className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-none border transition-colors ${
                       task.completed
                         ? "border-ok bg-ok text-surface-card"
                         : "border-border hover:border-accent"
@@ -384,7 +384,7 @@ export default function DashboardPage() {
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {growth_strategy.paths.map((p) => (
-              <div key={p.path_type} className="rounded-md border border-border bg-surface-subtle px-3 py-2">
+              <div key={p.path_type} className="rounded-lg border border-border bg-surface-subtle px-3 py-2">
                 <p className="truncate text-xs font-medium text-foreground-secondary">{PATH_LABELS[p.path_type] ?? p.path_type}</p>
                 <p className="mt-0.5 text-xs text-foreground-muted">
                   {p.status === "locked" ? "Locked" : p.status === "generating" ? "Generating…" : `${p.progress}%`}
@@ -393,7 +393,7 @@ export default function DashboardPage() {
             ))}
           </div>
           {growth_strategy.next_best_action && (
-            <div className="mt-4 rounded-md border border-accent/30 bg-accent-tint px-4 py-3">
+            <div className="mt-4 rounded-lg border border-accent/30 bg-accent-tint px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Next best action</p>
               <p className="mt-1 text-sm font-medium text-foreground-strong">{growth_strategy.next_best_action.title}</p>
               <p className="mt-0.5 text-xs text-foreground-secondary">{growth_strategy.next_best_action.reason}</p>
@@ -415,10 +415,10 @@ export default function DashboardPage() {
             {intelligence_feed.map((insight, i) => (
               <div
                 key={`${insight.type}-${i}`}
-                className="rounded-md border border-border bg-surface-subtle px-4 py-3"
+                className="rounded-lg border border-border bg-surface-subtle px-4 py-3"
               >
                 <div className="flex items-center gap-2">
-                  <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${SEVERITY_STYLES[insight.severity] ?? SEVERITY_STYLES.info}`}>
+                  <span className={`rounded-full px-1.5 py-0.5 text-xs font-medium ${SEVERITY_STYLES[insight.severity] ?? SEVERITY_STYLES.info}`}>
                     {insight.type.replace("_", " ")}
                   </span>
                   <span className="text-sm font-medium text-foreground-strong">{insight.title}</span>

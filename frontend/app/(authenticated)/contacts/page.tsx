@@ -223,7 +223,7 @@ function ContactsPageContent() {
                   <p className="text-sm font-semibold text-foreground-strong">
                     {contact.name}
                   </p>
-                  <span className="rounded bg-surface-subtle px-1.5 py-0.5 text-xs text-foreground-muted">
+                  <span className="rounded-full bg-surface-subtle px-1.5 py-0.5 text-xs text-foreground-muted">
                     {contact.role_type}
                   </span>
                 </div>
