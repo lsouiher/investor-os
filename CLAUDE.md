@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Two repos, one product name (read first)
+
+Two Investor OS codebases exist, with no shared history. Confirm which one you are in with `git remote -v` before any change.
+
+- **This repo: `lsouiher/investor-os`, local `Projects/investorOS`. Role: PRIMARY.** Deployed on Railway (staging), working. New product features land here and only here. It carries the shared brand (`docs/brand.md`, v0.4) but NOT the RECS import (RECS Appendix A row 8, §10.8): that lives in the candidate.
+- **The other: `lsouiher/investoros`, local `Desktop/investoros` (Railway service `investoros-mvp`). Role: CANDIDATE.** A from-scratch rewrite under evaluation; never edit it from a session in this repo. It has the RECS import (`/import`, `recs_deals`, hub list, Sprint 7 there, 2026-10-15) and gets only what a fair evaluation needs (deploy, brand), no new features.
+- **Decision date: 2026-12-04.** The owner picks one; the other is archived and its good parts ported one at a time. Until then, never build the same feature in both.
+- RECS (`lsouiher/recs`) is a sibling product sharing `brand.md`; its `VITE_INVESTORSMAP_URL` points at whichever repo serves `/import`, today the candidate.
+
 ## Project
 
 InvestorOS — an identity-centric real estate investment platform. Constructs a multidimensional investor identity through 5 structured audits (Financial, Time, Skills, Risk, Horizon), AI-synthesizes it into an archetype + readiness score, and activates it through personalized strategies, action plans, and an identity-aware CRM.
