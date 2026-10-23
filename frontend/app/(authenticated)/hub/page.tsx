@@ -153,7 +153,7 @@ export default function IdentityHubPage() {
         <p className="text-sm text-foreground-muted">{t("hub.auth_error")}</p>
         <button
           onClick={() => router.push("/login")}
-          className="mt-3 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
+          className="mt-3 rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
         >
           {t("hub.goto_login")}
         </button>

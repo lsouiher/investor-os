@@ -221,7 +221,7 @@ export default function IdentityHistoryPage() {
           </p>
           <Link
             href="/hub"
-            className="mt-4 inline-block rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-on-accent hover:bg-accent-hover"
+            className="mt-4 inline-block rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent hover:bg-accent-hover"
           >
             {t("identity_history.goto_hub")}
           </Link>

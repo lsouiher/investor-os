@@ -134,7 +134,7 @@ export default function TasksPage() {
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
+          className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
         >
           {showAddForm ? t("common.cancel") : t("tasks.add")}
         </button>
@@ -155,14 +155,14 @@ export default function TasksPage() {
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder={t("tasks.form.title_placeholder")}
               required
-              className="w-full rounded-lg border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
             <input
               type="text"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
               placeholder={t("tasks.form.description_placeholder")}
-              className="w-full rounded-lg border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium text-foreground-secondary">{t("tasks.form.impact_label")}</label>
@@ -184,7 +184,7 @@ export default function TasksPage() {
             <button
               type="submit"
               disabled={!newTitle.trim()}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
+              className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
             >
               {t("tasks.add")}
             </button>

@@ -44,7 +44,7 @@ export default function ManualUnlockDialog({
           </button>
           <button
             onClick={onConfirm}
-            className="rounded bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
+            className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
           >
             {t("growth.unlock.confirm")}
           </button>

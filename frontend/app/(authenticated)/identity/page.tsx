@@ -198,7 +198,7 @@ export default function IdentityPage() {
               <button
                 onClick={handleSynthesize}
                 disabled={synthesizing}
-                className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
+                className="rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
               >
                 {t("identity.ready.action")}
               </button>
@@ -210,7 +210,7 @@ export default function IdentityPage() {
               </p>
               <Link
                 href="/hub"
-                className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
+                className="rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
               >
                 {t("identity.goto_hub")}
               </Link>
@@ -290,7 +290,7 @@ export default function IdentityPage() {
               />
               <button
                 onClick={handleFeedback}
-                className="self-center rounded bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
+                className="self-center rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
               >
                 {t("identity.feedback_submit")}
               </button>

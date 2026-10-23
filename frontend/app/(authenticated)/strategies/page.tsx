@@ -194,7 +194,7 @@ export default function StrategiesPage() {
           {!primary.is_active && (
             <button
               onClick={() => handleActivate(primary.id)}
-              className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
+              className="rounded-none bg-accent px-5 py-2.5 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
             >
               {t("strategies.activate")}
             </button>

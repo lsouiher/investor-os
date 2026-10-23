@@ -278,7 +278,7 @@ export default function StrategyDetailPage() {
             <button
               onClick={handleActivate}
               disabled={activating}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
+              className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
             >
               {activating ? t("strategy.activating") : t("strategies.activate")}
             </button>
