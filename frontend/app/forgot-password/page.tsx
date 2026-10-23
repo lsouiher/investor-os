@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <p className="text-sm text-foreground-muted">{t("auth.forgot.description")}</p>
             {error && (
-              <div className="bg-score-red/10 px-4 py-3 text-sm text-score-red" style={{ borderRadius: "var(--radius-default)" }}>
+              <div className="bg-danger-tint px-4 py-3 text-sm text-danger" style={{ borderRadius: "var(--radius-default)" }}>
                 {error}
               </div>
             )}

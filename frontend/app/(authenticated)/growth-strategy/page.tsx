@@ -89,9 +89,9 @@ function useScoreTierLabel() {
 }
 
 function scoreTierColor(score: number): string {
-  if (score < 40) return "text-red-600";
+  if (score < 40) return "text-danger";
   if (score < 70) return "text-accent-text";
-  return "text-emerald-600";
+  return "text-ok";
 }
 
 export default function GrowthStrategyPage() {
@@ -209,7 +209,7 @@ export default function GrowthStrategyPage() {
             <>
               <h2 className="text-xl font-semibold text-foreground-strong">{t("growth.create.title")}</h2>
               <p className="mt-2 text-foreground-secondary">{t("growth.create.description")}</p>
-              {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
+              {error && <p className="mt-3 text-sm text-danger">{error}</p>}
               <button
                 onClick={handleCreate}
                 disabled={creating}
@@ -334,7 +334,7 @@ export default function GrowthStrategyPage() {
       )}
 
       {error && (
-        <div className="rounded border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-950 px-4 py-2 text-sm text-red-700 dark:text-red-300">
+        <div className="rounded border border-danger/30 bg-danger-tint px-4 py-2 text-sm text-danger">
           {error}
         </div>
       )}

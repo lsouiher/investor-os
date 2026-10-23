@@ -182,12 +182,12 @@ export default function AuditFormShell({
                 isCurrent
                   ? "border-accent text-accent-text font-medium"
                   : isCompleted
-                  ? "border-emerald-500 text-emerald-700 cursor-pointer hover:bg-surface-subtle"
+                  ? "border-ok text-ok cursor-pointer hover:bg-surface-subtle"
                   : "border-transparent text-foreground-tertiary cursor-not-allowed"
               }`}
             >
               {isCompleted && !isCurrent && (
-                <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-4 h-4 text-ok" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               )}
@@ -206,7 +206,7 @@ export default function AuditFormShell({
         <div className="space-y-5">
           {currentSection.fields.map((field) => {
             const fieldError = validationErrors[field.name];
-            const errorBorderClass = fieldError ? "border-red-400 dark:border-red-600" : "border-border";
+            const errorBorderClass = fieldError ? "border-danger" : "border-border";
             return (
             <div key={field.name}>
               <label
@@ -215,7 +215,7 @@ export default function AuditFormShell({
               >
                 {field.label}
                 {field.required && (
-                  <span className="text-red-500 dark:text-red-400 ml-0.5">*</span>
+                  <span className="text-danger ml-0.5">*</span>
                 )}
               </label>
 
@@ -270,7 +270,7 @@ export default function AuditFormShell({
                 />
               )}
               {fieldError && (
-                <p className="mt-1 text-xs text-red-500 dark:text-red-400">{fieldError}</p>
+                <p className="mt-1 text-xs text-danger">{fieldError}</p>
               )}
             </div>
             );

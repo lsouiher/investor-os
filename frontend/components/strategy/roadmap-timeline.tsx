@@ -48,9 +48,9 @@ export default function RoadmapTimeline({
                 disabled={milestone.is_completed}
                 className={`z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
                   milestone.is_completed
-                    ? "border-emerald-500 bg-emerald-500 text-white"
+                    ? "border-ok bg-ok text-surface-card"
                     : isPast
-                      ? "border-red-300 bg-surface-card text-red-400 hover:border-red-400"
+                      ? "border-danger/50 bg-surface-card text-danger hover:border-danger"
                       : "border-border bg-surface-card text-foreground-muted hover:border-accent hover:text-accent-text"
                 }`}
                 title={milestone.is_completed ? t("roadmap.completed") : t("roadmap.mark_complete")}
@@ -66,7 +66,7 @@ export default function RoadmapTimeline({
               {!isLast && (
                 <div
                   className={`w-0.5 flex-1 ${
-                    milestone.is_completed ? "bg-emerald-300" : "bg-border"
+                    milestone.is_completed ? "bg-ok" : "bg-border"
                   }`}
                 />
               )}
@@ -88,7 +88,7 @@ export default function RoadmapTimeline({
                   </span>
                 )}
                 {!milestone.is_completed && isPast && (
-                  <span className="rounded bg-red-50 dark:bg-red-950 px-1.5 py-0.5 text-xs font-medium text-red-600 dark:text-red-400">
+                  <span className="rounded bg-danger-tint px-1.5 py-0.5 text-xs font-medium text-danger">
                     {t("roadmap.overdue")}
                   </span>
                 )}

@@ -91,9 +91,9 @@ function toResult(res: SimulationResponse): SimulationResult {
 }
 
 function scoreColorClass(score: number): string {
-  if (score < 40) return "text-red-600";
+  if (score < 40) return "text-danger";
   if (score < 70) return "text-accent-text";
-  return "text-emerald-600";
+  return "text-ok";
 }
 
 interface SimulationJob {
@@ -331,9 +331,9 @@ export default function SimulationPage() {
                     <span
                       className={
                         change.delta > 0
-                          ? "font-medium text-emerald-600"
+                          ? "font-medium text-ok"
                           : change.delta < 0
-                            ? "font-medium text-red-600"
+                            ? "font-medium text-danger"
                             : "text-foreground-muted"
                       }
                     >

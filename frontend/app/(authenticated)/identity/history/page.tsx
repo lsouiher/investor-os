@@ -21,9 +21,9 @@ interface IdentityVersion {
 }
 
 function scoreColorClass(score: number): string {
-  if (score < 40) return "text-red-600";
+  if (score < 40) return "text-danger";
   if (score < 70) return "text-accent-text";
-  return "text-emerald-600";
+  return "text-ok";
 }
 
 export default function IdentityHistoryPage() {

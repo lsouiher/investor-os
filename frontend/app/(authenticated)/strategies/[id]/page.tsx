@@ -75,7 +75,7 @@ function CheckButton({ checked, onClick }: { checked: boolean; onClick: () => vo
       aria-pressed={checked}
       className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
         checked
-          ? "border-emerald-500 bg-emerald-500 text-white"
+          ? "border-ok bg-ok text-surface-card"
           : "border-border hover:border-accent"
       }`}
     >
@@ -266,7 +266,7 @@ export default function StrategyDetailPage() {
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-foreground-strong">{strategy.name}</h1>
             {strategy.is_active && (
-              <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+              <span className="rounded-full bg-ok-tint px-2 py-0.5 text-xs font-medium text-ok">
                 {t("strategies.active")}
               </span>
             )}

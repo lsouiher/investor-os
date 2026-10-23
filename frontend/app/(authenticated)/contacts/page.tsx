@@ -41,12 +41,12 @@ function lastContactedBadge(lastContacted: string | null, t: (key: string, param
   );
   const label = t("contacts.last_contacted.days_ago", { days: String(days) });
   if (days <= 7) {
-    return { label, className: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" };
+    return { label, className: "bg-ok-tint text-ok" };
   }
   if (days <= 30) {
     return { label, className: "bg-accent-tint text-accent-text" };
   }
-  return { label, className: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300" };
+  return { label, className: "bg-danger-tint/30 text-danger" };
 }
 
 export default function ContactsPage() {
@@ -235,7 +235,7 @@ function ContactsPageContent() {
               {/* Gap filled by this contact */}
               {contact.network_gap_filled && (
                 <div className="text-right">
-                  <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400">{t("contacts.fills_gap")}</p>
+                  <p className="text-xs font-medium text-ok">{t("contacts.fills_gap")}</p>
                   <p className="text-xs text-foreground-muted">{t(`contacts.role.${contact.network_gap_filled}`)}</p>
                 </div>
               )}

@@ -113,7 +113,7 @@ export default function ExportButton({
       >
         {isDownloading ? (
           <>
-            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             {t("export.downloading")}
           </>
         ) : (
@@ -137,7 +137,7 @@ export default function ExportButton({
       </button>
 
       {error && (
-        <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="mt-2 text-sm text-danger">{error}</p>
       )}
 
       {showConsent && (
@@ -167,7 +167,7 @@ export default function ExportButton({
               </button>
               <button
                 onClick={handleConsentConfirm}
-                className="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+                className="rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent hover:bg-accent-hover"
               >
                 {t("export.confirm")}
               </button>

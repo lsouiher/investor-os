@@ -85,7 +85,7 @@ function RegisterForm() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {error && (
             <div
-              className="bg-score-red/10 px-4 py-3 text-sm text-score-red"
+              className="bg-danger-tint px-4 py-3 text-sm text-danger"
               style={{ borderRadius: "var(--radius-default)" }}
             >
               {error}

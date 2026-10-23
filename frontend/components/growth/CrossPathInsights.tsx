@@ -22,8 +22,8 @@ const LINK_ICONS: Record<string, string> = {
 };
 
 const LINK_COLORS: Record<string, string> = {
-  prerequisite: "text-blue-600 bg-blue-50",
-  enabling: "text-emerald-600 bg-emerald-50",
+  prerequisite: "text-info bg-info-tint",
+  enabling: "text-ok bg-ok-tint",
   constraint: "text-foreground-secondary bg-surface-subtle",
   conflict: "text-accent-text bg-accent-tint",
 };

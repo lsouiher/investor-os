@@ -136,9 +136,22 @@ describe("brand.md §2 contrast pairs", () => {
 
 describe("Investor OS additions", () => {
   for (const mode of MODES) {
-    it(`accent-text on accent-tint (${mode}) >= 4.5:1`, () => {
-      expect(contrast(cssValue(mode, "accent-text"), resolve(mode, "accent-tint"))).toBeGreaterThanOrEqual(TEXT);
-    });
+    // each status colour on its own tint (badges, callouts, error banners)
+    for (const [fg, tint] of [
+      ["accent-text", "accent-tint"],
+      ["ok", "ok-tint"],
+      ["danger", "danger-tint"],
+      ["info", "info-tint"],
+    ]) {
+      it(`${fg} on ${tint} (${mode}) >= 4.5:1`, () => {
+        expect(contrast(cssValue(mode, fg), resolve(mode, tint))).toBeGreaterThanOrEqual(TEXT);
+      });
+    }
+    for (const fg of ["ok-on-inverse", "danger-on-inverse"]) {
+      it(`${fg} on surface-inverse (${mode}) >= 4.5:1`, () => {
+        expect(contrast(resolve(mode, fg), cssValue(mode, "surface-inverse"))).toBeGreaterThanOrEqual(TEXT);
+      });
+    }
     it(`foreground-secondary on surface (${mode}) >= 4.5:1`, () => {
       expect(contrast(resolve(mode, "foreground-secondary"), cssValue(mode, "surface"))).toBeGreaterThanOrEqual(TEXT);
     });

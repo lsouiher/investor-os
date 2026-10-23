@@ -53,15 +53,15 @@ const AUDIT_ORDER = [
 
 function ScoreBadge({ score }: { score: number }) {
   const colorClass =
-    score < 40 ? "text-red-600" : score < 70 ? "text-accent-text" : "text-emerald-600";
+    score < 40 ? "text-danger" : score < 70 ? "text-accent-text" : "text-ok";
   return <span className={`text-sm font-semibold ${colorClass}`}>{score}/100</span>;
 }
 
 function StepIcon({ status }: { status: "completed" | "current" | "not_started" }) {
   if (status === "completed") {
     return (
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-        <svg className="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-ok-tint">
+        <svg className="h-5 w-5 text-ok" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
@@ -203,7 +203,7 @@ export default function IdentityHubPage() {
                 {!isLast && (
                   <div
                     className={`w-0.5 flex-1 min-h-[24px] ${
-                      status === "completed" ? "bg-emerald-200 dark:bg-emerald-800" : "bg-border-muted"
+                      status === "completed" ? "bg-ok/40" : "bg-border-muted"
                     }`}
                   />
                 )}
@@ -301,12 +301,12 @@ export default function IdentityHubPage() {
       )}
 
       {completedCount === 5 && (
-        <div className="mt-8 bg-surface-card rounded-lg border border-emerald-200 dark:border-emerald-700 p-6 text-center">
+        <div className="mt-8 bg-surface-card rounded-lg border border-ok/30 p-6 text-center">
           <div className="inline-flex items-center gap-2 mb-2">
-            <svg className="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-5 w-5 text-ok" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="font-semibold text-emerald-700 dark:text-emerald-300">{t("hub.all_complete")}</span>
+            <span className="font-semibold text-ok">{t("hub.all_complete")}</span>
           </div>
           <p className="text-sm text-foreground-secondary mb-4">
             {t("hub.synthesis_ready")}

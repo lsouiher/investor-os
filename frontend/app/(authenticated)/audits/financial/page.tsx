@@ -371,7 +371,7 @@ export default function FinancialAuditPage() {
   return (
     <div className="py-6">
       {error && (
-        <div className="max-w-5xl mx-auto mb-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 text-sm">
+        <div className="max-w-5xl mx-auto mb-4 p-3 bg-danger-tint border border-danger/30 text-danger text-sm">
           {error}
         </div>
       )}

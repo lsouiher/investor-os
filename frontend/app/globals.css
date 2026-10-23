@@ -30,8 +30,10 @@
  * Not in brand.md (Investor OS only): --foreground-secondary (= ink-muted in
  * light), --foreground-tertiary (placeholders, disabled controls and decorative
  * fills only: 2.5:1 on white, never readable text; see
- * docs/brand-notes.md), --accent-tint (amber-tinted callout and badge
- * background), --score-* (readiness score on the navy identity card).
+ * docs/brand-notes.md), --accent-tint / --ok-tint / --danger-tint /
+ * --info-tint (tinted callout and badge backgrounds; each status colour reads
+ * 4.5:1 on its own tint), --ok-on-inverse / --danger-on-inverse (status on
+ * surface-inverse, e.g. scores on the navy identity card).
  */
 
 :root {
@@ -67,16 +69,16 @@
   --warn: #B45309;
   --danger: #B91C1C;
   --info: #475569;
+  --ok-tint: #ECFDF5; /* ok on it 5.2:1 */
+  --danger-tint: #FEF2F2; /* danger on it 5.9:1 */
+  --info-tint: #F1F5F9; /* info on it 6.9:1 */
+  --ok-on-inverse: #34D399; /* 8.9:1 on surface-inverse; light ok there is 3.1:1 */
+  --danger-on-inverse: #F87171; /* 6.2:1; light danger there is 2.6:1 */
 
   /* Charts, drawn on surface-card only */
   --chart-1: var(--accent);
   --chart-2: #334155;
   --chart-3: var(--ok);
-
-  /* Score colors */
-  --score-red: #DC2626;
-  --score-amber: #D97706;
-  --score-emerald: #059669;
 
   /* Spacing grid */
   --grid: 4px;
@@ -119,6 +121,9 @@
   --warn: #FBBF24;
   --danger: #F87171;
   --info: #94A3B8;
+  --ok-tint: #172A24;
+  --danger-tint: #2E1A1E;
+  --info-tint: #1E2433;
 
   --chart-2: #CBD5E1;
 }
@@ -150,9 +155,11 @@
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
-  --color-score-red: var(--score-red);
-  --color-score-amber: var(--score-amber);
-  --color-score-emerald: var(--score-emerald);
+  --color-ok-tint: var(--ok-tint);
+  --color-danger-tint: var(--danger-tint);
+  --color-info-tint: var(--info-tint);
+  --color-ok-on-inverse: var(--ok-on-inverse);
+  --color-danger-on-inverse: var(--danger-on-inverse);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

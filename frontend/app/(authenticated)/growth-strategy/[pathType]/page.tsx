@@ -63,9 +63,9 @@ function usePathNames() {
 }
 
 function scoreTierClass(score: number): string {
-  if (score < 40) return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
+  if (score < 40) return "bg-danger-tint/30 text-danger";
   if (score < 70) return "bg-accent-tint text-accent-text";
-  return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300";
+  return "bg-ok-tint text-ok";
 }
 
 export default function PathDetailPage() {

@@ -37,7 +37,7 @@ function impactOf(task: Task): Impact {
 const IMPACT_TO_SCORE: Record<Impact, number> = { high: 80, medium: 50, low: 20 };
 
 const IMPACT_STYLES: Record<string, string> = {
-  high: "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300",
+  high: "bg-danger-tint text-danger",
   medium: "bg-accent-tint text-accent-text",
   low: "bg-surface-subtle text-foreground-secondary",
 };
@@ -204,7 +204,7 @@ export default function TasksPage() {
               onClick={() => toggleTask(task.id)}
               className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
                 task.is_completed
-                  ? "border-emerald-500 bg-emerald-500 text-white"
+                  ? "border-ok bg-ok text-surface-card"
                   : "border-border hover:border-accent"
               }`}
             >
@@ -231,7 +231,7 @@ export default function TasksPage() {
                   {t(`tasks.impact.${impactOf(task)}`)}
                 </span>
                 {task.source !== "manual" && (
-                  <span className="rounded bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
+                  <span className="rounded bg-info-tint px-1.5 py-0.5 text-xs text-info">
                     {t(`tasks.source.${task.source}`)}
                   </span>
                 )}

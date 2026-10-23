@@ -30,10 +30,11 @@ function usePathNames() {
 }
 
 const PATH_COLORS: Record<string, string> = {
-  portfolio: "border-l-accent",
-  income_capital: "border-l-emerald-500",
-  skills_knowledge: "border-l-blue-500",
-  time_operations: "border-l-purple-500",
+  // chart series in layout order (brand.md §2), then info; the name always sits beside it
+  portfolio: "border-l-chart-1",
+  income_capital: "border-l-chart-3",
+  skills_knowledge: "border-l-chart-2",
+  time_operations: "border-l-info",
 };
 
 const PATH_ICONS: Record<string, string> = {
@@ -44,9 +45,9 @@ const PATH_ICONS: Record<string, string> = {
 };
 
 function scoreTierClass(progress: number): string {
-  if (progress < 40) return "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300";
+  if (progress < 40) return "bg-danger-tint text-danger";
   if (progress < 70) return "bg-accent-tint text-accent-text";
-  return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300";
+  return "bg-ok-tint text-ok";
 }
 
 export default function PathCard({
@@ -64,7 +65,7 @@ export default function PathCard({
   const { t } = useTranslation();
   const PATH_NAMES = usePathNames();
   const name = PATH_NAMES[pathType] || pathType;
-  const accentColor = PATH_COLORS[pathType] || "border-l-gray-400";
+  const accentColor = PATH_COLORS[pathType] || "border-l-border";
   const icon = PATH_ICONS[pathType] || "📌";
 
   // Coming Soon stub

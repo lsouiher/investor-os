@@ -64,9 +64,9 @@ const PATH_LABELS: Record<string, string> = {
 };
 
 const SEVERITY_STYLES: Record<string, string> = {
-  info: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
+  info: "bg-info-tint text-info",
   warning: "bg-accent-tint text-accent-text",
-  success: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300",
+  success: "bg-ok-tint text-ok",
 };
 
 function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
@@ -76,7 +76,7 @@ function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
   const progress = (score / 100) * circumference;
 
   const color =
-    score < 40 ? "#dc2626" : score < 70 ? "#d97706" : "#059669";
+    score < 40 ? "var(--danger)" : score < 70 ? "var(--chart-1)" : "var(--ok)";
 
   return (
     <div className="relative flex items-center justify-center" style={{ width: size, height: size / 2 + 12 }}>
@@ -84,7 +84,7 @@ function ScoreGauge({ score, size = 80 }: { score: number; size?: number }) {
         <path
           d={`M ${strokeWidth / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${size - strokeWidth / 2} ${size / 2}`}
           fill="none"
-          stroke="#e5e7eb"
+          stroke="var(--border)"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
@@ -172,8 +172,8 @@ export default function DashboardPage() {
             {user?.email ? t("dashboard.welcome_user", { email: user.email }) : t("dashboard.welcome")}
           </p>
         </div>
-        <div className="rounded-lg border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-950 p-6 text-center">
-          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+        <div className="rounded-lg border border-danger/30 bg-danger-tint p-6 text-center">
+          <p className="text-sm text-danger">{error}</p>
           <button
             onClick={fetchDashboard}
             className="mt-3 rounded-none bg-accent px-4 py-2 text-sm font-medium text-on-accent transition-colors hover:bg-accent-hover"
@@ -340,7 +340,7 @@ export default function DashboardPage() {
                     onClick={() => toggleTask(task.id)}
                     className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
                       task.completed
-                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        ? "border-ok bg-ok text-surface-card"
                         : "border-border hover:border-accent"
                     }`}
                   >

@@ -21,9 +21,9 @@ interface Strategy {
 }
 
 function scoreColorClass(score: number): string {
-  if (score < 40) return "text-red-600 bg-red-50";
+  if (score < 40) return "text-danger bg-danger-tint";
   if (score < 70) return "text-accent-text bg-accent-tint";
-  return "text-emerald-600 bg-emerald-50";
+  return "text-ok bg-ok-tint";
 }
 
 export default function StrategiesPage() {
@@ -129,7 +129,7 @@ export default function StrategiesPage() {
                 {t("strategies.top_match")}
               </span>
               {primary.is_active && (
-                <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                <span className="rounded-full bg-ok-tint px-2 py-0.5 text-xs font-medium text-ok">
                   {t("strategies.active")}
                 </span>
               )}
@@ -147,14 +147,14 @@ export default function StrategiesPage() {
 
         <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-ok">
               {t("strategies.pros")}
             </h4>
             <ul className="space-y-1">
               {primary.pros.map((pro, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-foreground-secondary">
                   <svg
-                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500"
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-ok"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -168,14 +168,14 @@ export default function StrategiesPage() {
             </ul>
           </div>
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-red-500 dark:text-red-400">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-danger">
               {t("strategies.cons")}
             </h4>
             <ul className="space-y-1">
               {primary.cons.map((con, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-foreground-secondary">
                   <svg
-                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-400"
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 text-danger"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -221,7 +221,7 @@ export default function StrategiesPage() {
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-foreground-strong">{strategy.name}</h3>
               {strategy.is_active && (
-                <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                <span className="rounded-full bg-ok-tint px-2 py-0.5 text-xs font-medium text-ok">
                   {t("strategies.active")}
                 </span>
               )}

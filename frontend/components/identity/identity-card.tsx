@@ -18,15 +18,16 @@ interface IdentityCardProps {
 }
 
 function scoreColor(score: number): string {
-  if (score < 40) return "var(--score-red)";
-  if (score < 70) return "var(--score-amber)";
-  return "var(--score-emerald)";
+  if (score < 40) return "var(--danger-on-inverse)";
+  if (score < 70) return "var(--accent-on-inverse)";
+  return "var(--ok-on-inverse)";
 }
 
 function scoreColorClass(score: number): string {
-  if (score < 40) return "text-red-600";
-  if (score < 70) return "text-accent-on-inverse"; // the card sits on surface-inverse
-  return "text-emerald-600";
+  // the card sits on surface-inverse
+  if (score < 40) return "text-danger-on-inverse";
+  if (score < 70) return "text-accent-on-inverse";
+  return "text-ok-on-inverse";
 }
 
 function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
@@ -68,7 +69,7 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-white">{animatedScore}</span>
+        <span className="text-3xl font-bold text-ink-on-inverse">{animatedScore}</span>
         <span className="text-xs text-ink-muted-on-inverse">{t("identity_card.readiness")}</span>
       </div>
     </div>
@@ -92,7 +93,7 @@ export default function IdentityCard({
       }}
     >
       {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-purple-900/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-transparent" />
 
       <div className="relative flex h-full flex-col justify-between p-6 sm:p-8">
         {/* Top: archetype title */}
