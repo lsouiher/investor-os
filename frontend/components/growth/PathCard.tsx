@@ -45,7 +45,7 @@ const PATH_ICONS: Record<string, string> = {
 
 function scoreTierClass(progress: number): string {
   if (progress < 40) return "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300";
-  if (progress < 70) return "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300";
+  if (progress < 70) return "bg-amber-100 dark:bg-amber-900/30 text-accent-text";
   return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300";
 }
 
@@ -80,7 +80,7 @@ export default function PathCard({
             <span className="text-lg">{icon}</span>
             <span className="font-medium text-foreground-secondary">{name}</span>
           </div>
-          <span className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
+          <span className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-medium text-accent-text">
             {t("growth.path.coming_soon")}
           </span>
         </div>
@@ -139,7 +139,7 @@ export default function PathCard({
             <span className="text-lg">{icon}</span>
             <span className="font-semibold text-foreground-strong">{name}</span>
           </div>
-          <span className="text-sm text-amber-600">{t("growth.path.generating")}</span>
+          <span className="text-sm text-accent-text">{t("growth.path.generating")}</span>
         </div>
         {/* Shimmer animation */}
         <div className="mt-3 h-8 w-full animate-pulse rounded bg-gradient-to-r from-surface-subtle via-border-muted to-surface-subtle" />

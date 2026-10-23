@@ -22,7 +22,7 @@ interface IdentityVersion {
 
 function scoreColorClass(score: number): string {
   if (score < 40) return "text-red-600";
-  if (score < 70) return "text-amber-600";
+  if (score < 70) return "text-accent-text";
   return "text-emerald-600";
 }
 
@@ -90,7 +90,7 @@ export default function IdentityHistoryPage() {
         </div>
         <Link
           href="/identity"
-          className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+          className="text-sm font-medium text-accent-text hover:underline"
         >
           {t("identity_history.back")}
         </Link>
@@ -181,7 +181,7 @@ export default function IdentityHistoryPage() {
                   {versionA.readiness_score}
                 </span>
               </div>
-              <p className="text-sm font-medium" style={{ color: "#D97706" }}>
+              <p className="text-sm font-medium text-accent-text">
                 {versionA.archetype}
               </p>
               <RadarChart data={versionA.radar_data} size={200} />
@@ -199,7 +199,7 @@ export default function IdentityHistoryPage() {
                     {versionB.readiness_score}
                   </span>
                 </div>
-                <p className="text-sm font-medium" style={{ color: "#D97706" }}>
+                <p className="text-sm font-medium text-accent-text">
                   {versionB.archetype}
                 </p>
                 <RadarChart data={versionB.radar_data} size={200} />

@@ -66,7 +66,7 @@ export default function AiErrorState({
             d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
-        <p className="flex-1 text-sm text-amber-800 dark:text-amber-200">
+        <p className="flex-1 text-sm text-accent-text">
           {message || t("error.medium.message")}
         </p>
         {onRetry && (
@@ -101,7 +101,7 @@ export default function AiErrorState({
       {onRetry && (
         <button
           onClick={onRetry}
-          className="font-medium text-amber-600 underline hover:text-amber-700"
+          className="font-medium text-accent-text underline"
         >
           {t("common.retry")}
         </button>

@@ -90,7 +90,7 @@ function useScoreTierLabel() {
 
 function scoreTierColor(score: number): string {
   if (score < 40) return "text-red-600";
-  if (score < 70) return "text-amber-600";
+  if (score < 70) return "text-accent-text";
   return "text-emerald-600";
 }
 
@@ -303,13 +303,13 @@ export default function GrowthStrategyPage() {
       {/* Next Best Action */}
       {strategy.next_best_action && (
         <div className="rounded-lg border-2 border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-5 py-4">
-          <div className="text-xs font-medium uppercase text-amber-700 dark:text-amber-300">{t("growth.next_best_action")}</div>
+          <div className="text-xs font-medium uppercase text-accent-text">{t("growth.next_best_action")}</div>
           <div className="mt-1 font-medium text-foreground-strong">{strategy.next_best_action.title}</div>
           <div className="mt-1 text-sm text-foreground-secondary">{strategy.next_best_action.reason}</div>
           {strategy.next_best_action.cross_path_impact.length > 0 && (
             <div className="mt-2 flex gap-2">
               {strategy.next_best_action.cross_path_impact.map((impact) => (
-                <span key={impact} className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs text-amber-700 dark:text-amber-300">
+                <span key={impact} className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs text-accent-text">
                   {PATH_NAMES[impact] || impact}
                 </span>
               ))}

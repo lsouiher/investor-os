@@ -39,7 +39,7 @@ export default function LandingPage() {
     <div className="flex-1 bg-background">
       {/* Top bar */}
       <header className="mx-auto flex w-full max-w-[var(--max-content)] items-center justify-between px-4 py-5 sm:px-6">
-        <p className="text-sm font-semibold tracking-widest uppercase text-accent">{t("nav.brand")}</p>
+        <p className="text-sm font-semibold tracking-widest uppercase text-accent-text">{t("nav.brand")}</p>
         <div className="flex items-center gap-4">
           <Link href="/login" className="text-sm font-medium text-foreground-muted hover:text-foreground">
             {t("landing.cta_login")}
@@ -52,7 +52,7 @@ export default function LandingPage() {
         {/* Hero */}
         <section className="grid items-center gap-10 py-12 md:grid-cols-[1.2fr_1fr] md:py-20">
           <div className="flex flex-col gap-6">
-            <p className="inline-flex w-fit items-center gap-2 bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent" style={{ borderRadius: "var(--radius-default)" }}>
+            <p className="inline-flex w-fit items-center gap-2 bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent-text" style={{ borderRadius: "var(--radius-default)" }}>
               {t("landing.eyebrow")}
             </p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
@@ -97,7 +97,7 @@ export default function LandingPage() {
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {PATH_KEYS.map((key) => (
               <div key={key} className="flex flex-col gap-3 border border-border bg-surface-card p-6" style={{ borderRadius: "var(--radius-card)" }}>
-                <p className="text-xs font-semibold uppercase tracking-wider text-accent">{t(`landing.path.${key}.label`)}</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">{t(`landing.path.${key}.label`)}</p>
                 <h3 className="text-lg font-semibold text-foreground">{t(`landing.path.${key}.title`)}</h3>
                 <p className="text-sm leading-relaxed text-foreground-muted">{t(`landing.path.${key}.description`)}</p>
               </div>
@@ -133,7 +133,7 @@ export default function LandingPage() {
         {/* Built by */}
         <section className="border-t border-border py-16">
           <div className="grid gap-6 md:grid-cols-[auto_1fr] md:items-start">
-            <div className="flex h-16 w-16 items-center justify-center bg-accent/10 text-xl font-bold text-accent" style={{ borderRadius: "var(--radius-card)" }}>
+            <div className="flex h-16 w-16 items-center justify-center bg-accent/10 text-xl font-bold text-accent-text" style={{ borderRadius: "var(--radius-card)" }}>
               L
             </div>
             <div>

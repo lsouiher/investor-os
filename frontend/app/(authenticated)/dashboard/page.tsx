@@ -65,7 +65,7 @@ const PATH_LABELS: Record<string, string> = {
 
 const SEVERITY_STYLES: Record<string, string> = {
   info: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
-  warning: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300",
+  warning: "bg-amber-100 dark:bg-amber-900/30 text-accent-text",
   success: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300",
 };
 
@@ -219,7 +219,7 @@ export default function DashboardPage() {
           </h2>
           <Link
             href="/identity"
-            className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+            className="text-xs font-medium text-accent-text hover:underline"
           >
             {t("dashboard.view_full_identity")}
           </Link>
@@ -275,7 +275,7 @@ export default function DashboardPage() {
             {active_strategy && (
               <Link
                 href={`/strategies/${active_strategy.id}`}
-                className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+                className="text-xs font-medium text-accent-text hover:underline"
               >
                 {t("common.view")}
               </Link>
@@ -308,7 +308,7 @@ export default function DashboardPage() {
               <p className="text-sm text-foreground-muted">{t("dashboard.no_strategy")}</p>
               <Link
                 href="/strategies"
-                className="mt-2 inline-block text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+                className="mt-2 inline-block text-sm font-medium text-accent-text hover:underline"
               >
                 {t("dashboard.browse_strategies")}
               </Link>
@@ -324,7 +324,7 @@ export default function DashboardPage() {
             </h2>
             <Link
               href="/tasks"
-              className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+              className="text-xs font-medium text-accent-text hover:underline"
             >
               {t("dashboard.all_tasks")}
             </Link>
@@ -377,7 +377,7 @@ export default function DashboardPage() {
             </h2>
             <Link
               href="/growth-strategy"
-              className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+              className="text-xs font-medium text-accent-text hover:underline"
             >
               View Paths
             </Link>
@@ -394,7 +394,7 @@ export default function DashboardPage() {
           </div>
           {growth_strategy.next_best_action && (
             <div className="mt-4 rounded-md border border-amber-100 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">Next best action</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Next best action</p>
               <p className="mt-1 text-sm font-medium text-foreground-strong">{growth_strategy.next_best_action.title}</p>
               <p className="mt-0.5 text-xs text-foreground-secondary">{growth_strategy.next_best_action.reason}</p>
             </div>
@@ -425,7 +425,7 @@ export default function DashboardPage() {
                 </div>
                 <p className="mt-1 text-sm text-foreground-secondary">{insight.message}</p>
                 {insight.action_url && (
-                  <Link href={insight.action_url} className="mt-1 inline-block text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700">
+                  <Link href={insight.action_url} className="mt-1 inline-block text-xs font-medium text-accent-text hover:underline">
                     Take action →
                   </Link>
                 )}

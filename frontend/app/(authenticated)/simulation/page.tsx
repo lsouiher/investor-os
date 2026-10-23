@@ -92,7 +92,7 @@ function toResult(res: SimulationResponse): SimulationResult {
 
 function scoreColorClass(score: number): string {
   if (score < 40) return "text-red-600";
-  if (score < 70) return "text-amber-600";
+  if (score < 70) return "text-accent-text";
   return "text-emerald-600";
 }
 
@@ -237,7 +237,7 @@ export default function SimulationPage() {
         </div>
         <div className="text-right">
           <span className="text-sm text-foreground-muted">{t("simulation.remaining")}</span>
-          <p className="text-2xl font-bold text-amber-600">
+          <p className="text-2xl font-bold text-accent">
             {config.remaining_simulations}
           </p>
         </div>
@@ -273,7 +273,7 @@ export default function SimulationPage() {
                   <label className="text-sm font-medium text-foreground-secondary">
                     {variable.label}
                   </label>
-                  <span className="text-sm font-bold text-amber-600">
+                  <span className="text-sm font-bold text-accent-text">
                     {sliderValues[variable.key] ?? variable.current}
                   </span>
                 </div>
@@ -343,7 +343,7 @@ export default function SimulationPage() {
                   </div>
                 ))}
               </div>
-              <p className="mt-4 rounded-md bg-amber-50 dark:bg-amber-950 p-3 text-xs text-amber-800 dark:text-amber-200">
+              <p className="mt-4 rounded-md bg-amber-50 dark:bg-amber-950 p-3 text-xs text-accent-text">
                 {result.insight}
               </p>
             </>

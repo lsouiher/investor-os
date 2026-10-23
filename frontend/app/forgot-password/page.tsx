@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
       </div>
       <div className="w-full max-w-md bg-surface-card p-8 shadow-sm" style={{ borderRadius: "var(--radius-card)" }}>
         <div className="mb-8 text-center">
-          <p className="text-sm font-semibold tracking-widest uppercase text-accent">{t("nav.brand")}</p>
+          <p className="text-sm font-semibold tracking-widest uppercase text-accent-text">{t("nav.brand")}</p>
           <h1 className="mt-2 text-2xl font-bold text-foreground">{t("auth.forgot.title")}</h1>
         </div>
 
@@ -80,7 +80,7 @@ export default function ForgotPasswordPage() {
         )}
 
         <p className="mt-6 text-center text-sm text-foreground-muted">
-          <Link href="/login" className="font-medium text-accent underline underline-offset-2 hover:text-accent-hover">
+          <Link href="/login" className="font-medium text-accent-text underline underline-offset-2">
             {t("auth.forgot.back_to_login")}
           </Link>
         </p>

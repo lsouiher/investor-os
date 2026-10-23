@@ -180,7 +180,7 @@ export default function AuditFormShell({
               disabled={!canJump}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm whitespace-nowrap border-b-2 transition-colors ${
                 isCurrent
-                  ? "border-amber-600 text-amber-700 font-medium"
+                  ? "border-amber-600 text-accent-text font-medium"
                   : isCompleted
                   ? "border-emerald-500 text-emerald-700 cursor-pointer hover:bg-surface-subtle"
                   : "border-transparent text-foreground-tertiary cursor-not-allowed"

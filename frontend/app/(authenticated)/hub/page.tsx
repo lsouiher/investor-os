@@ -53,7 +53,7 @@ const AUDIT_ORDER = [
 
 function ScoreBadge({ score }: { score: number }) {
   const colorClass =
-    score < 40 ? "text-red-600" : score < 70 ? "text-amber-600" : "text-emerald-600";
+    score < 40 ? "text-red-600" : score < 70 ? "text-accent-text" : "text-emerald-600";
   return <span className={`text-sm font-semibold ${colorClass}`}>{score}/100</span>;
 }
 
@@ -227,7 +227,7 @@ export default function IdentityHubPage() {
                         <ScoreBadge score={audit.sub_score} />
                       )}
                       {audit?.status === "in_progress" && (
-                        <span className="text-xs bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 px-2 py-0.5 border border-amber-200 dark:border-amber-700">
+                        <span className="text-xs bg-amber-50 dark:bg-amber-950 text-accent-text px-2 py-0.5 border border-amber-200 dark:border-amber-700">
                           {t("audit.status.in_progress")}
                         </span>
                       )}
@@ -278,7 +278,7 @@ export default function IdentityHubPage() {
                       </p>
                       <button
                         onClick={() => router.push(`/audits/${auditDef.type}`)}
-                        className="text-sm text-amber-600 hover:text-amber-700 font-medium underline"
+                        className="text-sm text-accent-text font-medium underline"
                       >
                         {t("audit.action.continue")}
                       </button>

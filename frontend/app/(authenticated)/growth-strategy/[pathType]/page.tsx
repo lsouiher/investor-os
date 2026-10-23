@@ -64,7 +64,7 @@ function usePathNames() {
 
 function scoreTierClass(score: number): string {
   if (score < 40) return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
-  if (score < 70) return "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300";
+  if (score < 70) return "bg-amber-100 dark:bg-amber-900/30 text-accent-text";
   return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300";
 }
 
@@ -212,7 +212,7 @@ export default function PathDetailPage() {
               { label: "Year 10", value: scalingPlan.year_10_vision },
             ].map(({ label, value }) => (
               <div key={label}>
-                <span className="text-xs font-medium text-amber-600">{label}</span>
+                <span className="text-xs font-medium text-accent-text">{label}</span>
                 <p className="mt-0.5 text-sm text-foreground-secondary">{value}</p>
               </div>
             ))}

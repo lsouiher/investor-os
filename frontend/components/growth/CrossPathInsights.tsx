@@ -25,7 +25,7 @@ const LINK_COLORS: Record<string, string> = {
   prerequisite: "text-blue-600 bg-blue-50",
   enabling: "text-emerald-600 bg-emerald-50",
   constraint: "text-foreground-secondary bg-surface-subtle",
-  conflict: "text-amber-600 bg-amber-50",
+  conflict: "text-accent-text bg-amber-50",
 };
 
 function usePathNamesShort() {
@@ -78,7 +78,7 @@ export default function CrossPathInsights({ links }: CrossPathInsightsProps) {
                 </div>
                 <div className="mt-0.5 text-xs text-foreground-muted">{link.description}</div>
                 {link.type === "conflict" && link.resolution && (
-                  <div className="mt-1 rounded bg-amber-50 dark:bg-amber-950 px-2 py-1 text-xs text-amber-700 dark:text-amber-300">
+                  <div className="mt-1 rounded bg-amber-50 dark:bg-amber-950 px-2 py-1 text-xs text-accent-text">
                     {t("growth.resolution")}: {link.resolution}
                   </div>
                 )}

@@ -38,7 +38,7 @@ const IMPACT_TO_SCORE: Record<Impact, number> = { high: 80, medium: 50, low: 20 
 
 const IMPACT_STYLES: Record<string, string> = {
   high: "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300",
-  medium: "bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300",
+  medium: "bg-amber-50 dark:bg-amber-950 text-accent-text",
   low: "bg-surface-subtle text-foreground-secondary",
 };
 

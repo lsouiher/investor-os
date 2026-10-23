@@ -44,7 +44,7 @@ function lastContactedBadge(lastContacted: string | null, t: (key: string, param
     return { label, className: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300" };
   }
   if (days <= 30) {
-    return { label, className: "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300" };
+    return { label, className: "bg-amber-100 dark:bg-amber-900/30 text-accent-text" };
   }
   return { label, className: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300" };
 }
@@ -213,7 +213,7 @@ function ContactsPageContent() {
               className="flex w-full items-center gap-4 rounded-lg border border-border bg-surface-card p-4 text-left transition-colors hover:border-border"
             >
               {/* Avatar */}
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-sm font-bold text-amber-700 dark:text-amber-300">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-sm font-bold text-accent-text">
                 {contact.name.charAt(0).toUpperCase()}
               </div>
 

@@ -9,7 +9,7 @@ export default function TermsPage() {
   return (
     <div className="flex-1 bg-background px-4 py-10">
       <article className="mx-auto max-w-2xl">
-        <p className="text-sm font-semibold tracking-widest uppercase text-accent">InvestorOS</p>
+        <p className="text-sm font-semibold tracking-widest uppercase text-accent-text">InvestorOS</p>
         <h1 className="mt-2 text-3xl font-bold text-foreground">Beta terms &amp; privacy</h1>
         <p className="mt-1 text-sm text-foreground-muted">Effective {EFFECTIVE}</p>
 
@@ -67,7 +67,7 @@ export default function TermsPage() {
 
         <Section title="Deleting your data">
           <p>
-            Ask and it&rsquo;s gone: email {CONTACT ? <a className="text-accent underline" href={`mailto:${CONTACT}`}>{CONTACT}</a> : "the address in the app footer"} from the
+            Ask and it&rsquo;s gone: email {CONTACT ? <a className="text-accent-text underline" href={`mailto:${CONTACT}`}>{CONTACT}</a> : "the address in the app footer"} from the
             address on your account. We erase your audit answers and generated results right away
             and deactivate the account; backups roll off within 30 days.
           </p>
@@ -86,12 +86,12 @@ export default function TermsPage() {
           <p>
             We may update these terms as the beta evolves; the effective date above changes when we
             do. Questions, feedback, deletion requests:{" "}
-            {CONTACT ? <a className="text-accent underline" href={`mailto:${CONTACT}`}>{CONTACT}</a> : "use the feedback link in the app"}.
+            {CONTACT ? <a className="text-accent-text underline" href={`mailto:${CONTACT}`}>{CONTACT}</a> : "use the feedback link in the app"}.
           </p>
         </Section>
 
         <p className="mt-10 text-sm text-foreground-muted">
-          <Link href="/" className="text-accent underline underline-offset-2">Back to InvestorOS</Link>
+          <Link href="/" className="text-accent-text underline underline-offset-2">Back to InvestorOS</Link>
         </p>
       </article>
     </div>

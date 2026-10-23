@@ -22,7 +22,7 @@ interface Strategy {
 
 function scoreColorClass(score: number): string {
   if (score < 40) return "text-red-600 bg-red-50";
-  if (score < 70) return "text-amber-600 bg-amber-50";
+  if (score < 70) return "text-accent-text bg-amber-50";
   return "text-emerald-600 bg-emerald-50";
 }
 
@@ -125,7 +125,7 @@ export default function StrategiesPage() {
         <div className="mb-4 flex items-start justify-between">
           <div>
             <div className="mb-1 flex items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+              <span className="text-xs font-semibold uppercase tracking-wider text-accent-text">
                 {t("strategies.top_match")}
               </span>
               {primary.is_active && (
@@ -237,7 +237,7 @@ export default function StrategiesPage() {
           </span>
           <Link
             href={`/strategies/${strategy.id}`}
-            className="flex-shrink-0 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+            className="flex-shrink-0 text-sm font-medium text-accent-text hover:underline"
           >
             {t("common.view")}
           </Link>

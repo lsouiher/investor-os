@@ -75,7 +75,7 @@ function RegisterForm() {
         style={{ borderRadius: "var(--radius-card)" }}
       >
         <div className="mb-8 text-center">
-          <p className="text-sm font-semibold tracking-widest uppercase text-accent">
+          <p className="text-sm font-semibold tracking-widest uppercase text-accent-text">
             {t("nav.brand")}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground">
@@ -150,7 +150,7 @@ function RegisterForm() {
           {t("auth.register.has_account")}{" "}
           <Link
             href="/login"
-            className="font-medium text-accent underline underline-offset-2 hover:text-accent-hover"
+            className="font-medium text-accent-text underline underline-offset-2"
           >
             {t("auth.register.login_link")}
           </Link>

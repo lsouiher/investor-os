@@ -235,7 +235,7 @@ export default function IdentityPage() {
         <button
           onClick={handleSynthesize}
           disabled={synthesizing}
-          className="rounded-lg border border-amber-600 px-4 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 transition-colors hover:bg-amber-50 dark:hover:bg-amber-950 disabled:opacity-50"
+          className="rounded-lg border border-amber-600 px-4 py-2 text-sm font-medium text-accent-text transition-colors hover:bg-amber-50 dark:hover:bg-amber-950 disabled:opacity-50"
         >
           {t("identity.resynthesize")}
         </button>
@@ -308,7 +308,7 @@ export default function IdentityPage() {
       <div className="flex justify-center">
         <Link
           href="/identity/history"
-          className="text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700"
+          className="text-sm font-medium text-accent-text hover:underline"
         >
           {t("identity.view_history")}
         </Link>

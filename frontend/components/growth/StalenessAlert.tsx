@@ -33,11 +33,11 @@ export default function StalenessAlert({
           />
         </svg>
         <div className="flex-1">
-          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+          <p className="text-sm font-medium text-accent-text">
             {t("export.staleness.message")}
           </p>
           {changedSinceExport.length > 0 && (
-            <ul className="mt-1 list-inside list-disc text-sm text-amber-700 dark:text-amber-300">
+            <ul className="mt-1 list-inside list-disc text-sm text-accent-text">
               {changedSinceExport.map((change, i) => (
                 <li key={i}>{change}</li>
               ))}
@@ -45,7 +45,7 @@ export default function StalenessAlert({
           )}
           <button
             onClick={onDownloadFresh}
-            className="mt-2 text-sm font-medium text-amber-900 underline hover:text-amber-700"
+            className="mt-2 text-sm font-medium text-accent-text underline"
           >
             {t("export.staleness.download_fresh")}
           </button>

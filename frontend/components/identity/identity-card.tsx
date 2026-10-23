@@ -25,7 +25,7 @@ function scoreColor(score: number): string {
 
 function scoreColorClass(score: number): string {
   if (score < 40) return "text-red-600";
-  if (score < 70) return "text-amber-600";
+  if (score < 70) return "text-accent-on-inverse"; // the card sits on surface-inverse
   return "text-emerald-600";
 }
 
@@ -100,7 +100,7 @@ export default function IdentityCard({
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
             {t("identity_card.label")}
           </p>
-          <h2 className="mt-1 text-2xl font-bold sm:text-3xl" style={{ color: "var(--accent)" }}>
+          <h2 className="mt-1 text-2xl font-bold sm:text-3xl" style={{ color: "var(--accent-on-inverse)" }}>
             {archetype}
           </h2>
         </div>

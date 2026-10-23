@@ -79,7 +79,7 @@ function AuthenticatedShell({
       >
         <div>
           <div className="px-6 py-6">
-            <p className="text-sm font-semibold tracking-widest uppercase text-accent">
+            <p className="text-sm font-semibold tracking-widest uppercase text-accent-text">
               {t("nav.brand")}
             </p>
           </div>
@@ -93,7 +93,7 @@ function AuthenticatedShell({
                   href={item.href}
                   className={`flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors ${
                     active
-                      ? "bg-accent/10 text-accent"
+                      ? "bg-accent/10 text-accent-text"
                       : "text-foreground-muted hover:bg-foreground/5 hover:text-foreground"
                   }`}
                   style={{ borderRadius: "var(--radius-default)" }}
@@ -110,7 +110,7 @@ function AuthenticatedShell({
         <div className="border-t border-foreground/5 px-4 py-4">
           <div className="flex items-center gap-3">
             <div
-              className="flex h-8 w-8 items-center justify-center bg-accent/10 text-xs font-bold text-accent"
+              className="flex h-8 w-8 items-center justify-center bg-accent/10 text-xs font-bold text-accent-text"
               style={{ borderRadius: "var(--radius-default)" }}
             >
               {user?.email?.charAt(0).toUpperCase() ?? "?"}
@@ -167,7 +167,7 @@ function AuthenticatedShell({
               key={item.href}
               href={item.href}
               className={`flex flex-col items-center gap-1 px-2 py-1 text-xs ${
-                active ? "text-accent" : "text-foreground-muted"
+                active ? "text-accent-text" : "text-foreground-muted"
               }`}
             >
               <item.icon className="h-5 w-5" />

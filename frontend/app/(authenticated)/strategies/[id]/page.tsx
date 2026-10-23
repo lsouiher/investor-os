@@ -259,7 +259,7 @@ export default function StrategyDetailPage() {
         <div>
           <Link
             href="/strategies"
-            className="mb-2 inline-block text-sm text-amber-600 dark:text-amber-400 hover:text-amber-700"
+            className="mb-2 inline-block text-sm text-accent-text hover:underline"
           >
             &larr; {t("strategy.all_strategies")}
           </Link>
@@ -296,7 +296,7 @@ export default function StrategyDetailPage() {
       )}
 
       {planPending && (
-        <div className="flex items-center gap-3 rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4 text-sm text-amber-800 dark:text-amber-200">
+        <div className="flex items-center gap-3 rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4 text-sm text-accent-text">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
           {t("strategy.plan_pending")}
         </div>
@@ -329,7 +329,7 @@ export default function StrategyDetailPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`border-b-2 pb-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? "border-amber-600 text-amber-600 dark:text-amber-400"
+                  ? "border-amber-600 text-accent-text"
                   : "border-transparent text-foreground-muted hover:text-foreground-secondary"
               }`}
             >
@@ -380,7 +380,7 @@ export default function StrategyDetailPage() {
             <div className="rounded-lg border border-border bg-surface-card p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-foreground-strong">{t("strategy.micro_plan.title")}</h3>
-                <span className="rounded-full bg-amber-50 dark:bg-amber-950 px-3 py-1 text-xs font-medium text-amber-600 dark:text-amber-400">
+                <span className="rounded-full bg-amber-50 dark:bg-amber-950 px-3 py-1 text-xs font-medium text-accent-text">
                   {getCountdown(strategy.micro_plan.expires_at, t)}
                 </span>
               </div>

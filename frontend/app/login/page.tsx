@@ -64,7 +64,7 @@ function LoginForm() {
         style={{ borderRadius: "var(--radius-card)" }}
       >
         <div className="mb-8 text-center">
-          <p className="text-sm font-semibold tracking-widest uppercase text-accent">
+          <p className="text-sm font-semibold tracking-widest uppercase text-accent-text">
             {t("nav.brand")}
           </p>
           <h1 className="mt-2 text-2xl font-bold text-foreground">
@@ -121,7 +121,7 @@ function LoginForm() {
         </form>
 
         <p className="mt-4 text-center text-sm">
-          <Link href="/forgot-password" className="text-foreground-muted underline underline-offset-2 hover:text-accent">
+          <Link href="/forgot-password" className="text-foreground-muted underline underline-offset-2 hover:text-accent-text">
             {t("auth.login.forgot_link")}
           </Link>
         </p>
@@ -130,7 +130,7 @@ function LoginForm() {
           {t("auth.login.no_account")}{" "}
           <Link
             href="/register"
-            className="font-medium text-accent underline underline-offset-2 hover:text-accent-hover"
+            className="font-medium text-accent-text underline underline-offset-2"
           >
             {t("auth.login.create_link")}
           </Link>
