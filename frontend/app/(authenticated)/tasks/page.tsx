@@ -165,7 +165,7 @@ export default function TasksPage() {
               className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-ink-faint focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-foreground-secondary">{t("tasks.form.impact_label")}</label>
+              <label className="text-sm font-medium text-accent-text">{t("tasks.form.impact_label")}</label>
               {(["high", "medium", "low"] as const).map((level) => (
                 <button
                   key={level}

@@ -48,7 +48,7 @@ export default function LandingPage() {
         {/* Hero */}
         <section className="grid items-center gap-10 py-12 md:grid-cols-[1.2fr_1fr] md:py-20">
           <div className="flex flex-col gap-6">
-            <p className="inline-flex w-fit items-center gap-2 bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent-text" style={{ borderRadius: "var(--radius-default)" }}>
+            <p className="inline-flex w-fit items-center gap-2 bg-accent-tint px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent-text" style={{ borderRadius: "var(--radius-default)" }}>
               {t("landing.eyebrow")}
             </p>
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl">
@@ -129,7 +129,7 @@ export default function LandingPage() {
         {/* Built by */}
         <section className="border-t border-border py-16">
           <div className="grid gap-6 md:grid-cols-[auto_1fr] md:items-start">
-            <div className="flex h-16 w-16 items-center justify-center bg-accent/10 text-xl font-bold text-accent-text" style={{ borderRadius: "var(--radius-card)" }}>
+            <div className="flex h-16 w-16 items-center justify-center bg-accent-tint text-xl font-bold text-accent-text" style={{ borderRadius: "var(--radius-card)" }}>
               L
             </div>
             <div>

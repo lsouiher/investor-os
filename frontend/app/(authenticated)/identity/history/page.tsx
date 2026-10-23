@@ -149,11 +149,11 @@ export default function IdentityHistoryPage() {
                   <span className="text-sm font-semibold text-foreground-strong">
                     v{version.version}
                   </span>
-                  <span className="text-xs text-foreground-muted">
+                  <span className={`text-xs ${isSelected ? "text-accent-text" : "text-foreground-muted"}`}>
                     {new Date(version.generated_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-sm text-foreground-secondary">{version.archetype}</p>
+                <p className={`text-sm ${isSelected ? "text-accent-text" : "text-foreground-secondary"}`}>{version.archetype}</p>
               </div>
 
               <span className={`text-lg font-bold ${scoreColorClass(version.readiness_score)}`}>

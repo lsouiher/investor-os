@@ -305,7 +305,7 @@ export default function GrowthStrategyPage() {
         <div className="rounded-lg border-2 border-accent/30 bg-accent-tint px-5 py-4">
           <div className="text-xs font-medium uppercase text-accent-text">{t("growth.next_best_action")}</div>
           <div className="mt-1 font-medium text-foreground-strong">{strategy.next_best_action.title}</div>
-          <div className="mt-1 text-sm text-foreground-secondary">{strategy.next_best_action.reason}</div>
+          <div className="mt-1 text-sm text-accent-text">{strategy.next_best_action.reason}</div>
           {strategy.next_best_action.cross_path_impact.length > 0 && (
             <div className="mt-2 flex gap-2">
               {strategy.next_best_action.cross_path_impact.map((impact) => (

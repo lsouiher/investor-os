@@ -46,7 +46,7 @@ function lastContactedBadge(lastContacted: string | null, t: (key: string, param
   if (days <= 30) {
     return { label, className: "bg-accent-tint text-accent-text" };
   }
-  return { label, className: "bg-danger-tint/30 text-danger" };
+  return { label, className: "bg-danger-tint text-danger" };
 }
 
 export default function ContactsPage() {

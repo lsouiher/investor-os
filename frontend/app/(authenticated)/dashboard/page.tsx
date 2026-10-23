@@ -396,7 +396,7 @@ export default function DashboardPage() {
             <div className="mt-4 rounded-lg border border-accent/30 bg-accent-tint px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Next best action</p>
               <p className="mt-1 text-sm font-medium text-foreground-strong">{growth_strategy.next_best_action.title}</p>
-              <p className="mt-0.5 text-xs text-foreground-secondary">{growth_strategy.next_best_action.reason}</p>
+              <p className="mt-0.5 text-xs text-accent-text">{growth_strategy.next_best_action.reason}</p>
             </div>
           )}
           {growth_strategy.export_is_stale && (

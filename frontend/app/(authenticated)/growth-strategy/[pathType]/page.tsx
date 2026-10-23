@@ -63,7 +63,7 @@ function usePathNames() {
 }
 
 function scoreTierClass(score: number): string {
-  if (score < 40) return "bg-danger-tint/30 text-danger";
+  if (score < 40) return "bg-danger-tint text-danger";
   if (score < 70) return "bg-accent-tint text-accent-text";
   return "bg-ok-tint text-ok";
 }

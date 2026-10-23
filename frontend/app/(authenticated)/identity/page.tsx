@@ -270,7 +270,7 @@ export default function IdentityPage() {
                 className={`flex h-10 w-10 items-center justify-center rounded-none border text-sm font-medium transition-colors ${
                   feedbackRating === n
                     ? "border-accent bg-accent text-on-accent"
-                    : "border-border text-foreground-secondary hover:border-accent hover:bg-accent-tint"
+                    : "border-border text-foreground-secondary hover:border-accent hover:bg-accent-tint hover:text-accent-text"
                 }`}
               >
                 {n}
