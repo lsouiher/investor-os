@@ -74,8 +74,8 @@ function AuthenticatedShell({
 
   return (
     <div className="flex flex-1 flex-col md:flex-row">
-      {/* Mobile header band: brand.md §5, surface-inverse in both modes */}
-      <header className="flex h-14 items-center justify-between bg-surface-dark px-4 md:hidden">
+      {/* Mobile header band: brand.md §5, surface-inverse in both modes; dark mode adds the 1px edge facing the page */}
+      <header className="flex h-14 items-center justify-between bg-surface-dark px-4 md:hidden dark:border-b dark:border-border">
         <Wordmark inverse />
         <RecsLink className="text-sm font-medium text-ink-muted-on-inverse hover:text-ink-on-inverse">
           {t("nav.calculators")}
@@ -84,7 +84,7 @@ function AuthenticatedShell({
 
       {/* Desktop sidebar: the header bar of brand.md §5, turned on its side */}
       <aside
-        className="hidden md:flex md:flex-col md:justify-between bg-surface-dark"
+        className="hidden md:flex md:flex-col md:justify-between bg-surface-dark dark:border-r dark:border-border"
         style={{ width: "var(--sidebar-width)" }}
       >
         <div>
@@ -170,8 +170,8 @@ function AuthenticatedShell({
         </div>
       </main>
 
-      {/* Mobile bottom tab bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch justify-around bg-surface-dark md:hidden">
+      {/* Mobile bottom tab bar: the dark-mode edge sits on the bar, so each item's border-t-2 stays the active line */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-stretch justify-around bg-surface-dark md:hidden dark:border-t dark:border-border">
         {NAV_ITEMS.map((item) => {
           const active = pathname === item.href;
           return (

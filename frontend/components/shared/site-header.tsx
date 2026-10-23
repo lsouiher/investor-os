@@ -8,11 +8,12 @@ import { RecsLink } from "@/components/shared/recs-link";
 import { useTranslation } from "@/lib/i18n";
 
 // Header band for the signed-out pages (landing, auth, terms): brand.md §5, surface-inverse
-// in both modes. Extra links (e.g. the landing page's log-in) go before the theme toggle.
+// in both modes, with a 1px edge under it in dark mode. Extra links (e.g. the landing page's
+// log-in) go before the theme toggle.
 export function SiteHeader({ children }: { children?: ReactNode }) {
   const { t } = useTranslation();
   return (
-    <header className="bg-surface-dark">
+    <header className="bg-surface-dark dark:border-b dark:border-border">
       <div className="mx-auto flex h-14 w-full max-w-[var(--max-content)] items-center justify-between px-4 sm:px-6">
         <Link href="/">
           <Wordmark inverse />
