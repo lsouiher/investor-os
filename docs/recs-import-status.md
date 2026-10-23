@@ -1,12 +1,21 @@
 # RECS import: status of the InvestorsMap side of the hand-off
 
 **Date:** 2026-10-23. **Branch of record:** `master` at a9c03bb (v0.4.1.0, brand v0.4 merged).
-**Verdict:** nothing of the import has been built here. Not on `master`, not on the one other
-branch, not in a stash, not in a local-only branch. The only RECS-facing code in this repo is
-the "Calculators" link, which is a different requirement (RECS D-105, not §10.8).
+**Verdict:** nothing of the import has been built in this repo (`lsouiher/investor-os`, the
+PRIMARY). Not on `master`, not on the one other branch, not in a stash, not in a local-only
+branch. The only RECS-facing code here is the "Calculators" link, which is a different
+requirement (RECS D-105, not §10.8).
 
-This note records what was checked, what the contract asks for item by item, and a proposed
-task list. It is read-only with respect to RECS: nothing under `~/projects/recs` was edited.
+**The import does exist, in the other Investor OS repo.** The CANDIDATE
+(`lsouiher/investoros`, local `Desktop/investoros`) built all of FR-10.8.2 in its Sprint 7 on
+2026-10-15 and verified the RECS round trip (§1.4). CLAUDE.md's "Two repos, one product name"
+rule applies: until the owner picks a repo on **2026-12-04**, the same feature is never built in
+both, so **nothing in §3 starts before that date, and only if this repo is the one kept.** Until
+then RECS's `VITE_INVESTORSMAP_URL` points at the candidate.
+
+This note records what was checked, what the contract asks for item by item, the decisions
+taken on the open questions (§4), and the port plan (§3). It is read-only with respect to RECS
+and the candidate: nothing under `~/projects/recs` or `Desktop/investoros` was edited.
 
 ## 1. What exists
 
@@ -53,6 +62,26 @@ a configured, documented build variable.
 - `backend/scripts/delete-user.ts` is the account-deletion purge. It blanks every user-owned
   table in one transaction. A `recs_deals` row joins that list.
 
+### 1.4 The candidate repo already has it (read-only look, 2026-10-23)
+
+`lsouiher/investoros` at `04dd8dd` (2026-10-23). Relevant commits: `5e8bcb4` and `0e5cdb5`
+(2026-10-15, Sprint 7: `single-family` added to the slug list; round trip against a local RECS
+at `485ec35`: an edited deal sent, saved, listed, reopened with an identical summary strip,
+deleted) and `b142061` (2026-10-23, brand v0.4 restyle of `/import` and the hub list). Files:
+
+- `src/app/import/` (page, `actions.ts`, `codes.ts`, tests) and `e2e/recs-import.spec.ts`
+- `src/db/migrations/0012_recs_deals.sql`, `src/db/schema.ts`
+- `src/components/hub/RecsDeals.tsx`, `src/app/(app)/app/recs-actions.ts`, `src/copy/recs.ts`
+- `config/recs.json`: three slugs (`multifamily`, `quick-screen`, `single-family`); limits as
+  code constants in `src/schemas/recs-deal.ts`; RECS origin from `RECS_URL`
+- Decisions D-130 (§10.8 is the contract), D-131 (the deal survives sign-in in the browser,
+  not on the server), D-132 (list on hub home, last, only when the user has a live deal);
+  PRD v2.2 §7.12 is its amendment. D-120 gives it a daily retention beat.
+
+That is RECS Appendix A row 8 delivered, which is why RECS's spec says it is built. If this repo
+is kept on 2026-12-04, §3 ports it; the candidate's D-131 and D-132 are the first things to
+read, since they answer §4's questions 1 and 3 the same way this note does.
+
 ## 2. The contract, item by item
 
 Source: `~/projects/recs/docs/spec.md` §10.8 FR-10.8.2 and DM-7; `~/projects/recs/docs/decisions.md`
@@ -79,13 +108,16 @@ Everything below is **missing** unless marked otherwise.
 FR-10.8.3 (InvestorsMap computes on sent deals, P2) is out of scope: it depends on RECS's
 engine package (P2-10) and our deal pipeline (PRD V3.1). Nothing here should decode `d`.
 
-## 3. Proposed task list
+## 3. Port plan (not before 2026-12-04, and only if this repo is kept)
 
 Sized the way `.specify/specs/001-identity-platform/tasks.md` sizes tasks: one task is one
 file or one closely related set of files, `[P]` where it can run in parallel with its
-neighbours. Roughly a two-day feature. Numbering is provisional; the spec-kit pass
-(`/speckit-specify` → `/speckit-plan` → `/speckit-tasks`) would renumber it under a
-`003-recs-import` folder. No identity, AI, or worker code is touched.
+neighbours. Roughly a two-day feature, less with the candidate's tests and copy to port from.
+Numbering is provisional; when the work is scheduled, the spec-kit pass
+(`/speckit-specify` → `/speckit-plan` → `/speckit-tasks`, see `Principal_Dev_Framework.md`)
+writes the feature's `spec.md`, `plan.md` and `tasks.md` under `.specify/specs/003-recs-import/`
+and renumbers these as T-tasks. The decisions in §4 are inputs to that pass. No identity, AI,
+or worker code is touched. Where the candidate made the same choice, port its tests first.
 
 ### Phase A: Data and API (backend)
 
@@ -100,7 +132,7 @@ neighbours. Roughly a two-day feature. Numbering is provisional; the spec-kit pa
 ### Phase B: Import page and auth return path (frontend)
 
 - [ ] R008 `frontend/lib/recs-import.ts`: `parseImportFragment(hash)` → `{ c, name, d } | null` (URL-decodes `c` and `n`, leaves `d` untouched), with the same bounds as the API; `stashImport` / `takeImport` on `sessionStorage` (same pattern and lifetime as `signup-source.ts`). Unit tests, including a name with `&`, `#`, `%` and non-ASCII (the D-112 (5) cases).
-- [ ] R009 `frontend/app/import/page.tsx` (public route, client component): reads the fragment on mount, stashes it, strips the hash from the address bar (`history.replaceState`) so a later reload or share does not re-import. Signed in: shows the deal name and the calculator's label with "Save to InvestorsMap" and "Cancel". Signed out: see open question 3. Invalid or absent fragment: a short "nothing to import" message with a link to the hub.
+- [ ] R009 `frontend/app/import/page.tsx` (public route, client component): reads the fragment on mount, stashes it, strips the hash from the address bar (`history.replaceState`) so a later reload or share does not re-import. Signed in: shows the deal name and the calculator's label with "Save to InvestorsMap" and "Cancel". Signed out: shows the same name and label with "Sign in to save" and "Create an account", both carrying `?next=/import`; after auth the page shows the one-click "Save" (§4 decision 3). Invalid or absent fragment: a short "nothing to import" message with a link to the hub.
 - [ ] R010 Return path: `/login` and `/register` accept `?next=/import` (allow-list of relative paths, no open redirect) and `rememberSignupSource` also reads `ref` so `?ref=recs` is recorded as the signup source. The authenticated layout's redirect to `/login` carries `next` for `/import`.
 - [ ] R011 `frontend/lib/signup-source.ts` test update and a contract test that `signup_source: "recs"` is accepted by `validateSignupSource` (it already matches the regex; the test pins it).
 - [ ] R012 EN and FR strings for the page and the hub section (`import.*`, `hub.recs_deals.*`) in `frontend/locales/{en,fr}.json`.
@@ -108,7 +140,7 @@ neighbours. Roughly a two-day feature. Numbering is provisional; the spec-kit pa
 ### Phase C: Hub list
 
 - [ ] R013 `frontend/components/hub/recs-deals.tsx`: "Deals from your calculators" with name, calculator label, date, "Open in RECS" (`${NEXT_PUBLIC_RECS_URL}/calculators/${c}#d=${d}`, new tab, `rel="noopener noreferrer"`) and delete with an inline confirm. Hidden when the list is empty and `NEXT_PUBLIC_RECS_URL` is unset; shows an empty state when the variable is set and the list is empty. Reuses `RecsLink`'s env handling.
-- [ ] R014 Mount the section on the page chosen in open question 1, below the audit cards.
+- [ ] R014 Mount the section on `/hub` (`frontend/app/(authenticated)/hub/page.tsx`), last, below the audit cards (§4 decision 1).
 - [ ] R015 Component tests: renders rows, Open in RECS href is exact (byte-for-byte `d`), delete calls the API and removes the row.
 
 ### Phase D: Docs, ops and release
@@ -120,42 +152,38 @@ neighbours. Roughly a two-day feature. Numbering is provisional; the spec-kit pa
 
 Dependencies: R001 → R002 → R004 → R006; R003 ∥ R005 ∥ R008; R008 → R009 → R010; R004 + R009 → R013 → R014 → R015; R018 after everything; R016 and R017 any time.
 
-## 4. Open questions
+## 4. Decisions on the open questions (owner, 2026-10-23)
 
-1. **Which hub page hosts the list?** `/hub` is the identity hub (five audit cards and progressive
-   disclosure); `/dashboard` is the return-visit page (identity snapshot, active strategy, priority
-   tasks). RECS says "the hub". Recommendation: `/hub`, below the audit cards, because the section
-   is a library the user curates, not a daily surface, and the dashboard is already three sections
-   deep on a phone. Revisit when the deal pipeline (PRD V3.1) exists; the list moves there.
+The owner took the recommendations as written. They bind §3 when it runs.
 
-2. **How does purge run?** Account deletion is covered by extending `delete-user.ts` (R005).
-   Time-based retention has no runner in this repo yet: data-model.md says "90 days recommended,
-   manual purge for now, scheduled task post-MVP". Options: (a) no time-based purge for
-   `recs_deals`, as for contacts and tasks, which are also kept until the account goes; (b) a
-   Bull repeatable job on the existing Redis worker that hard-deletes rows with `deleted_at`
-   older than 30 days, which would be the first scheduled purge in the codebase and would also
-   suit `password_reset_tokens`. Recommendation: (a) for v1, stated in `docs/deploy.md`; (b) as a
-   follow-up TODO so soft-deleted rows do not accumulate forever.
+1. **Host page: `/hub`, last, below the audit cards.** `/hub` is the identity hub (five audit
+   cards and progressive disclosure); `/dashboard` is the return-visit page (identity snapshot,
+   active strategy, priority tasks). The section is a library the user curates, not a daily
+   surface, and the dashboard is already three sections deep on a phone. Same placement as the
+   candidate's D-132. Revisit when the deal pipeline (PRD V3.1) exists; the list moves there.
 
-3. **Signed-out visitor: confirmation before or after sign-in?** FR-10.8.2 says "keeps it across
-   sign-in or sign-up, shows the name for confirmation, then stores". Two readings:
-   (a) `/import` shows the deal name immediately, with "Sign in to save" / "Create an account"
-   buttons, and after auth returns to `/import` where a one-click "Save" completes it; (b) `/import`
-   redirects straight to sign-in and the confirmation appears only afterwards. Recommendation: (a).
-   A stranger arriving from RECS should see what they are about to save before being asked for
-   an account; it is also the better conversion screen (the deal name is the hook). The stash is
-   session-scoped, so an abandoned sign-in leaves nothing behind. Either way the fragment is
-   stashed before any navigation, so a redirect through `/login` cannot lose it.
+2. **Purge: account deletion through `delete-user.ts` (R005); no time-based purge in v1.**
+   `recs_deals` rows are kept until the account goes, as contacts and tasks are. data-model.md's
+   "90 days recommended, manual purge for now" stands and `docs/deploy.md` says so (R017).
+   Follow-up TODO: a Bull repeatable job on the existing Redis worker that hard-deletes rows with
+   `deleted_at` older than 30 days, the first scheduled purge in this codebase, which would also
+   suit `password_reset_tokens`.
 
-4. **Dedup.** Recommendation: none in v1 (§2 item 11). If the list fills with near-duplicates in
-   the beta, dedup on exact `(user_id, c, d)` with a "saved again" notice is a one-line unique
-   index later.
+3. **Signed-out visitor sees the deal name before sign-in.** `/import` shows the name and
+   calculator label at once with "Sign in to save" and "Create an account"; after auth it returns
+   to `/import` for a one-click "Save". A stranger arriving from RECS sees what they are about to
+   save before being asked for an account, and the deal name is the conversion hook. The stash is
+   session-scoped, so an abandoned sign-in leaves nothing behind, and the fragment is stashed
+   before any navigation, so a redirect through `/login` cannot lose it. Same reading as the
+   candidate's D-131.
 
-5. **Scope of the known-slug list.** Start with all eight registered RECS slugs so RECS can set
-   `VITE_INVESTORSMAP_URL` once; or start with the two v1 calculators and extend as RECS ships?
-   Recommendation: all eight. The list only gates what we accept to store; it carries no
-   calculator knowledge, so there is no cost to being generous and a coordination cost to being
-   strict (RECS Q-17 to Q-27 each wait on it).
+4. **Dedup: none in v1** (§2 item 11). If the beta list fills with near-duplicates, dedup on exact
+   `(user_id, c, d)` with a "saved again" notice is a one-line unique index later.
+
+5. **Known-slug list: all eight registered RECS slugs from the start.** The list only gates what
+   we accept to store and carries no calculator knowledge, so there is no cost to being generous
+   and a coordination cost to being strict (RECS Q-17 to Q-27 each wait on it). The candidate
+   lists three; a port extends to eight.
 
 ## 5. Not in scope
 
