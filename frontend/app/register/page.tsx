@@ -5,8 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api-client";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { Wordmark } from "@/components/shared/wordmark";
+import { SiteHeader } from "@/components/shared/site-header";
 import { useTranslation } from "@/lib/i18n";
 
 export default function RegisterPage() {
@@ -67,93 +66,92 @@ function RegisterForm() {
   }
 
   return (
-    <div className="relative flex flex-1 items-center justify-center bg-background px-4">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-      <div
-        className="w-full max-w-md bg-surface-card p-8 shadow-sm"
-        style={{ borderRadius: "var(--radius-card)" }}
-      >
-        <div className="mb-8 text-center">
-          <Wordmark />
-          <h1 className="mt-2 text-2xl font-bold text-foreground">
-            {t("auth.register.title")}
-          </h1>
-        </div>
+    <div className="flex flex-1 flex-col bg-background">
+      <SiteHeader />
+      <div className="flex flex-1 items-center justify-center px-4 py-10">
+        <div
+          className="w-full max-w-md bg-surface-card p-8 shadow-sm"
+          style={{ borderRadius: "var(--radius-card)" }}
+        >
+          <div className="mb-8 text-center">
+            <h1 className="text-2xl font-bold text-foreground">
+              {t("auth.register.title")}
+            </h1>
+          </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {error && (
-            <div
-              className="bg-danger-tint px-4 py-3 text-sm text-danger"
-              style={{ borderRadius: "var(--radius-default)" }}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {error && (
+              <div
+                className="bg-danger-tint px-4 py-3 text-sm text-danger"
+                style={{ borderRadius: "var(--radius-default)" }}
+              >
+                {error}
+              </div>
+            )}
+
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-foreground">{t("auth.login.email_label")}</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t("auth.login.email_placeholder")}
+                autoComplete="email"
+                className="h-10 border border-foreground/10 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-accent"
+                style={{ borderRadius: "var(--radius-default)" }}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-foreground">
+                {t("auth.login.password_label")}
+              </span>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t("auth.register.password_placeholder")}
+                autoComplete="new-password"
+                className="h-10 border border-foreground/10 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-accent"
+                style={{ borderRadius: "var(--radius-default)" }}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-foreground">
+                {t("auth.register.confirm_label")}
+              </span>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder={t("auth.register.confirm_placeholder")}
+                autoComplete="new-password"
+                className="h-10 border border-foreground/10 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-accent"
+                style={{ borderRadius: "var(--radius-default)" }}
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="mt-2 h-10 bg-accent text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
+              style={{ borderRadius: "var(--radius-button)" }}
             >
-              {error}
-            </div>
-          )}
+              {submitting ? t("auth.register.submitting") : t("auth.register.submit")}
+            </button>
+          </form>
 
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-foreground">{t("auth.login.email_label")}</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t("auth.login.email_placeholder")}
-              autoComplete="email"
-              className="h-10 border border-foreground/10 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-accent"
-              style={{ borderRadius: "var(--radius-default)" }}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-foreground">
-              {t("auth.login.password_label")}
-            </span>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={t("auth.register.password_placeholder")}
-              autoComplete="new-password"
-              className="h-10 border border-foreground/10 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-accent"
-              style={{ borderRadius: "var(--radius-default)" }}
-            />
-          </label>
-
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-foreground">
-              {t("auth.register.confirm_label")}
-            </span>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder={t("auth.register.confirm_placeholder")}
-              autoComplete="new-password"
-              className="h-10 border border-foreground/10 bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-accent"
-              style={{ borderRadius: "var(--radius-default)" }}
-            />
-          </label>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-2 h-10 bg-accent text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
-            style={{ borderRadius: "var(--radius-button)" }}
-          >
-            {submitting ? t("auth.register.submitting") : t("auth.register.submit")}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-foreground-muted">
-          {t("auth.register.has_account")}{" "}
-          <Link
-            href="/login"
-            className="font-medium text-accent-text underline underline-offset-2"
-          >
-            {t("auth.register.login_link")}
-          </Link>
-        </p>
+          <p className="mt-6 text-center text-sm text-foreground-muted">
+            {t("auth.register.has_account")}{" "}
+            <Link
+              href="/login"
+              className="font-medium text-accent-text underline underline-offset-2"
+            >
+              {t("auth.register.login_link")}
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

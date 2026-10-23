@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Wordmark } from "@/components/shared/wordmark";
+import { SiteHeader } from "@/components/shared/site-header";
 
 const CONTACT = process.env.NEXT_PUBLIC_FEEDBACK_EMAIL ?? "";
 const EFFECTIVE = "September 2026";
@@ -8,10 +8,10 @@ const EFFECTIVE = "September 2026";
 // readable on a phone in two minutes. English only for the beta.
 export default function TermsPage() {
   return (
-    <div className="flex-1 bg-background px-4 py-10">
-      <article className="mx-auto max-w-2xl">
-        <Wordmark />
-        <h1 className="mt-2 text-3xl font-bold text-foreground">Beta terms &amp; privacy</h1>
+    <div className="flex-1 bg-background">
+      <SiteHeader />
+      <article className="mx-auto max-w-2xl px-4 py-10">
+        <h1 className="text-3xl font-bold text-foreground">Beta terms &amp; privacy</h1>
         <p className="mt-1 text-sm text-foreground-muted">Effective {EFFECTIVE}</p>
 
         <Section title="What this is">

@@ -3,9 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { rememberSignupSource } from "@/lib/signup-source";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
-import { Wordmark } from "@/components/shared/wordmark";
-import { RecsLink } from "@/components/shared/recs-link";
+import { SiteHeader } from "@/components/shared/site-header";
 import { useTranslation } from "@/lib/i18n";
 
 // Landing page for a stranger who just got an email or scanned a QR at a conference: what
@@ -40,22 +38,11 @@ export default function LandingPage() {
 
   return (
     <div className="flex-1 bg-background">
-      {/* Top bar */}
-      {/* Header band: brand.md §5, surface-inverse in both modes */}
-      <header className="bg-surface-dark">
-        <div className="mx-auto flex h-14 w-full max-w-[var(--max-content)] items-center justify-between px-4 sm:px-6">
-          <Wordmark inverse />
-          <div className="flex items-center gap-4">
-            <RecsLink className="text-sm font-medium text-ink-muted-on-inverse hover:text-ink-on-inverse">
-              {t("nav.calculators")}
-            </RecsLink>
-            <Link href="/login" className="text-sm font-medium text-ink-on-inverse hover:text-accent-on-inverse">
-              {t("landing.cta_login")}
-            </Link>
-            <ThemeToggle inverse />
-          </div>
-        </div>
-      </header>
+      <SiteHeader>
+        <Link href="/login" className="text-sm font-medium text-ink-on-inverse hover:text-accent-on-inverse">
+          {t("landing.cta_login")}
+        </Link>
+      </SiteHeader>
 
       <main className="mx-auto w-full max-w-[var(--max-content)] px-4 sm:px-6">
         {/* Hero */}
