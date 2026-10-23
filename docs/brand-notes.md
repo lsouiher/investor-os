@@ -38,8 +38,9 @@ Radii follow §4: `--radius-button` 0, `--radius-default` 4 (inputs), `--radius-
 new `--radius-pill` 999.
 
 Kept, not in brand.md: `--foreground-secondary` (same as `ink-muted` in light, `#D1D5DB`
-dark), `--foreground-tertiary` (see v0.4 below), `--score-red/amber/emerald` (the identity
-card's score ring).
+dark), `--foreground-tertiary` (see v0.4 below). Added, not in brand.md: the tints and the
+status-on-inverse pair in §2 below. `--score-red/amber/emerald` are gone; their users now take
+`danger`/`accent`/`ok`, or the on-inverse pair on the identity card.
 
 ### Classes
 
@@ -57,52 +58,74 @@ card's score ring).
 | `accent-amber-600` (range input), `from-amber-600/10` | `accent-accent`, `from-accent/10` |
 | `text-foreground-tertiary` on readable text (51 places) | `text-foreground-muted` |
 | primary buttons `rounded`/`rounded-md`/`rounded-lg`; text inputs `rounded-lg` | `rounded-none`; `rounded` (4px) |
+| `text-red-500/600/700` (+ `dark:text-red-300/400`), `text-score-red` | `text-danger` |
+| `text-emerald-500/600/700` (+ `dark:text-emerald-300/400`) | `text-ok` |
+| `bg-red-50/100` + `dark:bg-red-900/950`, `bg-score-red/10` (error banners, badges) | `bg-danger-tint` |
+| `bg-emerald-50/100` + `dark:bg-emerald-900/30` (success badges) | `bg-ok-tint` |
+| `bg-blue-50/100` + `text-blue-*` (info badges, prerequisite tag) | `bg-info-tint text-info` (brand.md: slate, not blue) |
+| `border-red-200` + `dark:border-red-700`; `border-emerald-200` + `dark:border-emerald-700` | `border-danger/30`; `border-ok/30` |
+| `border-red-400/600` (invalid field), `border-emerald-500` (done step) | `border-danger`, `border-ok` |
+| completed checkbox `border-emerald-500 bg-emerald-500 text-white` | `border-ok bg-ok text-surface-card` (white on light `ok` 5.5:1, navy on dark `ok` 8.9:1; white on emerald-500 was 2.5:1) |
+| `bg-emerald-200/300` + `dark:bg-emerald-800` (progress connectors) | `bg-ok/40`, `bg-ok` |
+| dashboard `ScoreGauge` hex `#dc2626/#d97706/#059669`, track `#e5e7eb` | `var(--danger)`/`var(--chart-1)`/`var(--ok)`, `var(--border)` |
+| growth path stripes `border-l-emerald/blue/purple-500`, fallback `border-l-gray-400` | `border-l-chart-3`/`chart-2`/`info`, fallback `border-l-border` (portfolio stays `chart-1`) |
+| export consent confirm `bg-gray-900 text-white` | the primary button (`bg-accent text-on-accent`, square) |
+| identity card `to-purple-900/10` gradient, `text-white` score | `to-transparent`, `text-ink-on-inverse` |
 
-`grep -rnoE '[a-z:]*amber-[0-9]+' frontend/app frontend/components` returns nothing.
+`grep -rnoE '[a-z:]*amber-[0-9]+' frontend/app frontend/components` returns nothing, and
+neither does the same grep for `red|emerald|gray|blue|purple|green|yellow`.
 
 ## 2. Changes beyond brand.md's letter
 
 - **`--accent-tint`** (`#FFFBEB` light, `#2A2418` dark): brand.md has no tinted background,
   and Investor OS uses one for amber callouts and badges. `accent-text` on it is 4.8:1 and
   9.2:1. Callout borders use `border-accent/30`, not a new token.
+- **Status tints**, the same idea for the other three status colours: `--ok-tint`
+  (`#ECFDF5` / `#172A24`), `--danger-tint` (`#FEF2F2` / `#2E1A1E`), `--info-tint`
+  (`#F1F5F9` / `#1E2433`). Each status colour reads 4.5:1 on its own tint in both modes
+  (ok 5.2 / 7.8, danger 5.9 / 5.9, info 6.9 / 6.0); the contrast test asserts it.
+- **Status on `surface-inverse`**: `--ok-on-inverse` `#34D399` and `--danger-on-inverse`
+  `#F87171`, the same in both modes (brand.md's dark `ok`/`danger`), for scores on the navy
+  identity card: 8.9:1 and 6.2:1 on navy. See the v0.4 item below.
 - **The sidebar is the header bar on its side.** §5 describes a horizontal header with a line
   *under* the active route. Investor OS's signed-in shell has a left sidebar on desktop and a
   bottom tab bar on phones. Both are on `surface-inverse` now. The active line sits on the
   sidebar's left edge and the tab bar's top edge (2px `accent-on-inverse`, with
   `aria-current="page"`). Phones also get a 56px header band with the wordmark, since they
   had no brand surface before.
-- **Wordmark on light cards.** The auth pages and terms page show the wordmark on a white
-  card. `accent-on-inverse` (`#F59E0B`) on white is 2.1:1, under the 3:1 a graphic needs,
-  so the square takes `accent` there (3.2:1). On inverse surfaces it is `accent-on-inverse`.
+- **Signed-out pages share one band.** Landing, login, register, both password pages and
+  terms render `SiteHeader` (`components/shared/site-header.tsx`): wordmark linking home,
+  Calculators, the theme toggle, plus the landing page's log-in link. The auth card drops its
+  own wordmark. `Wordmark` keeps a light variant (square in `accent`, since
+  `accent-on-inverse` on white is 2.1:1) but nothing renders it now.
 - **Chart on navy.** The identity card draws the radar chart on `surface-inverse`, so
   "charts on `surface` only" was not quite true. Its axis labels were
   `fill-foreground-secondary`, which is 2.3:1 on navy in light mode. `RadarChart` takes
   `inverse` for that card: series `accent-on-inverse`, labels `ink-muted-on-inverse`. All
   other radar and sparkline uses sit on `surface-card`. Both charts draw with `var(--chart-1)`.
-- **Score thresholds.** The mid-band score text (`text-amber-600` in five score-colour
-  helpers) is now `text-accent-text`, which has the same value as `warn`. Its red-600 and
-  emerald-600 siblings are raw Tailwind and still in place, because this pass was about
-  amber. Next step: move all three to `danger`/`warn`/`ok`. The dashboard's `ScoreGauge`
-  also strokes hex `#dc2626/#d97706/#059669`.
+- **Score thresholds.** The five score-colour helpers now read `danger` / `accent-text`
+  (same value as `warn`) / `ok`. On the identity card they read `danger-on-inverse` /
+  `accent-on-inverse` / `ok-on-inverse`, for the ring and the sub-score figures.
+- **Path stripes.** The growth path cards had a colour per path (emerald, blue, purple).
+  brand.md spends colour on status, not decoration, and has no blue or purple; the stripes
+  now take the chart series in layout order and then `info`. The path name and icon always
+  sit beside the stripe.
 - **Disabled controls keep `foreground-tertiary`.** These are the two `cursor-not-allowed`
   states in the audit form. WCAG 1.4.3 exempts inactive components.
 - **Dead hovers.** `text-foreground-muted hover:text-foreground-secondary` changed nothing in
   light mode, because both are `#4B5563`. These hovers now go to `foreground-strong`.
 - **Calculators link.** It opens RECS in a new tab, and it appears in the sidebar nav, the
-  phone header band and the landing header. The frontend has no `.env.example`, so
+  phone header band and the signed-out header band. The frontend has no `.env.example`, so
   `NEXT_PUBLIC_RECS_URL` is documented in `frontend/.env.local.example`, the frontend
   Dockerfile's build args and `docs/deploy.md`.
 
 Left as they were (follow-ups, not regressions):
 
-- The product name in body copy, the page `<title>` and locale strings (e.g. "InvestorOS
-  feedback") is still "InvestorOS". Only the wordmark says "Investor OS", as §5 has it.
-- The auth pages have no header band. They are a centred card, so the light-mode signature
-  pairing only shows on the landing page and the signed-in shell.
 - Other radii: secondary buttons and some badges still use `rounded-md`/`rounded-lg`, and the
   identity card uses `rounded-xl`.
-- Raw `red-*`, `emerald-*` and `gray-*` classes elsewhere.
-- On the navy identity card, red-600 sub-scores are 3.5:1 (3.9:1 in dark mode).
+- Code comments, the backend `package.json` description and the Dockerfile headers still say
+  "InvestorOS"; every string a user sees (page title, copy, locales, the PDF blueprint, the
+  growth export and the reset email) says "Investor OS".
 
 ## 3. Proposed for v0.4
 
@@ -162,7 +185,10 @@ The tokens all pass. Only the quoted ratios are off.
 
 - **Status colours on `surface-inverse`.** Investor OS needs them on the identity card, and
   RECS will need them on the summary strip ("status colour on the figure"). The light
-  `danger` (`#B91C1C`) is about 2.6:1 on navy.
+  `danger` (`#B91C1C`) is about 2.6:1 on navy. Proposal: `ok-on-inverse` `#34D399` and
+  `danger-on-inverse` `#F87171` (the dark-mode values, as Investor OS now ships them), and
+  `accent-on-inverse` for watch/warn. Also name the tints (`ok-tint`, `danger-tint`,
+  `info-tint`, `accent-tint`) in §2.
 - **§7, the link rule:** Investor OS has now adopted `accent-text` for light-mode links and
   amber text, so this item can close.
 
@@ -214,7 +240,12 @@ how the tokens were used, which is what the next table shows.
 | Radar axis labels on the navy identity card, light | 2.3 ✗ | 6.7 (`ink-muted-on-inverse`) |
 | Amber callout text, light (amber-800 on amber-50 → accent-text on accent-tint) | 6.8 | 4.8 |
 | Amber callout text, dark (amber-200 on amber-950 → accent-text on accent-tint) | 12.0 | 9.2 |
-| Wordmark square on a white card | n/a (no mark) | 3.2 (`accent`) |
+| Score text, light (red-600 / emerald-600 on white) | 4.8 / 3.8 ✗ | 6.5 / 5.5 (`danger` / `ok`) |
+| Score text, dark (same classes, no dark pair, on `#1A1A2E`) | 3.5 ✗ / 4.5 | 6.2 / 8.9 |
+| Identity card sub-scores on navy, light (red-600 / emerald-600) | 3.5 ✗ / 4.5 | 6.2 / 8.9 (on-inverse) |
+| Error banner text (red-700 on red-50 → danger on danger-tint), light / dark | 5.9 / 8.5 | 5.9 / 5.9 |
+| Success badge text (emerald-700 on emerald-100 → ok on ok-tint), light | 4.8 | 5.2 |
+| Completed checkbox tick (white on emerald-500) | 2.5 ✗ | 5.5 light / 8.9 dark |
 
 The callouts lose some contrast in return for sitting on brand tokens. Both modes still clear
 4.5:1.
