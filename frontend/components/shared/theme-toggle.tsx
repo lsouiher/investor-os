@@ -5,7 +5,7 @@ import { useTranslation } from "@/lib/i18n";
 
 const CYCLE: Array<"light" | "dark" | "system"> = ["light", "dark", "system"];
 
-export function ThemeToggle({ className }: { className?: string }) {
+export function ThemeToggle({ className, inverse = false }: { className?: string; inverse?: boolean }) {
   const { theme, setTheme } = useTheme();
   const { t } = useTranslation();
 
@@ -24,7 +24,7 @@ export function ThemeToggle({ className }: { className?: string }) {
   return (
     <button
       onClick={next}
-      className={`text-foreground-muted hover:text-foreground transition-colors ${className ?? ""}`}
+      className={`${inverse ? "text-ink-muted-on-inverse hover:text-ink-on-inverse" : "text-foreground-muted hover:text-foreground"} transition-colors ${className ?? ""}`}
       title={label}
       aria-label={label}
     >

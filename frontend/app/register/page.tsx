@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api-client";
 import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { Wordmark } from "@/components/shared/wordmark";
 import { useTranslation } from "@/lib/i18n";
 
 export default function RegisterPage() {
@@ -75,9 +76,7 @@ function RegisterForm() {
         style={{ borderRadius: "var(--radius-card)" }}
       >
         <div className="mb-8 text-center">
-          <p className="text-sm font-semibold tracking-widest uppercase text-accent-text">
-            {t("nav.brand")}
-          </p>
+          <Wordmark />
           <h1 className="mt-2 text-2xl font-bold text-foreground">
             {t("auth.register.title")}
           </h1>

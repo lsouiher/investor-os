@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Wordmark } from "@/components/shared/wordmark";
 
 const CONTACT = process.env.NEXT_PUBLIC_FEEDBACK_EMAIL ?? "";
 const EFFECTIVE = "September 2026";
@@ -9,7 +10,7 @@ export default function TermsPage() {
   return (
     <div className="flex-1 bg-background px-4 py-10">
       <article className="mx-auto max-w-2xl">
-        <p className="text-sm font-semibold tracking-widest uppercase text-accent-text">InvestorOS</p>
+        <Wordmark />
         <h1 className="mt-2 text-3xl font-bold text-foreground">Beta terms &amp; privacy</h1>
         <p className="mt-1 text-sm text-foreground-muted">Effective {EFFECTIVE}</p>
 
