@@ -108,7 +108,7 @@ export default function ExportButton({
         className={`inline-flex items-center gap-2 rounded-none px-4 py-2 text-sm font-medium transition-colors ${
           isStale
             ? "bg-accent text-on-accent hover:bg-accent-hover"
-            : "bg-foreground-strong text-background hover:bg-foreground-secondary"
+            : "border border-border text-foreground hover:bg-surface-subtle"
         } disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       >
         {isDownloading ? (
