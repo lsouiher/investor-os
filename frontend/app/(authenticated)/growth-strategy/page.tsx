@@ -302,14 +302,14 @@ export default function GrowthStrategyPage() {
 
       {/* Next Best Action */}
       {strategy.next_best_action && (
-        <div className="rounded-lg border-2 border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-5 py-4">
+        <div className="rounded-lg border-2 border-accent/30 bg-accent-tint px-5 py-4">
           <div className="text-xs font-medium uppercase text-accent-text">{t("growth.next_best_action")}</div>
           <div className="mt-1 font-medium text-foreground-strong">{strategy.next_best_action.title}</div>
           <div className="mt-1 text-sm text-foreground-secondary">{strategy.next_best_action.reason}</div>
           {strategy.next_best_action.cross_path_impact.length > 0 && (
             <div className="mt-2 flex gap-2">
               {strategy.next_best_action.cross_path_impact.map((impact) => (
-                <span key={impact} className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs text-accent-text">
+                <span key={impact} className="rounded bg-accent-tint px-2 py-0.5 text-xs text-accent-text">
                   {PATH_NAMES[impact] || impact}
                 </span>
               ))}
@@ -394,7 +394,7 @@ export default function GrowthStrategyPage() {
         </div>
         <div className="mt-2 h-2 w-full rounded-full bg-surface-subtle">
           <div
-            className="h-2 rounded-full bg-amber-500 transition-all"
+            className="h-2 rounded-full bg-accent transition-all"
             style={{ width: `${strategy.overall_progress}%` }}
           />
         </div>

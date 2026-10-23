@@ -91,7 +91,7 @@ export default function BlueprintDownload({
       >
         {loading ? (
           <>
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-border border-t-amber-600" />
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-border border-t-accent" />
             {t("blueprint.downloading")}
           </>
         ) : (

@@ -286,7 +286,7 @@ export default function SimulationPage() {
                   onChange={(e) =>
                     handleSliderChange(variable.key, Number(e.target.value))
                   }
-                  className="w-full accent-amber-600"
+                  className="w-full accent-accent"
                 />
                 <div className="flex justify-between text-xs text-foreground-tertiary">
                   <span>{variable.min}</span>
@@ -343,7 +343,7 @@ export default function SimulationPage() {
                   </div>
                 ))}
               </div>
-              <p className="mt-4 rounded-md bg-amber-50 dark:bg-amber-950 p-3 text-xs text-accent-text">
+              <p className="mt-4 rounded-md bg-accent-tint p-3 text-xs text-accent-text">
                 {result.insight}
               </p>
             </>

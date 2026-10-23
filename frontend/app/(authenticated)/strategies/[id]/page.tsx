@@ -76,7 +76,7 @@ function CheckButton({ checked, onClick }: { checked: boolean; onClick: () => vo
       className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
         checked
           ? "border-emerald-500 bg-emerald-500 text-white"
-          : "border-border hover:border-amber-400"
+          : "border-border hover:border-accent"
       }`}
     >
       {checked && (
@@ -296,8 +296,8 @@ export default function StrategyDetailPage() {
       )}
 
       {planPending && (
-        <div className="flex items-center gap-3 rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4 text-sm text-accent-text">
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-600 border-t-transparent" />
+        <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent-tint p-4 text-sm text-accent-text">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
           {t("strategy.plan_pending")}
         </div>
       )}
@@ -313,7 +313,7 @@ export default function StrategyDetailPage() {
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-surface-subtle">
             <div
-              className="h-full rounded-full bg-amber-600 transition-all duration-500"
+              className="h-full rounded-full bg-accent transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -329,7 +329,7 @@ export default function StrategyDetailPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`border-b-2 pb-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? "border-amber-600 text-accent-text"
+                  ? "border-accent text-accent-text"
                   : "border-transparent text-foreground-muted hover:text-foreground-secondary"
               }`}
             >
@@ -380,7 +380,7 @@ export default function StrategyDetailPage() {
             <div className="rounded-lg border border-border bg-surface-card p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-foreground-strong">{t("strategy.micro_plan.title")}</h3>
-                <span className="rounded-full bg-amber-50 dark:bg-amber-950 px-3 py-1 text-xs font-medium text-accent-text">
+                <span className="rounded-full bg-accent-tint px-3 py-1 text-xs font-medium text-accent-text">
                   {getCountdown(strategy.micro_plan.expires_at, t)}
                 </span>
               </div>

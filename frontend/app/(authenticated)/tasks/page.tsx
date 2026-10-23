@@ -38,7 +38,7 @@ const IMPACT_TO_SCORE: Record<Impact, number> = { high: 80, medium: 50, low: 20 
 
 const IMPACT_STYLES: Record<string, string> = {
   high: "bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300",
-  medium: "bg-amber-50 dark:bg-amber-950 text-accent-text",
+  medium: "bg-accent-tint text-accent-text",
   low: "bg-surface-subtle text-foreground-secondary",
 };
 
@@ -146,7 +146,7 @@ export default function TasksPage() {
       {showAddForm && (
         <form
           onSubmit={addTask}
-          className="rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 p-4"
+          className="rounded-lg border border-accent/30 bg-accent-tint p-4"
         >
           <div className="space-y-3">
             <input
@@ -155,14 +155,14 @@ export default function TasksPage() {
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder={t("tasks.form.title_placeholder")}
               required
-              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
             <input
               type="text"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
               placeholder={t("tasks.form.description_placeholder")}
-              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border bg-surface-card px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             />
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium text-foreground-secondary">{t("tasks.form.impact_label")}</label>
@@ -205,7 +205,7 @@ export default function TasksPage() {
               className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
                 task.is_completed
                   ? "border-emerald-500 bg-emerald-500 text-white"
-                  : "border-border hover:border-amber-400"
+                  : "border-border hover:border-accent"
               }`}
             >
               {task.is_completed && (

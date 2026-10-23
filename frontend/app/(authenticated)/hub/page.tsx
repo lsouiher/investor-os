@@ -69,8 +69,8 @@ function StepIcon({ status }: { status: "completed" | "current" | "not_started" 
   }
   if (status === "current") {
     return (
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
-        <svg className="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent-tint">
+        <svg className="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
       </div>
@@ -181,7 +181,7 @@ export default function IdentityHubPage() {
         </div>
         <div className="w-full bg-border-muted h-2.5 rounded-full overflow-hidden">
           <div
-            className="bg-amber-600 h-2.5 transition-all duration-500 rounded-full"
+            className="bg-accent h-2.5 transition-all duration-500 rounded-full"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -214,7 +214,7 @@ export default function IdentityHubPage() {
                 <div
                   className={`bg-surface-card rounded-lg border p-6 transition-all ${
                     isRecommended
-                      ? "border-amber-300 shadow-sm"
+                      ? "border-accent shadow-sm"
                       : "border-border"
                   }`}
                 >
@@ -227,7 +227,7 @@ export default function IdentityHubPage() {
                         <ScoreBadge score={audit.sub_score} />
                       )}
                       {audit?.status === "in_progress" && (
-                        <span className="text-xs bg-amber-50 dark:bg-amber-950 text-accent-text px-2 py-0.5 border border-amber-200 dark:border-amber-700">
+                        <span className="text-xs bg-accent-tint text-accent-text px-2 py-0.5 border border-accent/30">
                           {t("audit.status.in_progress")}
                         </span>
                       )}

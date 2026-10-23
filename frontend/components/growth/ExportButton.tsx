@@ -153,7 +153,7 @@ export default function ExportButton({
             <p className="mt-2 text-sm text-foreground-secondary">
               {t("export.description")}
             </p>
-            <div className="mt-3 rounded-md bg-amber-50 dark:bg-amber-950 p-3">
+            <div className="mt-3 rounded-md bg-accent-tint p-3">
               <p className="text-sm text-accent-text">
                 <strong>{t("export.sensitive_title")}</strong> {t("export.sensitive_text")}
               </p>

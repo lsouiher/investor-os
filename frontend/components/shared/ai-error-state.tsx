@@ -52,9 +52,9 @@ export default function AiErrorState({
 
   if (severity === "medium") {
     return (
-      <div className="flex items-center gap-3 rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-amber-950 px-4 py-3">
+      <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent-tint px-4 py-3">
         <svg
-          className="h-5 w-5 flex-shrink-0 text-amber-600"
+          className="h-5 w-5 flex-shrink-0 text-accent"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

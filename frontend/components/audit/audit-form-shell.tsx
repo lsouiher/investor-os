@@ -159,7 +159,7 @@ export default function AuditFormShell({
         {/* Progress bar */}
         <div className="w-full bg-border h-2 rounded-full overflow-hidden">
           <div
-            className="bg-amber-600 h-2 transition-all duration-300"
+            className="bg-accent h-2 transition-all duration-300"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -180,7 +180,7 @@ export default function AuditFormShell({
               disabled={!canJump}
               className={`flex items-center gap-1.5 px-3 py-2 text-sm whitespace-nowrap border-b-2 transition-colors ${
                 isCurrent
-                  ? "border-amber-600 text-accent-text font-medium"
+                  ? "border-accent text-accent-text font-medium"
                   : isCompleted
                   ? "border-emerald-500 text-emerald-700 cursor-pointer hover:bg-surface-subtle"
                   : "border-transparent text-foreground-tertiary cursor-not-allowed"
@@ -226,7 +226,7 @@ export default function AuditFormShell({
                   onChange={(e) =>
                     updateField(currentSection.id, field.name, e.target.value)
                   }
-                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong bg-surface-card focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
+                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong bg-surface-card focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent`}
                 >
                   <option value="">Select...</option>
                   {field.options?.map((opt) => (
@@ -244,7 +244,7 @@ export default function AuditFormShell({
                   }
                   placeholder={field.placeholder}
                   rows={3}
-                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
+                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               ) : field.type === "number" ? (
                 <input
@@ -255,7 +255,7 @@ export default function AuditFormShell({
                     updateField(currentSection.id, field.name, e.target.value)
                   }
                   placeholder={field.placeholder}
-                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
+                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               ) : (
                 <input
@@ -266,7 +266,7 @@ export default function AuditFormShell({
                     updateField(currentSection.id, field.name, e.target.value)
                   }
                   placeholder={field.placeholder}
-                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500`}
+                  className={`w-full border ${errorBorderClass} px-3 py-2.5 text-sm text-foreground-strong focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent`}
                 />
               )}
               {fieldError && (

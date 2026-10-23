@@ -128,7 +128,7 @@ export default function IdentityHistoryPage() {
               }}
               className={`flex w-full items-center gap-4 rounded-lg border p-4 text-left transition-colors ${
                 isSelected
-                  ? "border-amber-400 bg-amber-50 dark:bg-amber-950"
+                  ? "border-accent bg-accent-tint"
                   : "border-border bg-surface-card hover:border-border"
               }`}
             >
@@ -136,7 +136,7 @@ export default function IdentityHistoryPage() {
               <div className="flex flex-col items-center">
                 <div
                   className={`h-3 w-3 rounded-full ${
-                    isSelected ? "bg-amber-600" : "bg-foreground-tertiary"
+                    isSelected ? "bg-accent" : "bg-foreground-tertiary"
                   }`}
                 />
                 {idx < versions.length - 1 && (

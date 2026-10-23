@@ -65,7 +65,7 @@ const PATH_LABELS: Record<string, string> = {
 
 const SEVERITY_STYLES: Record<string, string> = {
   info: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
-  warning: "bg-amber-100 dark:bg-amber-900/30 text-accent-text",
+  warning: "bg-accent-tint text-accent-text",
   success: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300",
 };
 
@@ -227,9 +227,9 @@ export default function DashboardPage() {
         <div className="mt-4 flex flex-wrap items-center gap-6">
           {/* Archetype badge */}
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-tint">
               <svg
-                className="h-5 w-5 text-amber-600 dark:text-amber-400"
+                className="h-5 w-5 text-accent"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -297,7 +297,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="h-2 overflow-hidden rounded-full bg-surface-subtle">
                   <div
-                    className="h-full rounded-full bg-amber-600 transition-all duration-500"
+                    className="h-full rounded-full bg-accent transition-all duration-500"
                     style={{ width: `${active_strategy.progress?.percentage ?? 0}%` }}
                   />
                 </div>
@@ -341,7 +341,7 @@ export default function DashboardPage() {
                     className={`flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border transition-colors ${
                       task.completed
                         ? "border-emerald-500 bg-emerald-500 text-white"
-                        : "border-border hover:border-amber-400"
+                        : "border-border hover:border-accent"
                     }`}
                   >
                     {task.completed && (
@@ -393,7 +393,7 @@ export default function DashboardPage() {
             ))}
           </div>
           {growth_strategy.next_best_action && (
-            <div className="mt-4 rounded-md border border-amber-100 dark:border-amber-800 bg-amber-50 dark:bg-amber-950 px-4 py-3">
+            <div className="mt-4 rounded-md border border-accent/30 bg-accent-tint px-4 py-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-accent-text">Next best action</p>
               <p className="mt-1 text-sm font-medium text-foreground-strong">{growth_strategy.next_best_action.title}</p>
               <p className="mt-0.5 text-xs text-foreground-secondary">{growth_strategy.next_best_action.reason}</p>

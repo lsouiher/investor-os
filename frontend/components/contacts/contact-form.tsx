@@ -112,7 +112,7 @@ export default function ContactFormModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t("contacts.form.name_placeholder")}
             />
           </div>
@@ -125,7 +125,7 @@ export default function ContactFormModal({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t("contacts.form.email_placeholder")}
             />
           </div>
@@ -138,7 +138,7 @@ export default function ContactFormModal({
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t("contacts.form.phone_placeholder")}
             />
           </div>
@@ -150,7 +150,7 @@ export default function ContactFormModal({
             <select
               value={roleType}
               onChange={(e) => setRoleType(e.target.value)}
-              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
             >
               {ROLE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -168,7 +168,7 @@ export default function ContactFormModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="w-full rounded border border-border px-3 py-2 text-sm text-foreground-strong placeholder:text-foreground-tertiary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
               placeholder={t("contacts.form.notes_placeholder")}
             />
           </div>

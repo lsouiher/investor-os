@@ -30,7 +30,7 @@ function usePathNames() {
 }
 
 const PATH_COLORS: Record<string, string> = {
-  portfolio: "border-l-amber-500",
+  portfolio: "border-l-accent",
   income_capital: "border-l-emerald-500",
   skills_knowledge: "border-l-blue-500",
   time_operations: "border-l-purple-500",
@@ -45,7 +45,7 @@ const PATH_ICONS: Record<string, string> = {
 
 function scoreTierClass(progress: number): string {
   if (progress < 40) return "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300";
-  if (progress < 70) return "bg-amber-100 dark:bg-amber-900/30 text-accent-text";
+  if (progress < 70) return "bg-accent-tint text-accent-text";
   return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300";
 }
 
@@ -80,7 +80,7 @@ export default function PathCard({
             <span className="text-lg">{icon}</span>
             <span className="font-medium text-foreground-secondary">{name}</span>
           </div>
-          <span className="rounded bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 text-xs font-medium text-accent-text">
+          <span className="rounded bg-accent-tint px-2 py-0.5 text-xs font-medium text-accent-text">
             {t("growth.path.coming_soon")}
           </span>
         </div>
@@ -115,7 +115,7 @@ export default function PathCard({
         {/* Progress bar */}
         <div className="mt-3 h-1.5 w-full rounded-full bg-surface-subtle">
           <div
-            className="h-1.5 rounded-full bg-amber-500 transition-all"
+            className="h-1.5 rounded-full bg-accent transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>

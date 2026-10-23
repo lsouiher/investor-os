@@ -92,7 +92,7 @@ export default function IdentityCard({
       }}
     >
       {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-600/10 via-transparent to-purple-900/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-purple-900/10" />
 
       <div className="relative flex h-full flex-col justify-between p-6 sm:p-8">
         {/* Top: archetype title */}

@@ -175,9 +175,9 @@ export default function IdentityPage() {
           <AiErrorState severity="medium" message={error} onRetry={handleSynthesize} />
         )}
         <div className="flex flex-col items-center justify-center rounded-lg border border-border bg-surface-card px-6 py-16 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-950">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent-tint">
             <svg
-              className="h-7 w-7 text-amber-600 dark:text-amber-400"
+              className="h-7 w-7 text-accent"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -235,7 +235,7 @@ export default function IdentityPage() {
         <button
           onClick={handleSynthesize}
           disabled={synthesizing}
-          className="rounded-lg border border-amber-600 px-4 py-2 text-sm font-medium text-accent-text transition-colors hover:bg-amber-50 dark:hover:bg-amber-950 disabled:opacity-50"
+          className="rounded-lg border border-accent px-4 py-2 text-sm font-medium text-accent-text transition-colors hover:bg-accent-tint disabled:opacity-50"
         >
           {t("identity.resynthesize")}
         </button>
@@ -270,7 +270,7 @@ export default function IdentityPage() {
                 className={`flex h-10 w-10 items-center justify-center rounded-full border text-sm font-medium transition-colors ${
                   feedbackRating === n
                     ? "border-accent bg-accent text-on-accent"
-                    : "border-border text-foreground-secondary hover:border-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950"
+                    : "border-border text-foreground-secondary hover:border-accent hover:bg-accent-tint"
                 }`}
               >
                 {n}
@@ -286,7 +286,7 @@ export default function IdentityPage() {
                 onChange={(e) => setFeedbackText(e.target.value.slice(0, 2000))}
                 placeholder={t("identity.feedback_placeholder")}
                 rows={3}
-                className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-amber-500"
+                className="w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-accent"
               />
               <button
                 onClick={handleFeedback}

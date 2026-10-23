@@ -64,7 +64,7 @@ function usePathNames() {
 
 function scoreTierClass(score: number): string {
   if (score < 40) return "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300";
-  if (score < 70) return "bg-amber-100 dark:bg-amber-900/30 text-accent-text";
+  if (score < 70) return "bg-accent-tint text-accent-text";
   return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300";
 }
 
@@ -168,7 +168,7 @@ export default function PathDetailPage() {
       {/* Progress bar */}
       <div className="h-2 w-full rounded-full bg-surface-subtle">
         <div
-          className="h-2 rounded-full bg-amber-500 transition-all"
+          className="h-2 rounded-full bg-accent transition-all"
           style={{ width: `${path.progress}%` }}
         />
       </div>
@@ -276,7 +276,7 @@ export default function PathDetailPage() {
                   type="checkbox"
                   checked={item.is_completed}
                   onChange={() => handleToggleAction(item.id, !item.is_completed)}
-                  className="mt-0.5 h-5 w-5 rounded border-border text-amber-600 focus:ring-amber-500"
+                  className="mt-0.5 h-5 w-5 rounded border-border text-accent focus:ring-accent"
                 />
                 <div className="flex-1">
                   <div className={`text-sm font-medium ${item.is_completed ? "text-foreground-tertiary line-through" : "text-foreground-strong"}`}>

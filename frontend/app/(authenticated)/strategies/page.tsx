@@ -22,7 +22,7 @@ interface Strategy {
 
 function scoreColorClass(score: number): string {
   if (score < 40) return "text-red-600 bg-red-50";
-  if (score < 70) return "text-accent-text bg-amber-50";
+  if (score < 70) return "text-accent-text bg-accent-tint";
   return "text-emerald-600 bg-emerald-50";
 }
 
@@ -121,7 +121,7 @@ export default function StrategiesPage() {
       )}
 
       {/* Primary strategy -- expanded */}
-      <div className="rounded-lg border border-amber-200 dark:border-amber-700 bg-surface-card p-6">
+      <div className="rounded-lg border border-accent/30 bg-surface-card p-6">
         <div className="mb-4 flex items-start justify-between">
           <div>
             <div className="mb-1 flex items-center gap-2">

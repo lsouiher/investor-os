@@ -51,7 +51,7 @@ export default function RoadmapTimeline({
                     ? "border-emerald-500 bg-emerald-500 text-white"
                     : isPast
                       ? "border-red-300 bg-surface-card text-red-400 hover:border-red-400"
-                      : "border-border bg-surface-card text-foreground-tertiary hover:border-amber-400 hover:text-accent-text"
+                      : "border-border bg-surface-card text-foreground-tertiary hover:border-accent hover:text-accent-text"
                 }`}
                 title={milestone.is_completed ? t("roadmap.completed") : t("roadmap.mark_complete")}
               >
