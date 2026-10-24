@@ -1,22 +1,33 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api-client";
 import { SiteHeader } from "@/components/shared/site-header";
 import { useTranslation } from "@/lib/i18n";
+import { safeNextPath } from "@/lib/next-path";
 
 export default function LoginPage() {
   return (
     <AuthProvider>
-      <LoginForm />
+      {/* useSearchParams renders client-only up to its Suspense boundary; the fallback is the same
+          form, inert until hydration replaces it (typing into it would be lost), so the page still
+          prerenders in full */}
+      <Suspense fallback={<LoginForm next={null} prerender />}>
+        <LoginFormWithNext />
+      </Suspense>
     </AuthProvider>
   );
 }
 
-function LoginForm() {
+// ?next=/import brings a visitor back to the deal they arrived with (allow-listed)
+function LoginFormWithNext() {
+  return <LoginForm next={safeNextPath(useSearchParams().get("next"))} />;
+}
+
+function LoginForm({ next, prerender = false }: { next: string | null; prerender?: boolean }) {
   const router = useRouter();
   const { login } = useAuth();
   const { t } = useTranslation();
@@ -42,7 +53,7 @@ function LoginForm() {
     setSubmitting(true);
     try {
       await login(email, password);
-      router.push("/dashboard");
+      router.push(next ?? "/dashboard");
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);
@@ -81,6 +92,7 @@ function LoginForm() {
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium text-foreground">{t("auth.login.email_label")}</span>
               <input
+                disabled={prerender}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -96,6 +108,7 @@ function LoginForm() {
                 {t("auth.login.password_label")}
               </span>
               <input
+                disabled={prerender}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -108,7 +121,7 @@ function LoginForm() {
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || prerender}
               className="mt-2 h-10 bg-accent text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
               style={{ borderRadius: "var(--radius-button)" }}
             >
@@ -125,7 +138,7 @@ function LoginForm() {
           <p className="mt-4 text-center text-sm text-foreground-muted">
             {t("auth.login.no_account")}{" "}
             <Link
-              href="/register"
+              href={next ? `/register?next=${next}` : "/register"}
               className="font-medium text-accent-text underline underline-offset-2"
             >
               {t("auth.login.create_link")}

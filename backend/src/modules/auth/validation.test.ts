@@ -66,6 +66,7 @@ describe('validateRegisterInput', () => {
 
   it('keeps a well-formed signup_source and drops anything else', () => {
     expect(validateRegisterInput({ email: 'a@b.co', password: 'password123', signup_source: ' BPCON ' }).signupSource).toBe('bpcon');
+    expect(validateRegisterInput({ email: 'a@b.co', password: 'password123', signup_source: 'recs' }).signupSource).toBe('recs');
     expect(validateRegisterInput({ email: 'a@b.co', password: 'password123', signup_source: '<script>' }).signupSource).toBeNull();
     expect(validateRegisterInput({ email: 'a@b.co', password: 'password123', signup_source: 'x'.repeat(33) }).signupSource).toBeNull();
   });

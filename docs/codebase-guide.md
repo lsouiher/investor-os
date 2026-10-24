@@ -46,8 +46,9 @@ investorOS/
 │   ├── lib/api-client.ts    the only HTTP layer (api.get/post/put/del, getEnvelope, poll)
 │   ├── components/          audit/ contacts/ growth/ hub/ identity/ shared/ strategy/
 │   └── locales/{en,fr}.json UI strings (AI output itself is English-only — see ai-pipeline.md)
-├── docs/                    deploy.md, designs/bpcon-beta-launch.md, this guide, ai-pipeline.md
+├── docs/                    deploy.md, designs/bpcon-beta-launch.md, this guide, ai-pipeline.md, recs-import-status.md
 ├── .specify/specs/001-identity-platform/   spec, plan, tasks, research, data-model, contracts/api-v1.md
+├── .specify/specs/003-recs-import/         same set for the RECS import (contracts/recs-deals-api.md, import-link.md)
 ├── specs/001-growth-strategy-engine/       same set for the growth engine (contracts/api-v2.md)
 ├── CLAUDE.md                commands, key patterns, status — the operational cheat sheet
 ├── PRD_InvestorOS_Identity_Platform.md, Growth_Strategy_Engine.md   product intent (long)
@@ -59,7 +60,7 @@ lines. The AI layer proper (`backend/src/shared/ai/`) is 650 lines including tes
 
 ## 3. One request, end to end
 
-`backend/src/main.ts` assembles the app in this order (`main.ts:32-93`):
+`backend/src/main.ts` assembles the app in this order (`main.ts:32-97`):
 
 1. `helmet()` → `cors()` (origins from `CORS_ORIGIN`) → `express.json({ limit: '50kb' })`
 2. `requestLogger` → `generalLimiter` (IP brake, 600/min)
@@ -71,9 +72,11 @@ lines. The AI layer proper (`backend/src/shared/ai/`) is 650 lines including tes
 6. `authenticate` (JWT) → `userLimiter` (120/min per user) → `setTenantContext` (AsyncLocalStorage +
    `SET app.current_tenant_id` for Postgres RLS)
 7. Module routers: admin, audits, identity, strategies, simulations, blueprint, contacts, tasks,
-   dashboard, growth-strategy
+   dashboard, growth-strategy, recs-deals
 8. `errorHandler` last — `AppError` → `{ error: { code, message, details } }` with the status from
-   `ERROR_STATUS_MAP`; anything else → 500 `INTERNAL_ERROR` (`shared/middleware/error-handler.ts:36-57`)
+   `ERROR_STATUS_MAP`; a body the JSON parser refused → 400 (invalid JSON) or 413 (over 50 kb)
+   `VALIDATION_ERROR`, not logged; anything else → 500 `INTERNAL_ERROR`
+   (`shared/middleware/error-handler.ts:36-73`)
 
 Inside a module the shape is always `routes.ts` (parse `req.body` in snake_case, call service,
 `res.json({ data })`) → `service.ts` (business rules, cross-module calls by direct import) →
@@ -145,6 +148,10 @@ Each module lives in `backend/src/modules/<name>/`. "AI" marks modules that call
 - **task** — tasks with `source` = `ai_generated | identity_gap | manual`; the active strategy's
   action items are merged into the list view; completion triggers growth unlock evaluation.
 - **blueprint** — HTML template (`template.html`) → Puppeteer → PDF. Pure rendering of stored data.
+- **recs-deal** — deals sent from RECS calculators (v0.5.0.0, `.specify/specs/003-recs-import/`):
+  `POST/GET/DELETE /recs-deals`, the payload `d` stored opaque and never decoded, `validation.ts`
+  checks the slug against `backend/config/recs.json` (the API will not start without that file),
+  at most 500 live deals per user, soft delete blanks `name` and `d`.
 - **logging** — `activity_logs` helpers. Only `audit.completed`, `contact.added`, `task.completed`
   are wired; the AI-related helpers exist but have no callers (`logging/service.ts:17-62`).
 - **admin** — prompt-template list/create/activate (role `admin`); no UI. See `ai-pipeline.md` §4.
@@ -156,7 +163,8 @@ Each module lives in `backend/src/modules/<name>/`. "AI" marks modules that call
 ## 6. Data model essentials
 
 Full column lists: `.specify/specs/001-identity-platform/data-model.md` and
-`backend/prisma/schema.prisma` (17 models; `schema.prisma:93-447`). What matters for reasoning
+`backend/prisma/schema.prisma` (16 models since v0.5.0.0 added `recs_deals`, whose columns are in
+`.specify/specs/003-recs-import/data-model.md`; `schema.prisma:93-487`). What matters for reasoning
 about behaviour:
 
 - **Append-only versioning.** `audits` (one row per completed version per type; drafts are
@@ -182,13 +190,17 @@ about behaviour:
 `frontend/lib/api-client.ts` is the entire HTTP layer: `api.get/post/put/del` unwrap `{ data }`,
 `api.getEnvelope` keeps sibling fields (used for `generating` on `GET /strategies`), and
 `poll(fetchOnce, done, { intervalMs, maxAttempts })` throws `ApiError("TIMEOUT")` after the cap
-(`api-client.ts:109-130`). A 401 clears local storage and redirects to `/login`. Two components
+(`api-client.ts:136-148`). A 401 (except from `/auth/login`, a wrong password) clears the token
+and redirects to `/login` (`/login?next=/import` from `/import`), unless another tab has stored a
+newer token, which it leaves alone. `lib/auth-context.tsx` reloads the page when another tab signs in or out, and a tab whose
+session ended elsewhere first forgets its held RECS deal and signup source. Two components
 bypass it with raw `fetch` for binary downloads: `components/strategy/blueprint-download.tsx`
 and `components/growth/ExportButton.tsx`.
 
 | Route (`app/(authenticated)/…`) | Backend endpoints | Model output shown / waiting behaviour |
 |---|---|---|
-| `hub/` | `GET /audits` | none; "synthesis ready" button after 5 audits |
+| `hub/` | `GET /audits`, `GET/DELETE /recs-deals` | none; "synthesis ready" button after 5 audits; "Deals from your calculators" last |
+| `/import` (public, `app/import/`) | `POST /recs-deals` | none; reads the RECS deal from the URL fragment, holds it in `sessionStorage` across sign-in |
 | `audits/<type>/` | `GET/PUT /audits/:type` | none; completion redirects to hub |
 | `identity/` | `POST /identity/synthesize`, `GET /identity/status`, `GET /identity`, `PUT /identity/:id/rate` | archetype, score, radar, headline, insights; polls status 80×3 s; rating + feedback box |
 | `identity/history/` | `GET /identity/history` | version list with deltas |
@@ -206,7 +218,8 @@ critical/medium/low with optional retry) and `components/shared/loading-states.t
 the locale is stored in `localStorage` and **never sent to the backend**, so all model output is
 English regardless of the FR toggle.
 
-Frontend tests: only `components/identity/identity-card.test.tsx` and `lib/identity.test.ts`.
+Frontend tests: co-located `*.test.ts(x)` files next to the code they cover (Jest + React Testing
+Library).
 
 ## 8. Four async patterns
 
@@ -274,7 +287,7 @@ the next successful call (`shared/ai/client.ts:69-88`).
 
 Ops scripts from `backend/`: `npm run funnel -- 7` (signup funnel per source, plus identity
 ratings and free-text feedback for the last 7 days), `npm run delete-user -- <email>` (erase
-audits, blank `ai_call_logs` prompt/response, deactivate). There is no reader for `ai_call_logs`
+audits, blank `ai_call_logs` prompt/response, scrub and soft-delete saved RECS deals, deactivate). There is no reader for `ai_call_logs`
 beyond that scrubber — `ai-pipeline.md` §11 proposes one.
 
 Reading logs: pino JSON on stdout. AI calls log `AI call completed` with `serviceType`,

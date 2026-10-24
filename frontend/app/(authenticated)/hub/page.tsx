@@ -6,6 +6,7 @@ import { api } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
 import { useTranslation } from "@/lib/i18n";
 import { getDisclosureMessage } from "@/components/hub/disclosure-messages";
+import { RecsDeals } from "@/components/hub/recs-deals";
 
 interface AuditSummary {
   id: string;
@@ -85,13 +86,16 @@ function StepIcon({ status }: { status: "completed" | "current" | "not_started" 
 
 export default function IdentityHubPage() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, token, loading: authLoading } = useAuth();
+  // A token without a user: another tab's sign-in is being checked, so wait rather than say
+  // "log in again"
+  const checkingSession = !user && !!token;
   const { t } = useTranslation();
   const [audits, setAudits] = useState<AuditSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || checkingSession) return;
     if (!user) {
       setLoading(false);
       return;
@@ -105,7 +109,7 @@ export default function IdentityHubPage() {
         setAudits([]);
       })
       .finally(() => setLoading(false));
-  }, [user, authLoading]);
+  }, [user, authLoading, checkingSession]);
 
   const auditMap = new Map(audits.map((a) => [a.audit_type, a]));
 
@@ -130,7 +134,7 @@ export default function IdentityHubPage() {
     return "not_started";
   }
 
-  if (loading) {
+  if (loading || checkingSession) {
     return (
       <div className="max-w-5xl mx-auto py-12">
         <div className="animate-pulse space-y-6">
@@ -165,7 +169,7 @@ export default function IdentityHubPage() {
     <div className="max-w-5xl mx-auto py-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground-strong">{t("hub.title")}</h1>
+        <h1 tabIndex={-1} className="text-2xl font-bold text-foreground-strong">{t("hub.title")}</h1>
         <p className="mt-1 text-sm text-foreground-muted">
           {t("hub.subtitle")}
         </p>
@@ -319,6 +323,9 @@ export default function IdentityHubPage() {
           </button>
         </div>
       )}
+
+      {/* Deals sent from RECS calculators: last, below the audits (spec FR-5) */}
+      <RecsDeals />
     </div>
   );
 }

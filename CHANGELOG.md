@@ -2,6 +2,33 @@
 
 All notable changes to InvestorOS will be documented in this file.
 
+## [0.5.0.0] - 2026-10-24
+
+Deals sent from RECS calculators can be kept here. A RECS user presses "Send to InvestorsMap" (RECS's button label), lands on `/import`, signs in or signs up without losing the deal, and finds it in the hub, where it reopens in RECS exactly as it was. Spec: `.specify/specs/003-recs-import/`.
+
+### Added
+
+- **Import page (`/import`)** that reads a deal from a RECS link (`#c=<calculator>&n=<name>&d=<payload>`, never sent to the server on load), shows its name and calculator, and saves it with one click. Signed-out visitors keep the deal through sign-in or sign-up (`?next=/import`), and an unreadable link says "nothing to import" (EN + FR)
+- **"Deals from your calculators" in the hub:** saved deals newest first, "Open in RECS" to continue the calculation, delete with an inline confirm; hidden when empty and RECS is not configured
+- **`/api/v1/recs-deals`** (create, list, delete; authenticated, per user and tenant, rate limited), a `recs_deals` table with row-level security, and the shared list of known calculators in `config/recs.json` (8 RECS calculators, drift-tested against the labels)
+- Arrivals from RECS (`?ref=recs`) are counted as a signup source in the funnel
+
+### Changed
+
+- **A sign-in or sign-out in another tab reloads every other tab**, so no page keeps showing or acting for the previous account; when that tab's session ends, its held RECS deal and signup source are forgotten
+- Signing out forgets a held RECS deal and the signup source, so the next person on a shared device is not offered them
+- A wrong password on sign-in now shows the error instead of reloading the page; an expired session on `/import` returns there after signing in again, so a held deal is not stranded
+- Deleting an account also scrubs and removes its RECS deals (`npm run delete-user`)
+- Keyboard focus is visible on every control
+
+### Fixed
+
+- **A database blip no longer signs everyone out:** the API answers 500, not 401, when the user lookup fails, and the app keeps the session and checks again
+- Errors thrown in async middleware reach the error handler instead of crashing the API process
+- A request body that is not valid JSON, or too large, gets a 400 or 413 and is not written to the logs
+- `/login` and `/register` render their form on first load instead of a blank page
+- Deal names are cleaned of control and invisible characters (including bidi overrides and lone surrogates) so one deal's name cannot pass for another's; a live-deal cap (500 per user) bounds storage
+
 ## [0.4.1.0] - 2026-09-13
 
 First run against the real Anthropic API (25/25). Synthesis 34–45 s, strategies 16 s, activation 44 s, growth paths 48–79 s, simulation 9 s; content specific to the profile (market, capital, hours, network).

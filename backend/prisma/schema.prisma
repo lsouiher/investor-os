@@ -110,6 +110,7 @@ model Tenant {
   growthStrategies   GrowthStrategy[]
   growthPaths        GrowthPath[]
   exportHistory      ExportHistory[]
+  recsDeals          RecsDeal[]
 
   @@map("tenants")
 }
@@ -144,6 +145,7 @@ model User {
   growthStrategies    GrowthStrategy[]
   growthPaths         GrowthPath[]
   exportHistory       ExportHistory[]
+  recsDeals           RecsDeal[]
 
   @@index([tenantId])
   @@map("users")
@@ -463,4 +465,23 @@ model ExportHistory {
   @@index([tenantId, userId])
   @@index([tenantId, userId, exportType, createdAt])
   @@map("export_history")
+}
+
+model RecsDeal {
+  id        Int       @id @default(autoincrement())
+  publicId  String    @unique @map("public_id")
+  tenantId  Int       @map("tenant_id")
+  userId    Int       @map("user_id")
+  c         String    @db.VarChar(64) // RECS calculator slug (DM-7)
+  name      String    @db.VarChar(120)
+  d         String // Opaque RECS payload: never decoded (RECS D-108 (3))
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at") // Soft delete
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([tenantId, userId, deletedAt, createdAt])
+  @@map("recs_deals")
 }

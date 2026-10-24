@@ -10,8 +10,10 @@ requirement (RECS D-105, not §10.8).
 (`lsouiher/investoros`, local `Desktop/investoros`) built all of FR-10.8.2 in its Sprint 7 on
 2026-10-15 and verified the RECS round trip (§1.4). CLAUDE.md's "Two repos, one product name"
 rule applies: until the owner picks a repo on **2026-12-04**, the same feature is never built in
-both, so **nothing in §3 starts before that date, and only if this repo is the one kept.** Until
-then RECS's `VITE_INVESTORSMAP_URL` points at the candidate.
+both, so **nothing in §3 starts before that date, and only if this repo is the one kept.**
+**Superseded 2026-10-23:** the owner made an exception and the import is built here now, from
+`.specify/specs/003-recs-import/tasks.md` (which supersedes §3); the candidate gets nothing new.
+RECS's `VITE_INVESTORSMAP_URL` keeps pointing at the candidate until this build ships (T038).
 
 This note records what was checked, what the contract asks for item by item, the decisions
 taken on the open questions (§4), and the port plan (§3). It is read-only with respect to RECS
@@ -86,29 +88,29 @@ read, since they answer §4's questions 1 and 3 the same way this note does.
 
 Source: `~/projects/recs/docs/spec.md` §10.8 FR-10.8.2 and DM-7; `~/projects/recs/docs/decisions.md`
 D-108 (2), (3), (4). Related: D-105, D-112, D-264, Q-14, Q-17 to Q-27, Appendix A row 8.
-Everything below is **missing** unless marked otherwise.
+Everything below was **missing** before 003-recs-import; each row is now **built** and checked in `.specify/specs/003-recs-import/qa.md` (T037, 2026-10-23).
 
 | # | Requirement (FR-10.8.2 / DM-7 / D-108 (2)) | Status | Notes |
 |---|---|---|---|
-| 1 | `/import` page reads the fragment `#c=<slug>&n=<name>&d=<payload>` from `<origin>/import?ref=recs` | **missing** | Must be client-side: a fragment never reaches the server, and that is the point of the design (RECS I5, D-02). |
-| 2 | Keeps the fragment across sign-in or sign-up | **missing** | Neither `/login` nor `/register` takes a return path today; login lands on `/dashboard`, register on `/hub`. The authenticated layout redirects to `/login` with no `next`. |
-| 3 | Shows the deal name and asks the user to confirm before storing | **missing** | `n` is URL-encoded; `d` is shown to no one. |
-| 4 | Stores `{ c, name, d }` for the user | **missing** | No endpoint, no module. |
-| 5 | Validation: `c` in a known-slug list | **missing** | RECS Q-17 to Q-27 assume a `config/recs.json` here. Registered RECS slugs today: `multifamily`, `quick-screen`, `single-family`, `fix-and-flip`, `brrrr`, `wholesaling`, `subject-to`, `short-term-rental`. RECS hides Send until the list here has the slug and `VITE_INVESTORSMAP_URL` is set. |
-| 6 | Validation: `name` under 120 characters | **missing** | |
-| 7 | Validation: `d` under 8,000 base64url characters, never decoded | **missing** | RECS caps `d` at 7,997 (D-112 (2)) so every stored deal reopens. We store opaque text; no lz-string, no schema (D-108 (3)). |
-| 8 | `recs_deals` table: `id`, `user_id`, `c`, `name`, `d`, `created_at`, `deleted_at` (DM-7) | **missing** | Plus `tenant_id` and `public_id` (CUID2) per this repo's constitution; soft delete via `deleted_at`. |
-| 9 | Hub section "Deals from your calculators": name, date, delete, "Open in RECS" | **missing** | "Open in RECS" = `<RECS URL>/calculators/<c>#d=<d>`. The URL base exists as `NEXT_PUBLIC_RECS_URL` (**partial**: the variable and its plumbing are built). |
-| 10 | Retention and account-deletion purge as for other rows | **missing** | `delete-user.ts` is the purge path; `recs_deals` is not in it. Retention is "90 days recommended, manual purge for now" (data-model.md), so there is nothing scheduled to extend. |
-| 11 | A second send adds a row; dedup is our choice | **missing** | Proposal: no dedup in v1 (DM-7 says RECS sends no id, so equality would have to be on `d`, and two edits of one deal are legitimately two rows). |
-| 12 | PRD amendment row naming RECS spec §10.8 as the contract (D-108 (4)) | **missing** | The PRD has no amendments section; one must be added. §7's "Property Deal Analyzer, V3.2" row should also note that calculators live in RECS and arrive by this hand-off. |
-| 13 | RECS acceptance: a sent deal opened from the list shows an identical summary strip (round trip) | **missing** | Follows from 7 and 9 if `d` is stored and echoed byte for byte. Worth one end-to-end check against a local RECS build before `VITE_INVESTORSMAP_URL` is set. |
-| 14 | `?ref=recs` is countable in our logs (D-105) | **partial** | Request logs see the query string; nothing records it. Extending `signup-source.ts` to read `ref` makes it a funnel source. |
+| 1 | `/import` page reads the fragment `#c=<slug>&n=<name>&d=<payload>` from `<origin>/import?ref=recs` | **built** (003, qa.md T037) | Must be client-side: a fragment never reaches the server, and that is the point of the design (RECS I5, D-02). |
+| 2 | Keeps the fragment across sign-in or sign-up | **built** (003, qa.md T037) | Neither `/login` nor `/register` takes a return path today; login lands on `/dashboard`, register on `/hub`. The authenticated layout redirects to `/login` with no `next`. |
+| 3 | Shows the deal name and asks the user to confirm before storing | **built** (003, qa.md T037) | `n` is URL-encoded; `d` is shown to no one. |
+| 4 | Stores `{ c, name, d }` for the user | **built** (003, qa.md T037) | No endpoint, no module. |
+| 5 | Validation: `c` in a known-slug list | **built** (003, qa.md T037) | RECS Q-17 to Q-27 assume a `config/recs.json` here. Registered RECS slugs today: `multifamily`, `quick-screen`, `single-family`, `fix-and-flip`, `brrrr`, `wholesaling`, `subject-to`, `short-term-rental`. RECS hides Send until the list here has the slug and `VITE_INVESTORSMAP_URL` is set. |
+| 6 | Validation: `name` under 120 characters | **built** (003, qa.md T037) | |
+| 7 | Validation: `d` under 8,000 base64url characters, never decoded | **built** (003, qa.md T037) | RECS caps `d` at 7,997 (D-112 (2)) so every stored deal reopens. We store opaque text; no lz-string, no schema (D-108 (3)). |
+| 8 | `recs_deals` table: `id`, `user_id`, `c`, `name`, `d`, `created_at`, `deleted_at` (DM-7) | **built** (003, qa.md T037) | Plus `tenant_id` and `public_id` (CUID2) per this repo's constitution; soft delete via `deleted_at`. |
+| 9 | Hub section "Deals from your calculators": name, date, delete, "Open in RECS" | **built** (003, qa.md T037) | "Open in RECS" = `<RECS URL>/calculators/<c>#d=<d>`. The URL base exists as `NEXT_PUBLIC_RECS_URL` (**partial**: the variable and its plumbing are built). |
+| 10 | Retention and account-deletion purge as for other rows | **built** (003, qa.md T037) | `delete-user.ts` is the purge path; `recs_deals` is not in it. Retention is "90 days recommended, manual purge for now" (data-model.md), so there is nothing scheduled to extend. |
+| 11 | A second send adds a row; dedup is our choice | **built** (003, qa.md T037) | Proposal: no dedup in v1 (DM-7 says RECS sends no id, so equality would have to be on `d`, and two edits of one deal are legitimately two rows). |
+| 12 | PRD amendment row naming RECS spec §10.8 as the contract (D-108 (4)) | **built** (003, qa.md T037) | The PRD has no amendments section; one must be added. §7's "Property Deal Analyzer, V3.2" row should also note that calculators live in RECS and arrive by this hand-off. |
+| 13 | RECS acceptance: a sent deal opened from the list shows an identical summary strip (round trip) | **built** (003, qa.md T037) | Follows from 7 and 9 if `d` is stored and echoed byte for byte. Worth one end-to-end check against a local RECS build before `VITE_INVESTORSMAP_URL` is set. |
+| 14 | `?ref=recs` is countable in our logs (D-105) | **built** (003, qa.md T037) | Request logs see the query string; nothing records it. Extending `signup-source.ts` to read `ref` makes it a funnel source. |
 
 FR-10.8.3 (InvestorsMap computes on sent deals, P2) is out of scope: it depends on RECS's
 engine package (P2-10) and our deal pipeline (PRD V3.1). Nothing here should decode `d`.
 
-## 3. Port plan (not before 2026-12-04, and only if this repo is kept)
+## 3. Port plan (superseded by `.specify/specs/003-recs-import/tasks.md`, gate lifted 2026-10-23)
 
 Sized the way `.specify/specs/001-identity-platform/tasks.md` sizes tasks: one task is one
 file or one closely related set of files, `[P]` where it can run in parallel with its
@@ -131,7 +133,7 @@ or worker code is touched. Where the candidate made the same choice, port its te
 
 ### Phase B: Import page and auth return path (frontend)
 
-- [ ] R008 `frontend/lib/recs-import.ts`: `parseImportFragment(hash)` → `{ c, name, d } | null` (URL-decodes `c` and `n`, leaves `d` untouched), with the same bounds as the API; `stashImport` / `takeImport` on `sessionStorage` (same pattern and lifetime as `signup-source.ts`). Unit tests, including a name with `&`, `#`, `%` and non-ASCII (the D-112 (5) cases).
+- [ ] R008 `frontend/lib/recs-import.ts`: `parseImportFragment(hash)` → `{ c, name, d } | null` (URL-decodes `c` and `n`, leaves `d` untouched), with the same bounds as the API; `stashImport` / `readImport` on `sessionStorage` (same pattern and lifetime as `signup-source.ts`). Unit tests, including a name with `&`, `#`, `%` and non-ASCII (the D-112 (5) cases).
 - [ ] R009 `frontend/app/import/page.tsx` (public route, client component): reads the fragment on mount, stashes it, strips the hash from the address bar (`history.replaceState`) so a later reload or share does not re-import. Signed in: shows the deal name and the calculator's label with "Save to InvestorsMap" and "Cancel". Signed out: shows the same name and label with "Sign in to save" and "Create an account", both carrying `?next=/import`; after auth the page shows the one-click "Save" (§4 decision 3). Invalid or absent fragment: a short "nothing to import" message with a link to the hub.
 - [ ] R010 Return path: `/login` and `/register` accept `?next=/import` (allow-list of relative paths, no open redirect) and `rememberSignupSource` also reads `ref` so `?ref=recs` is recorded as the signup source. The authenticated layout's redirect to `/login` carries `next` for `/import`.
 - [ ] R011 `frontend/lib/signup-source.ts` test update and a contract test that `signup_source: "recs"` is accepted by `validateSignupSource` (it already matches the regex; the test pins it).

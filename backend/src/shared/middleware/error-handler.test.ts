@@ -1,5 +1,6 @@
 import { AppError, errorHandler, type ErrorCode } from './error-handler';
-import { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
+import request from 'supertest';
 
 function mockRes(): Response {
   const res = {
@@ -90,5 +91,34 @@ describe('errorHandler', () => {
     const jsonCall = (res.json as jest.Mock).mock.calls[0][0];
     expect(jsonCall.error.message).toBe('An unexpected error occurred.');
     expect(jsonCall.error.message).not.toContain('SECRET');
+  });
+});
+
+// Review (ship, adversarial): a body the JSON parser refuses is the client's error, and the raw
+// body (which can hold a RECS deal payload) must never reach the logs
+describe('errorHandler, body parser failures', () => {
+  const app = express();
+  app.use(express.json({ limit: '50kb' }));
+  app.post('/echo', (_req, res) => {
+    res.json({ ok: true });
+  });
+  app.use(errorHandler);
+
+  let logged: jest.SpyInstance;
+  beforeEach(() => {
+    logged = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+  afterEach(() => logged.mockRestore());
+
+  it('answers malformed JSON with 400 and does not log the body', async () => {
+    const res = await request(app).post('/echo').set('Content-Type', 'application/json').send('{"d":"SECRETPAYLOAD"');
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    expect(JSON.stringify(logged.mock.calls)).not.toContain('SECRETPAYLOAD');
+  });
+
+  it('answers a body over the limit with 413', async () => {
+    const res = await request(app).post('/echo').set('Content-Type', 'application/json').send(JSON.stringify({ d: 'a'.repeat(60_000) }));
+    expect(res.status).toBe(413);
   });
 });

@@ -542,7 +542,7 @@ prompt_templates (system-level)
 | Team / Partner Collaboration | Shared identities, joint strategies | V3.3 — enterprise/team feature |
 | Payment / Subscription | Monetize after engagement is proven | V3.2 — when retention metrics validate |
 | Mobile Native App | Responsive web first | V3.4 — when daily usage patterns demand it |
-| Property Deal Analyzer | Calculator layered on identity | V3.2 — high value but separate module |
+| Property Deal Analyzer | Calculator layered on identity | V3.2 — high value but separate module. Calculators live in RECS, the sibling product; deals arrive here through the RECS hand-off (Amendments, row 1) |
 
 ---
 
@@ -740,3 +740,11 @@ Here's why the identity-first approach creates a defensible product:
 ---
 
 *V3 doesn't just build a better tool. It builds a platform that knows you better than you know yourself as an investor — and gets smarter every time you use it.*
+
+---
+
+## Amendments
+
+| # | Date | Change |
+|---|------|--------|
+| 1 | 2026-10-23 (v0.5.0.0) | RECS hand-off: deals sent from RECS calculators are stored as opaque payloads and listed in the hub; the contract is RECS `docs/spec.md` §10.8 (FR-10.8.1, FR-10.8.2, DM-7) and D-108; Investor OS never decodes the payload (RECS calls this app InvestorsMap); spec `.specify/specs/003-recs-import/` |

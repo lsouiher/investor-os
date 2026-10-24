@@ -29,6 +29,7 @@ COPY prisma ./prisma
 RUN npm ci --include=dev && npx prisma generate
 COPY --from=build /app/dist ./dist
 COPY scripts ./scripts
+COPY config ./config
 EXPOSE 3001
 # Migrations and the prompt-template seed (an upsert) run on every start, then the API.
 CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && node dist/main.js"]

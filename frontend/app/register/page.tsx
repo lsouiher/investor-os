@@ -1,22 +1,33 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api-client";
 import { SiteHeader } from "@/components/shared/site-header";
 import { useTranslation } from "@/lib/i18n";
+import { safeNextPath } from "@/lib/next-path";
 
 export default function RegisterPage() {
   return (
     <AuthProvider>
-      <RegisterForm />
+      {/* useSearchParams renders client-only up to its Suspense boundary; the fallback is the same
+          form, inert until hydration replaces it (typing into it would be lost), so the page still
+          prerenders in full */}
+      <Suspense fallback={<RegisterForm next={null} prerender />}>
+        <RegisterFormWithNext />
+      </Suspense>
     </AuthProvider>
   );
 }
 
-function RegisterForm() {
+// ?next=/import brings a visitor back to the deal they arrived with (allow-listed)
+function RegisterFormWithNext() {
+  return <RegisterForm next={safeNextPath(useSearchParams().get("next"))} />;
+}
+
+function RegisterForm({ next, prerender = false }: { next: string | null; prerender?: boolean }) {
   const router = useRouter();
   const { register } = useAuth();
   const { t } = useTranslation();
@@ -53,7 +64,7 @@ function RegisterForm() {
     setSubmitting(true);
     try {
       await register(email, password);
-      router.push("/hub");
+      router.push(next ?? "/hub");
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);
@@ -92,6 +103,7 @@ function RegisterForm() {
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium text-foreground">{t("auth.login.email_label")}</span>
               <input
+                disabled={prerender}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -107,6 +119,7 @@ function RegisterForm() {
                 {t("auth.login.password_label")}
               </span>
               <input
+                disabled={prerender}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -122,6 +135,7 @@ function RegisterForm() {
                 {t("auth.register.confirm_label")}
               </span>
               <input
+                disabled={prerender}
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -134,7 +148,7 @@ function RegisterForm() {
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || prerender}
               className="mt-2 h-10 bg-accent text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
               style={{ borderRadius: "var(--radius-button)" }}
             >
@@ -145,7 +159,7 @@ function RegisterForm() {
           <p className="mt-6 text-center text-sm text-foreground-muted">
             {t("auth.register.has_account")}{" "}
             <Link
-              href="/login"
+              href={next ? `/login?next=${next}` : "/login"}
               className="font-medium text-accent-text underline underline-offset-2"
             >
               {t("auth.register.login_link")}
