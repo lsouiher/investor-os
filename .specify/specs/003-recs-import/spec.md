@@ -145,6 +145,7 @@ RECS users who want to keep a deal have nowhere to keep it: RECS has no accounts
 ### FR-4: Saving
 - Save is one action for a signed-in user and stores calculator, name, payload, owner and time saved
 - No deduplication: each save creates a new record
+- At most 500 live (not deleted) deals per user; a save beyond that is refused with a message pointing to the hub, and the held deal stays so it can be saved after deleting some (added at T038 from the security review, `security-review.md`)
 - Saving, listing and deleting require authentication and are subject to the per-user rate limit that protects other authenticated actions
 
 ### FR-5: Hub list "Deals from your calculators"

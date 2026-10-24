@@ -419,6 +419,7 @@
   "import.saved": "Enregistrée. Vous la retrouverez dans votre hub.",
   "import.go_to_hub": "Aller à votre hub",
   "import.error": "Impossible d’enregistrer cette affaire. Veuillez réessayer.",
+  "import.limit": "Vous avez 500 affaires enregistrées, le maximum pour un compte. Supprimez-en dans votre hub, puis enregistrez celle-ci.",
   "import.signed_out_hint": "Connectez-vous ou créez un compte gratuit pour garder cette affaire.",
   "import.sign_in": "Se connecter pour enregistrer",
   "import.create_account": "Créer un compte",

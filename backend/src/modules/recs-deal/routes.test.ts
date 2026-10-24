@@ -8,10 +8,12 @@ import request from 'supertest';
 const mockCreate = jest.fn();
 const mockList = jest.fn();
 const mockSoftDelete = jest.fn();
+const mockCount = jest.fn();
 jest.mock('./repository.js', () => ({
   createRecsDeal: (...args: unknown[]) => mockCreate(...args),
   listRecsDeals: (...args: unknown[]) => mockList(...args),
   softDeleteRecsDeal: (...args: unknown[]) => mockSoftDelete(...args),
+  countLiveRecsDeals: (...args: unknown[]) => mockCount(...args),
 }));
 
 import recsDealRoutes from './routes';
@@ -36,10 +38,27 @@ function row(overrides: Record<string, unknown> = {}) {
 }
 
 beforeEach(() => {
+  mockCount.mockResolvedValue(0);
   mockCreate.mockImplementation(async (_t: number, _u: number, input: typeof VALID) => row(input));
 });
 
 describe('POST /recs-deals', () => {
+  // Security review (cso 89b18400): one account cannot grow the table without bound
+  it('refuses the 501st live deal of a user with 400 on field limit, and stores nothing', async () => {
+    mockCount.mockResolvedValue(500);
+    const res = await request(app).post('/recs-deals').send(VALID);
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    expect(res.body.error.details).toEqual([expect.objectContaining({ field: 'limit' })]);
+    expect(mockCount).toHaveBeenCalledWith(1, 7);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('saves the 500th live deal', async () => {
+    mockCount.mockResolvedValue(499);
+    expect((await request(app).post('/recs-deals').send(VALID)).status).toBe(201);
+  });
+
   it('saves a deal and returns 201 with id, c, name, created_at', async () => {
     const res = await request(app).post('/recs-deals').send({ ...VALID, name: '  Elm St 12-plex ' });
     expect(res.status).toBe(201);

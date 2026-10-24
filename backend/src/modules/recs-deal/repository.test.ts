@@ -4,6 +4,7 @@
  */
 const mockCreate = jest.fn().mockResolvedValue({});
 const mockFindMany = jest.fn().mockResolvedValue([]);
+const mockCount = jest.fn().mockResolvedValue(0);
 const mockUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
 
 jest.mock('../../shared/db.js', () => ({
@@ -12,11 +13,12 @@ jest.mock('../../shared/db.js', () => ({
       create: (...args: unknown[]) => mockCreate(...args),
       findMany: (...args: unknown[]) => mockFindMany(...args),
       updateMany: (...args: unknown[]) => mockUpdateMany(...args),
+      count: (...args: unknown[]) => mockCount(...args),
     },
   },
 }));
 
-import { createRecsDeal, listRecsDeals, softDeleteRecsDeal } from './repository';
+import { countLiveRecsDeals, createRecsDeal, listRecsDeals, softDeleteRecsDeal } from './repository';
 
 describe('recs-deal repository', () => {
   it('lists only the live deals of this user and tenant, newest first', async () => {
@@ -32,6 +34,11 @@ describe('recs-deal repository', () => {
     const args = mockUpdateMany.mock.calls[0][0];
     expect(args.where).toEqual(expect.objectContaining({ publicId: 'pub', userId: 3, tenantId: 9, deletedAt: null }));
     expect(args.data.deletedAt).toBeInstanceOf(Date);
+  });
+
+  it('counts only the live deals of this user and tenant', async () => {
+    await countLiveRecsDeals(3, 9);
+    expect(mockCount.mock.calls[0][0].where).toEqual({ tenantId: 9, userId: 3, deletedAt: null });
   });
 
   it('creates with a public id and d unchanged', async () => {

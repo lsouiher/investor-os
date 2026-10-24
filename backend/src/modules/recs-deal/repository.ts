@@ -15,6 +15,10 @@ export async function createRecsDeal(tenantId: number, userId: number, input: Re
   });
 }
 
+export async function countLiveRecsDeals(userId: number, tenantId: number) {
+  return prisma.recsDeal.count({ where: { tenantId, userId, deletedAt: null } });
+}
+
 export async function listRecsDeals(userId: number, tenantId: number) {
   return prisma.recsDeal.findMany({
     where: { tenantId, userId, deletedAt: null },

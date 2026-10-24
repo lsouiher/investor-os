@@ -32,6 +32,9 @@ first failing field in the order `c`, `name`, `d`. The message never echoes `d`.
 
 No dedup: the same body twice gives two rows and two ids.
 
+400 `VALIDATION_ERROR`, `details: [ { "field": "limit" } ]` when the caller already has 500 live deals
+(checked after the field rules; count then insert, so concurrent saves may pass it by a few).
+
 ## GET /api/v1/recs-deals
 
 The caller's live deals, newest first. No pagination in v1.

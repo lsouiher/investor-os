@@ -47,3 +47,18 @@ the edited input (Market value 291507, Units 51) and the strip differs from RECS
 **Notes.** Headless Chromium has no emoji font, so 🏠 renders as a box in screenshots; the page
 text and the stored name contain it. Evidence (strip text before/after, Send links, screenshots):
 `.gstack/browse-reports/t037/` (not committed).
+
+## T038 /qa (2026-10-23, after /review fixes, commit a7f3eb7)
+
+Local, headless Chromium (gstack `$B`), web and API restarted on the reviewed code.
+
+| Check | Result |
+|---|---|
+| Stale token on arrival → `/login?next=/import` with the deal held → sign in → back on `/import` with the same deal → Save | PASS |
+| Wrong password on `/login?next=/import` shows "Invalid email or password." and keeps `?next` | PASS |
+| Hub: Open in RECS link `<RECS>/calculators/<c>#d=<d>`, new tab, `noopener noreferrer`; Delete → confirm → row gone, survives reload | PASS |
+| Signed out → Create an account → `/import` → Save; funnel `recs` row +1 | PASS |
+| API: 4 concurrent DELETEs of one deal → one 204, three 404, no 500 | PASS |
+| Per-user cap (after /cso): 500 live deals seeded → 501st POST 400 `limit`; `/import` shows the limit message and keeps the deal; after one delete, save → 201 | PASS |
+
+Report: `.gstack/qa-reports/run-20261024T010331Z/` (not committed). Code review: `code-review.md`.

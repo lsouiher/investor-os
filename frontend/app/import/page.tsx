@@ -13,6 +13,7 @@ import { SiteHeader } from "@/components/shared/site-header";
 import { useTranslation } from "@/lib/i18n";
 import { rememberSignupSource } from "@/lib/signup-source";
 import { saveRecsDeal } from "@/lib/recs-deals-api";
+import { ApiError } from "@/lib/api-client";
 import {
   clearImport,
   parseImportFragment,
@@ -43,7 +44,8 @@ function ImportView() {
   const [arrived, setArrived] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [error, setError] = useState(false);
+  // null, or the locale key of the message to show
+  const [error, setError] = useState<string | null>(null);
 
   // Arrival: hold the deal, record ?ref=, then take the deal out of the address bar so a reload
   // or a copied link cannot save it again. An invalid fragment leaves an existing stash alone.
@@ -59,13 +61,14 @@ function ImportView() {
   async function handleSave() {
     if (!deal) return;
     setSaving(true);
-    setError(false);
+    setError(null);
     try {
       await saveRecsDeal(deal);
       clearImport();
       setSaved(true);
-    } catch {
-      setError(true); // the stash stays, so Save can be retried
+    } catch (err) {
+      // The stash stays, so Save can be retried (after deleting deals, for the per-user limit)
+      setError(isLimitError(err) ? "import.limit" : "import.error");
     } finally {
       setSaving(false);
     }
@@ -123,7 +126,7 @@ function ImportView() {
               className="mt-4 bg-danger-tint px-4 py-3 text-sm text-danger"
               style={{ borderRadius: "var(--radius-default)" }}
             >
-              {t("import.error")}
+              {t(error)}
             </div>
           )}
           <div className="mt-4 flex flex-wrap gap-3">
@@ -161,6 +164,14 @@ function ImportView() {
         </>
       )}
     </Shell>
+  );
+}
+
+function isLimitError(err: unknown): boolean {
+  return (
+    err instanceof ApiError &&
+    Array.isArray(err.details) &&
+    err.details.some((detail) => (detail as { field?: string })?.field === "limit")
   );
 }
 

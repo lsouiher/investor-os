@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { I18nProvider } from "@/lib/i18n";
 import { takeSignupSource } from "@/lib/signup-source";
+import { ApiError } from "@/lib/api-client";
 
 const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({ useRouter: () => ({ push: mockPush }) }));
@@ -111,6 +112,23 @@ describe("/import, signed in", () => {
     expect(screen.getByText("We couldn't save this deal. Please try again.")).toBeInTheDocument();
     expect(sessionStorage.getItem("investoros_recs_import")).not.toBeNull();
     expect(screen.getByRole("button", { name: "Save deal" })).toBeEnabled();
+  });
+});
+
+describe("/import, deal limit", () => {
+  beforeEach(() => {
+    mockAuth = SIGNED_IN;
+  });
+
+  it("says the hub is full when the server refuses on the per-user limit", async () => {
+    mockSave.mockRejectedValue(new ApiError("VALIDATION_ERROR", "limit", [{ field: "limit" }]));
+    arrive(HASH);
+    renderPage();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Save deal" }));
+    });
+    expect(screen.getByText("You have 500 saved deals, the most an account can keep. Delete some in your hub, then save this one.")).toBeInTheDocument();
+    expect(sessionStorage.getItem("investoros_recs_import")).not.toBeNull();
   });
 });
 

@@ -419,6 +419,7 @@
   "import.saved": "Saved. You'll find it in your hub.",
   "import.go_to_hub": "Go to your hub",
   "import.error": "We couldn't save this deal. Please try again.",
+  "import.limit": "You have 500 saved deals, the most an account can keep. Delete some in your hub, then save this one.",
   "import.signed_out_hint": "Sign in or create a free account to keep this deal.",
   "import.sign_in": "Sign in to save",
   "import.create_account": "Create an account",
