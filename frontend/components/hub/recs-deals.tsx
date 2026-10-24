@@ -35,6 +35,8 @@ export function RecsDeals() {
     try {
       await deleteRecsDeal(id);
     } catch (err) {
+      // Already deleted elsewhere (another tab, or a retried request): the row stays gone
+      if ((err as { code?: string })?.code === "NOT_FOUND") return;
       console.error("Could not delete the deal", err);
       setDeals((current) =>
         before && current ? before.filter((deal) => deal.id === id || current.some((c) => c.id === deal.id)) : before,

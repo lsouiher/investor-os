@@ -258,3 +258,43 @@ describe("AuthProvider, failed sign-in during the stored-session check", () => {
     expect(screen.getByRole("button")).toHaveTextContent("a@example.com ready");
   });
 });
+
+// Review (adversarial): a server or network failure on /auth/me is not a signed-out user. Clearing
+// the token would also sign out every other tab (storage event), undoing the 500-not-401 fix.
+describe("AuthProvider, /auth/me fails for a reason other than 401", () => {
+  afterEach(() => {
+    localStorage.clear();
+    jest.useRealTimers();
+  });
+
+  it("keeps the token, stays loading, and checks again", async () => {
+    jest.useFakeTimers();
+    localStorage.setItem("token", "t1");
+    mockGet.mockReset()
+      .mockRejectedValueOnce(Object.assign(new Error("Server returned an unexpected response (502)"), { code: "NON_JSON_RESPONSE" }))
+      .mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" });
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    await act(async () => {});
+    expect(localStorage.getItem("token")).toBe("t1");
+    expect(screen.getByText("loading")).toBeInTheDocument();
+    await act(async () => {
+      jest.advanceTimersByTime(5000);
+    });
+    expect(screen.getByText("a@example.com t1")).toBeInTheDocument();
+  });
+
+  it("signs out on a 401 (the API client has already cleared storage)", async () => {
+    localStorage.setItem("token", "t1");
+    mockGet.mockReset().mockRejectedValueOnce(Object.assign(new Error("Session expired"), { code: "UNAUTHORIZED" }));
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    expect(await screen.findByText("signed out")).toBeInTheDocument();
+  });
+});

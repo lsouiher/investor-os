@@ -164,6 +164,21 @@ describe("RecsDeals", () => {
     expect(document.activeElement).toBe(screen.getByRole("heading", { name: "Identity hub" }));
   });
 
+  // Review (adversarial): a deal already deleted elsewhere answers 404; the row must not come back
+  it("treats a 404 on delete as already deleted", async () => {
+    mockList.mockResolvedValue(DEALS);
+    mockDelete.mockRejectedValue(Object.assign(new Error("Deal not found."), { code: "NOT_FOUND" }));
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    await renderSection();
+    const first = screen.getAllByRole("listitem")[0];
+    fireEvent.click(within(first).getByRole("button", { name: "Delete" }));
+    await act(async () => {
+      fireEvent.click(within(first).getByRole("button", { name: "Yes, delete" }));
+    });
+    expect(screen.queryByText("Elm St duplex")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  });
+
   it("shows an empty state pointing to the calculators when the RECS address is set", async () => {
     mockList.mockResolvedValue([]);
     await renderSection();

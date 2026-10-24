@@ -54,7 +54,7 @@ function ImportView() {
     if (arriving) stashImport(arriving);
     rememberSignupSource(window.location.search);
     window.history.replaceState(null, "", "/import");
-    setDeal(readImport() ?? arriving);
+    setDeal(arriving ?? readImport());
     setArrived(true);
   }, []);
 

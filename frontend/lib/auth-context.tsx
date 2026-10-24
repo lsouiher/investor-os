@@ -49,11 +49,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Each validation gets a number; a reply for an older one is ignored (two quick switches)
   const validation = useRef(0);
   const currentUser = useRef<User | null>(null);
-  currentUser.current = user;
+  useEffect(() => {
+    currentUser.current = user;
+  }, [user]);
+  const retry = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const validateRef = useRef<() => void>(() => {});
 
   // Check the stored token and validate it: on mount, and whenever another tab signs in or out
   const validateStoredToken = useCallback(() => {
     const run = ++validation.current;
+    if (retry.current) clearTimeout(retry.current);
     const storedToken = localStorage.getItem("token");
     if (!storedToken) {
       setToken(null);
@@ -67,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const shown = currentUser.current;
     if (shown && tokenSubject(storedToken) === shown.id) {
       setToken(storedToken);
+      setLoading(false); // this supersedes any check still running, which would have cleared it
       return;
     }
 
@@ -83,19 +89,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (run !== validation.current) return;
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
+        setLoading(false);
       })
-      .catch(() => {
+      .catch((err: { code?: string }) => {
         if (run !== validation.current) return;
-        // Token invalid — clear everything
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        setToken(null);
-        setUser(null);
-      })
-      .finally(() => {
-        if (run === validation.current) setLoading(false);
+        if (err?.code === "UNAUTHORIZED") {
+          // Token invalid: the API client has already cleared storage and redirects to sign-in
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setToken(null);
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        // A server or network failure is not a signed-out user: keep the token (removing it would
+        // also sign out every other tab) and check again, still loading
+        retry.current = setTimeout(() => {
+          if (run === validation.current) validateRef.current();
+        }, 5000);
       });
   }, []);
+  useEffect(() => {
+    validateRef.current = validateStoredToken;
+  }, [validateStoredToken]);
+
+  useEffect(
+    () => () => {
+      if (retry.current) clearTimeout(retry.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     validateStoredToken();

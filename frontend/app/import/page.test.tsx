@@ -146,6 +146,19 @@ describe("/import, state changes while a deal is held", () => {
     expect(sessionStorage.getItem("investoros_recs_import")).not.toBeNull();
   });
 
+  // Review (adversarial): if the stash cannot be written, the deal in the link still wins
+  it("shows the arriving deal when holding it fails, not an older held one", () => {
+    arrive(HASH);
+    renderPage().unmount();
+    const setItem = jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("QuotaExceededError");
+    });
+    arrive(`#c=brrrr&n=${encodeURIComponent("Rue Saint-Denis")}&d=AbC_-123`);
+    renderPage();
+    setItem.mockRestore();
+    expect(screen.getByText("Rue Saint-Denis")).toBeInTheDocument();
+  });
+
   it("replaces a held deal with a newly arrived valid one", () => {
     arrive(HASH);
     renderPage().unmount();
