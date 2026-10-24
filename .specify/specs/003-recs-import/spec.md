@@ -117,6 +117,9 @@ RECS users who want to keep a deal have nowhere to keep it: RECS has no accounts
 - The visitor is signed in as a different account than expected: the deal is saved to whichever account is signed in when Save is pressed; the page shows which account that is
 - The visitor opens the import link, signs in in another tab, and returns: the page reflects the signed-in state before offering Save
 - The RECS address is not configured in this deployment: see FR-5 (no "Open in RECS"; an empty section is hidden)
+- The visitor uses "Forgot your password?" while a deal is held: the reset link opens a new tab, and the held deal belongs to the first tab only, so it is not carried through the reset; the visitor sends it again from RECS (known limit, accepted at T038)
+- A link elsewhere carries `?ref=<other site>`: it is not a signup source; only `ref=recs` is (T038)
+- Sign-out forgets a held deal and the signup source, so the next person to sign in on a shared device is not offered it (T038)
 - Account deletion: every saved deal of the user is scrubbed (name set to `deleted`, payload emptied) and soft-deleted with the rest of their data, as the account-deletion script does for every user table (FR-7)
 
 ---
@@ -131,7 +134,7 @@ RECS users who want to keep a deal have nowhere to keep it: RECS has no accounts
 
 ### FR-2: Validation (same rules in the browser and on the server)
 - Calculator (`c`): must be one of the known calculators listed in a configuration file maintained in this repo, initially the eight in the Clarifications
-- Name (`n`): URL-decoded; control characters (Unicode C0/C1) replaced by a space and bidirectional formatting characters (U+202A–U+202E, U+2066–U+2069) removed, since they could make one deal's name pass for another's (constitution X, sanitize before storing); then trimmed; 1 to 120 code points. RECS's name input accepts any non-blank text (RECS `packages/calculators/src/schema-helpers.ts` `text()`, D-112 (1), read at RECS `5463018`), so the name is cleaned, never refused for these characters: a refusal would lose a deal RECS sent. Only the name is cleaned; the payload `d`, which is what reopens in RECS, is untouched
+- Name (`n`): URL-decoded; control characters (Unicode C0/C1) replaced by a space and bidirectional formatting characters (U+202A–U+202E, U+2066–U+2069) removed, since they could make one deal's name pass for another's (constitution X, sanitize before storing); then trimmed; 1 to 120 code points. RECS's name input accepts any non-blank text (RECS `packages/calculators/src/schema-helpers.ts` `text()`, D-112 (1), read at RECS `5463018`), so the name is cleaned, never refused for these characters: a refusal would lose a deal RECS sent. Only the name is cleaned; the payload `d`, which is what reopens in RECS, is untouched At ship (T038, review), the cleaning widened to every invisible formatting character: line separators U+2028/U+2029 become a space; direction marks (U+200E, U+200F, U+061C), zero-width space U+200B, word joiners U+2060–U+2064, U+180E, BOM U+FEFF and tag characters U+E0000–U+E007F are removed; the joiners U+200C/U+200D are kept (emoji sequences and several scripts need them) but a name made only of them is blank
 - Payload (`d`): 1 to 8,000 characters, URL-safe base64 alphabet only (`A–Z a–z 0–9 - _`)
 - The payload is never decoded, decompressed, parsed or altered. It is stored and returned byte for byte
 - A deal failing any rule is not saved; the user sees "nothing to import"; the server answers with the app's standard error shape
@@ -161,7 +164,7 @@ RECS users who want to keep a deal have nowhere to keep it: RECS has no accounts
 
 ### FR-7: Data protection and retention
 - Saved deals belong to one user and one tenant, are isolated by the same tenant-isolation rules as all user data, and are referred to externally only by a non-guessable public identifier
-- Deletion by the user is a soft delete
+- Deletion by the user is a soft delete; the row keeps its owner and dates but its name becomes `deleted` and its payload is emptied, as account erasure does (added at T038: the per-user cap counts live deals, so a deleted row must not keep its payload)
 - Account deletion leaves no readable deal: every saved deal of the user is scrubbed (name set to `deleted`, payload emptied) and soft-deleted with the rest of their data, as the account-deletion script does for every user table
 - No time-based purge in this version; the retention statement in the deployment guide says so
 

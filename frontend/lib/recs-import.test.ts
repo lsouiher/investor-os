@@ -3,7 +3,7 @@ import {
   isKnownSlug,
   openInRecsUrl,
   stashImport,
-  takeImport,
+  readImport,
   clearImport,
 } from "./recs-import";
 
@@ -74,6 +74,15 @@ describe("parseImportFragment", () => {
     expect(parseImportFragment("#c=brrrr&n=Elm%09St%E2%80%AE&d=abc")?.name).toBe("Elm St");
     expect(parseImportFragment("#c=brrrr&n=%09%E2%80%AE%20&d=abc")).toBeNull();
   });
+
+  // Same rules as backend validation.ts
+  it("removes zero-width, direction-mark and tag characters, and rejects a name of only those", () => {
+    const n = encodeURIComponent("Elm \u200BSt\u200E\uFEFF\u2028\u{E0041}");
+    expect(parseImportFragment(`#c=brrrr&n=${n}&d=abc`)?.name).toBe("Elm St");
+    expect(parseImportFragment(`#c=brrrr&n=${encodeURIComponent("\u200B\u200D\u200C")}&d=abc`)).toBeNull();
+    const family = "\u{1F468}\u200D\u{1F469}\u200D\u{1F467}";
+    expect(parseImportFragment(`#c=brrrr&n=${encodeURIComponent(family)}&d=abc`)?.name).toBe(family);
+  });
 });
 
 describe("isKnownSlug", () => {
@@ -110,17 +119,17 @@ describe("stash", () => {
 
   it("round-trips through sessionStorage and clears", () => {
     stashImport(deal);
-    expect(takeImport()).toEqual(deal);
-    expect(takeImport()).toEqual(deal); // reading does not remove it
+    expect(readImport()).toEqual(deal);
+    expect(readImport()).toEqual(deal); // reading does not remove it
     clearImport();
-    expect(takeImport()).toBeNull();
+    expect(readImport()).toBeNull();
   });
 
   it("ignores a stash that no longer passes validation", () => {
     sessionStorage.setItem("investoros_recs_import", JSON.stringify({ ...deal, d: "a+b" }));
-    expect(takeImport()).toBeNull();
+    expect(readImport()).toBeNull();
     sessionStorage.setItem("investoros_recs_import", "{not json");
-    expect(takeImport()).toBeNull();
+    expect(readImport()).toBeNull();
   });
 
   it("survives a throwing sessionStorage", () => {
@@ -134,7 +143,7 @@ describe("stash", () => {
       throw new Error("denied");
     });
     expect(() => stashImport(deal)).not.toThrow();
-    expect(takeImport()).toBeNull();
+    expect(readImport()).toBeNull();
     expect(() => clearImport()).not.toThrow();
   });
 });

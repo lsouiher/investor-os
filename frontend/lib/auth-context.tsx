@@ -8,7 +8,8 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { takeSignupSource } from "@/lib/signup-source";
+import { clearSignupSource, takeSignupSource } from "@/lib/signup-source";
+import { clearImport } from "@/lib/recs-import";
 import { api } from "./api-client";
 
 export interface User {
@@ -102,6 +103,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    // A shared device: the next person to sign in in this tab must not be offered this user's
+    // held RECS deal or inherit their signup source
+    clearImport();
+    clearSignupSource();
     setToken(null);
     setUser(null);
     window.location.href = "/login";

@@ -18,7 +18,7 @@ import {
   clearImport,
   parseImportFragment,
   stashImport,
-  takeImport,
+  readImport,
   type RecsImport,
 } from "@/lib/recs-import";
 
@@ -54,7 +54,7 @@ function ImportView() {
     if (arriving) stashImport(arriving);
     rememberSignupSource(window.location.search);
     window.history.replaceState(null, "", "/import");
-    setDeal(takeImport() ?? arriving);
+    setDeal(readImport() ?? arriving);
     setArrived(true);
   }, []);
 
@@ -68,6 +68,8 @@ function ImportView() {
       setSaved(true);
     } catch (err) {
       // The stash stays, so Save can be retried (after deleting deals, for the per-user limit)
+      // gstack-shortcut(dec-f8c385f4-318e-477f-a8ec-93db7c038e62): no idempotency key, a lost reply can duplicate on retry; upgrade
+      // when a user reports duplicates
       setError(isLimitError(err) ? "import.limit" : "import.error");
     } finally {
       setSaving(false);
@@ -85,7 +87,7 @@ function ImportView() {
     return (
       <Shell>
         <h1 className="text-2xl font-bold text-foreground">{t("import.title")}</h1>
-        <p className="mt-4 text-sm text-foreground-secondary">{t("import.saved")}</p>
+        <p className="mt-4 text-base text-foreground-secondary">{t("import.saved")}</p>
         <Link href="/hub" className={`mt-6 ${primaryButton}`} style={{ borderRadius: "var(--radius-button)" }}>
           {t("import.go_to_hub")}
         </Link>
@@ -97,7 +99,7 @@ function ImportView() {
     return (
       <Shell>
         <h1 className="text-2xl font-bold text-foreground">{t("import.nothing_title")}</h1>
-        <p className="mt-4 text-sm text-foreground-secondary">{t("import.nothing_body")}</p>
+        <p className="mt-4 text-base text-foreground-secondary">{t("import.nothing_body")}</p>
         <Link
           href={user ? "/hub" : "/"}
           className="mt-6 inline-block text-sm font-medium text-accent-text underline underline-offset-2"
@@ -123,7 +125,7 @@ function ImportView() {
           {error && (
             <div
               role="alert"
-              className="mt-4 bg-danger-tint px-4 py-3 text-sm text-danger"
+              className="mt-4 bg-danger-tint px-4 py-3 text-base text-danger"
               style={{ borderRadius: "var(--radius-default)" }}
             >
               {t(error)}
@@ -152,7 +154,7 @@ function ImportView() {
         </>
       ) : (
         <>
-          <p className="mt-6 text-sm text-foreground-secondary">{t("import.signed_out_hint")}</p>
+          <p className="mt-6 text-base text-foreground-secondary">{t("import.signed_out_hint")}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Link href="/login?next=/import" className={primaryButton} style={{ borderRadius: "var(--radius-button)" }}>
               {t("import.sign_in")}

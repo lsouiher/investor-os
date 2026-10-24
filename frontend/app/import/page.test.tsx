@@ -115,6 +115,52 @@ describe("/import, signed in", () => {
   });
 });
 
+describe("/import, state changes while a deal is held", () => {
+  it("keeps the held deal when the session expires during Save, so it survives the sign-in", async () => {
+    mockAuth = SIGNED_IN;
+    mockSave.mockRejectedValue(new ApiError("UNAUTHORIZED", "Session expired"));
+    arrive(HASH);
+    renderPage();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Save deal" }));
+    });
+    expect(JSON.parse(sessionStorage.getItem("investoros_recs_import")!)).toEqual(
+      expect.objectContaining({ c: "multifamily", name: "Elm St & Co #12", d: PAYLOAD }),
+    );
+  });
+
+  it("switches to the signed-out view when another tab signs out, keeping the deal", () => {
+    mockAuth = SIGNED_IN;
+    arrive(HASH);
+    const { rerender } = renderPage();
+    expect(screen.getByRole("button", { name: "Save deal" })).toBeInTheDocument();
+    mockAuth = { user: null, loading: false };
+    rerender(
+      <I18nProvider>
+        <ImportPage />
+      </I18nProvider>,
+    );
+    expect(screen.queryByRole("button", { name: "Save deal" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Sign in to save" })).toHaveAttribute("href", "/login?next=/import");
+    expect(screen.getByText("Elm St & Co #12")).toBeInTheDocument();
+    expect(sessionStorage.getItem("investoros_recs_import")).not.toBeNull();
+  });
+
+  it("replaces a held deal with a newly arrived valid one", () => {
+    arrive(HASH);
+    renderPage().unmount();
+    arrive(`#c=brrrr&n=${encodeURIComponent("Rue Saint-Denis")}&d=AbC_-123`);
+    renderPage();
+    expect(screen.getByText("Rue Saint-Denis")).toBeInTheDocument();
+    expect(screen.queryByText("Elm St & Co #12")).not.toBeInTheDocument();
+    expect(JSON.parse(sessionStorage.getItem("investoros_recs_import")!)).toEqual({
+      c: "brrrr",
+      name: "Rue Saint-Denis",
+      d: "AbC_-123",
+    });
+  });
+});
+
 describe("/import, deal limit", () => {
   beforeEach(() => {
     mockAuth = SIGNED_IN;

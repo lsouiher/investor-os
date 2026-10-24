@@ -14,8 +14,12 @@ const KEY = "investoros_recs_import";
 const KNOWN_SLUGS = new Set(recsConfig.calculators.map((calculator) => calculator.slug));
 const PAYLOAD_REGEX = /^[A-Za-z0-9_-]{1,8000}$/;
 const MAX_NAME_CODE_POINTS = 120;
-const CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F]/g;
-const BIDI_FORMATTING = /[\u202A-\u202E\u2066-\u2069]/g;
+const CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F\u2028\u2029]/g;
+// Invisible formatting characters: bidi embeddings and isolates, direction marks, zero-width
+// space, word joiners, BOM and tag characters. The joiners U+200C/U+200D stay (emoji sequences
+// and several scripts need them), but a name made only of joiners is blank.
+const INVISIBLE_FORMATTING = /[\u061C\u180E\u200B\u200E\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF\u{E0000}-\u{E007F}]/gu;
+const JOINERS = /[\u200C\u200D]/g;
 
 export function isKnownSlug(c: string): boolean {
   return KNOWN_SLUGS.has(c);
@@ -25,9 +29,9 @@ export function isKnownSlug(c: string): boolean {
 function validate(c: unknown, name: unknown, d: unknown): RecsImport | null {
   if (typeof c !== "string" || !isKnownSlug(c)) return null;
   if (typeof name !== "string") return null;
-  const cleaned = name.replace(CONTROL_CHARS, " ").replace(BIDI_FORMATTING, "").trim();
+  const cleaned = name.replace(CONTROL_CHARS, " ").replace(INVISIBLE_FORMATTING, "").trim();
   const length = [...cleaned].length;
-  if (length < 1 || length > MAX_NAME_CODE_POINTS) return null;
+  if (!cleaned.replace(JOINERS, "").trim() || length > MAX_NAME_CODE_POINTS) return null;
   if (typeof d !== "string" || !PAYLOAD_REGEX.test(d)) return null;
   return { c, name: cleaned, d };
 }
@@ -60,7 +64,7 @@ export function stashImport(deal: RecsImport): void {
 
 // Reads the held deal without removing it (a reload still offers Save); re-validated because
 // sessionStorage is writable by anything on this origin
-export function takeImport(): RecsImport | null {
+export function readImport(): RecsImport | null {
   try {
     const raw = sessionStorage.getItem(KEY);
     if (!raw) return null;

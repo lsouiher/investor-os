@@ -39,7 +39,7 @@ function row(overrides: Record<string, unknown> = {}) {
 
 beforeEach(() => {
   mockCount.mockResolvedValue(0);
-  mockCreate.mockImplementation(async (_t: number, _u: number, input: typeof VALID) => row(input));
+  mockCreate.mockImplementation(async (_u: number, _t: number, input: typeof VALID) => row(input));
 });
 
 describe('POST /recs-deals', () => {
@@ -65,7 +65,7 @@ describe('POST /recs-deals', () => {
     expect(res.body).toEqual({
       data: { id: 'pub10', c: 'multifamily', name: 'Elm St 12-plex', created_at: '2026-12-05T10:00:00.000Z' },
     });
-    expect(mockCreate).toHaveBeenCalledWith(7, 1, VALID);
+    expect(mockCreate).toHaveBeenCalledWith(1, 7, VALID);
   });
 
   it('passes d to the repository unchanged', async () => {

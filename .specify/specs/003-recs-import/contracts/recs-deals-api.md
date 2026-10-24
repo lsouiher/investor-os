@@ -18,7 +18,7 @@ Request:
 | Field | Rule |
 |---|---|
 | `c` | required string, in `config/recs.json` |
-| `name` | required string; control characters become spaces and bidi formatting characters are removed, then trimmed; 1–120 code points. The cleaned name is what is stored and returned |
+| `name` | required string; control characters and U+2028/U+2029 become spaces, invisible formatting characters (bidi, direction marks, zero-width space, word joiners, BOM, tags) are removed, then trimmed; 1–120 code points and not only U+200C/U+200D. The cleaned name is what is stored and returned |
 | `d` | required string; `^[A-Za-z0-9_-]{1,8000}$`; stored exactly as received |
 
 201:
@@ -52,6 +52,7 @@ The caller's live deals, newest first. No pagination in v1.
 Soft delete one of the caller's deals. `:id` is the public id.
 
 204, no body.
+The deleted row's `name` becomes `deleted` and `d` is emptied.
 404 `NOT_FOUND` if the id does not exist, is already deleted, or belongs to another user or
 tenant (indistinguishable on purpose).
 

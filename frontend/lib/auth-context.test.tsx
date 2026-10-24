@@ -82,3 +82,31 @@ describe("AuthProvider across tabs", () => {
     expect(mockGet).not.toHaveBeenCalled();
   });
 });
+
+// Review (red team): on a shared device, the next person to sign in in this tab must not be
+// offered the previous user's held RECS deal, nor inherit their signup source
+describe("AuthProvider logout", () => {
+  afterEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    jest.restoreAllMocks();
+  });
+
+  it("forgets the held RECS deal and the signup source", async () => {
+    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm", d: "abc" }));
+    sessionStorage.setItem("investoros_signup_source", "recs");
+    jest.spyOn(console, "error").mockImplementation(() => {}); // jsdom: navigation not implemented
+    function LogoutButton() {
+      const { logout } = useAuth();
+      return <button onClick={logout}>out</button>;
+    }
+    render(
+      <AuthProvider>
+        <LogoutButton />
+      </AuthProvider>,
+    );
+    act(() => screen.getByRole("button", { name: "out" }).click());
+    expect(sessionStorage.getItem("investoros_recs_import")).toBeNull();
+    expect(sessionStorage.getItem("investoros_signup_source")).toBeNull();
+  });
+});

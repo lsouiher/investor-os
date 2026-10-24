@@ -2,7 +2,7 @@
 
 // "Deals from your calculators": deals sent from RECS and saved on /import, last on the hub
 // (spec FR-5). The payload d is only passed back to RECS, never read here.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RecsLink } from "@/components/shared/recs-link";
 import { useTranslation } from "@/lib/i18n";
 import { deleteRecsDeal, listRecsDeals, type RecsDeal } from "@/lib/recs-deals-api";
@@ -13,6 +13,7 @@ export function RecsDeals() {
   // null while loading or after a failed fetch: the hub's job is the audits, so render nothing
   const [deals, setDeals] = useState<RecsDeal[] | null>(null);
   const [confirming, setConfirming] = useState<string | null>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const recsUrl = process.env.NEXT_PUBLIC_RECS_URL;
 
   useEffect(() => {
@@ -27,6 +28,8 @@ export function RecsDeals() {
     const before = deals;
     setConfirming(null);
     setDeals((current) => current?.filter((deal) => deal.id !== id) ?? null);
+    // The row and its buttons unmount: keep keyboard focus in the section, not at the page top
+    headingRef.current?.focus();
     try {
       await deleteRecsDeal(id);
     } catch (err) {
@@ -42,7 +45,9 @@ export function RecsDeals() {
 
   return (
     <section className="mt-10">
-      <h2 className="text-lg font-semibold text-foreground-strong">{t("hub.recs_deals.title")}</h2>
+      <h2 ref={headingRef} tabIndex={-1} className="text-lg font-semibold text-foreground-strong">
+        {t("hub.recs_deals.title")}
+      </h2>
 
       {deals.length === 0 ? (
         <p className="mt-2 text-sm text-foreground-muted">

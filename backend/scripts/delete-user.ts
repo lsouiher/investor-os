@@ -49,6 +49,8 @@ async function main() {
       data: { name: 'deleted', email: null, phone: null, notes: null, deletedAt: now },
     });
     const tasks = await tx.task.updateMany({ where, data: { title: 'deleted', description: null, deletedAt: now } });
+    // gstack-shortcut(dec-7c22e17c-1a6d-48e6-8729-35796bf865f2): no unit test (main() runs on import), checked live; upgrade when
+    // this script exports main()
     const recsDeals = await tx.recsDeal.updateMany({ where, data: { name: 'deleted', d: '', deletedAt: now } });
     await tx.user.update({
       where: { id: user.id },

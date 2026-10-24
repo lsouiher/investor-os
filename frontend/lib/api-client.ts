@@ -117,6 +117,12 @@ async function requestEnvelope<T, M extends object = Record<string, unknown>>(
     clearAuthAndRedirect();
     throw new ApiError("UNAUTHORIZED", "Session expired");
   }
+  if (!(res.headers.get("content-type") ?? "").includes("application/json")) {
+    throw new ApiError(
+      "NON_JSON_RESPONSE",
+      `Server returned an unexpected response (${res.status} ${res.statusText})`
+    );
+  }
   const json = (await res.json()) as ApiResponse<T> & M;
   if (isErrorResponse(json)) {
     throw new ApiError(json.error.code, json.error.message, json.error.details);

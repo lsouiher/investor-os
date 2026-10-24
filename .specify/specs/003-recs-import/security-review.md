@@ -23,3 +23,9 @@ The one low finding is **fixed** on this branch (owner decision, T038): 500 live
 
 - RLS on `recs_deals` is defense in depth only (`set_config(..., true)` outside a transaction, policy not forced): isolation rests on the repository filters, as for every other table. Not a finding.
 - No scanners (daily static mode); deployed Railway configuration not in the snapshot.
+
+## Recheck (after `e5afa27`)
+
+Run `1792804595850-81c3d33140ef43c7` (recheck of 89b18400 on current source): **complete**, "No supported
+findings in the assessed scope." Evidence: `routes.ts:22` is the only caller of `createRecsDeal`;
+`service.ts:12` refuses at 500 live deals before inserting.

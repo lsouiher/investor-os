@@ -18,6 +18,12 @@ describe("rememberSignupSource", () => {
     expect(takeSignupSource()).toBe("qr");
   });
 
+  // Review (red team): other sites append ?ref=<site>; only RECS arrivals are a source
+  it("ignores any ref other than recs", () => {
+    rememberSignupSource("?ref=producthunt");
+    expect(takeSignupSource()).toBeNull();
+  });
+
   it("ignores an invalid ref", () => {
     rememberSignupSource("?ref=<script>");
     expect(takeSignupSource()).toBeNull();

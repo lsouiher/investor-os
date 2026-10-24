@@ -89,6 +89,8 @@ app.use('/api/v1/contacts', contactRoutes);
 app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/growth-strategy', growthRoutes);
+// gstack-shortcut(dec-7c22e17c-1a6d-48e6-8729-35796bf865f2): no test that this sits behind authenticate (listen runs on import),
+// checked live with a no-token POST; upgrade when main.ts exports app without listening
 app.use('/api/v1/recs-deals', recsDealRoutes);
 
 // Error handler (must be last)

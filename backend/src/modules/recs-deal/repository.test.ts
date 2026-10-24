@@ -36,6 +36,14 @@ describe('recs-deal repository', () => {
     expect(args.data.deletedAt).toBeInstanceOf(Date);
   });
 
+  // Review (security): the cap counts live deals, so a deleted deal must not keep its payload
+  it('blanks the name and payload of a deleted deal, as account erasure does', async () => {
+    await softDeleteRecsDeal('pub', 3, 9);
+    expect(mockUpdateMany.mock.calls.at(-1)[0].data).toEqual(
+      expect.objectContaining({ name: 'deleted', d: '' }),
+    );
+  });
+
   it('counts only the live deals of this user and tenant', async () => {
     await countLiveRecsDeals(3, 9);
     expect(mockCount.mock.calls[0][0].where).toEqual({ tenantId: 9, userId: 3, deletedAt: null });
@@ -43,7 +51,7 @@ describe('recs-deal repository', () => {
 
   it('creates with a public id and d unchanged', async () => {
     const d = 'N4Ig_-'.repeat(500);
-    await createRecsDeal(9, 3, { c: 'brrrr', name: 'Elm', d });
+    await createRecsDeal(3, 9, { c: 'brrrr', name: 'Elm', d });
     const { data } = mockCreate.mock.calls[0][0];
     expect(data).toEqual(expect.objectContaining({ tenantId: 9, userId: 3, c: 'brrrr', name: 'Elm', d }));
     expect(typeof data.publicId).toBe('string');

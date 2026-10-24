@@ -33,6 +33,7 @@ beforeEach(() => {
 
 afterEach(() => {
   delete process.env.NEXT_PUBLIC_RECS_URL;
+  jest.restoreAllMocks(); // console.error spies below must not silence later tests
 });
 
 describe("RecsDeals", () => {
@@ -105,6 +106,41 @@ describe("RecsDeals", () => {
     const rows = screen.getAllByRole("listitem");
     expect(rows).toHaveLength(2);
     expect(within(rows[0]).getByText("Elm St duplex")).toBeInTheDocument();
+  });
+
+  it("restores only the failed row, not a row deleted successfully in the meantime", async () => {
+    mockList.mockResolvedValue(DEALS);
+    let rejectFirst!: (err: Error) => void;
+    mockDelete
+      .mockImplementationOnce(() => new Promise((_, reject) => { rejectFirst = reject; }))
+      .mockResolvedValueOnce(undefined);
+    jest.spyOn(console, "error").mockImplementation(() => {});
+    await renderSection();
+    for (const name of ["Elm St duplex", "Oak 12-plex"]) {
+      const row = screen.getByText(name).closest("li")!;
+      fireEvent.click(within(row).getByRole("button", { name: "Delete" }));
+      await act(async () => {
+        fireEvent.click(within(row).getByRole("button", { name: "Yes, delete" }));
+      });
+    }
+    await act(async () => {
+      rejectFirst(new Error("500"));
+    });
+    expect(screen.getByText("Elm St duplex")).toBeInTheDocument();
+    expect(screen.queryByText("Oak 12-plex")).not.toBeInTheDocument();
+  });
+
+  // Review (design): the deleted row unmounts, so focus must not fall back to the page top
+  it("moves keyboard focus to the section heading after a delete", async () => {
+    mockList.mockResolvedValue(DEALS);
+    mockDelete.mockResolvedValue(undefined);
+    await renderSection();
+    const first = screen.getAllByRole("listitem")[0];
+    fireEvent.click(within(first).getByRole("button", { name: "Delete" }));
+    await act(async () => {
+      fireEvent.click(within(first).getByRole("button", { name: "Yes, delete" }));
+    });
+    expect(document.activeElement).toBe(screen.getByRole("heading", { name: "Deals from your calculators" }));
   });
 
   it("shows an empty state pointing to the calculators when the RECS address is set", async () => {

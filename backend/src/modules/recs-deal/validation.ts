@@ -8,8 +8,12 @@ import type { RecsDealInput } from './types.js';
 const SLUG_REGEX = /^[a-z0-9-]{1,64}$/;
 const PAYLOAD_REGEX = /^[A-Za-z0-9_-]{1,8000}$/;
 const MAX_NAME_CODE_POINTS = 120;
-const CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F]/g;
-const BIDI_FORMATTING = /[\u202A-\u202E\u2066-\u2069]/g;
+const CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F\u2028\u2029]/g;
+// Invisible formatting characters: bidi embeddings and isolates, direction marks, zero-width
+// space, word joiners, BOM and tag characters. The joiners U+200C/U+200D stay (emoji sequences
+// and several scripts need them), but a name made only of joiners is blank.
+const INVISIBLE_FORMATTING = /[\u061C\u180E\u200B\u200E\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF\u{E0000}-\u{E007F}]/gu;
+const JOINERS = /[\u200C\u200D]/g;
 
 // Read once at start; the API must not run without the list (research R1), so a missing or
 // malformed file throws and the process fails before it takes traffic.
@@ -37,10 +41,11 @@ function invalid(field: 'c' | 'name' | 'd', message: string): AppError {
   return new AppError('VALIDATION_ERROR', message, 400, [{ field, message }]);
 }
 
-// Control characters become spaces and bidi formatting characters go, so one deal's name cannot
-// pass for another's (constitution X). Cleaned, never refused: RECS accepts any non-blank name.
+// Control characters and line separators become spaces and invisible formatting characters go,
+// so one deal's name cannot pass for another's (constitution X). Cleaned, never refused: RECS
+// accepts any non-blank name.
 export function cleanName(name: string): string {
-  return name.replace(CONTROL_CHARS, ' ').replace(BIDI_FORMATTING, '').trim();
+  return name.replace(CONTROL_CHARS, ' ').replace(INVISIBLE_FORMATTING, '').trim();
 }
 
 export function validateRecsDeal(body: Record<string, unknown>): RecsDealInput {
@@ -50,7 +55,7 @@ export function validateRecsDeal(body: Record<string, unknown>): RecsDealInput {
   }
   const cleaned = typeof name === 'string' ? cleanName(name) : '';
   const length = [...cleaned].length;
-  if (length < 1 || length > MAX_NAME_CODE_POINTS) {
+  if (!cleaned.replace(JOINERS, '').trim() || length > MAX_NAME_CODE_POINTS) {
     throw invalid('name', `Name must be 1 to ${MAX_NAME_CODE_POINTS} characters.`);
   }
   // The message never includes d: it is the user's deal, and logs keep error messages

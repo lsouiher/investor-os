@@ -12,18 +12,22 @@ import { safeNextPath } from "@/lib/next-path";
 export default function LoginPage() {
   return (
     <AuthProvider>
-      {/* useSearchParams needs a Suspense boundary for the static build */}
-      <Suspense>
-        <LoginForm />
+      {/* useSearchParams renders client-only up to its Suspense boundary; the fallback is the same
+          form without ?next=, so the page still prerenders in full */}
+      <Suspense fallback={<LoginForm next={null} />}>
+        <LoginFormWithNext />
       </Suspense>
     </AuthProvider>
   );
 }
 
-function LoginForm() {
+// ?next=/import brings a visitor back to the deal they arrived with (allow-listed)
+function LoginFormWithNext() {
+  return <LoginForm next={safeNextPath(useSearchParams().get("next"))} />;
+}
+
+function LoginForm({ next }: { next: string | null }) {
   const router = useRouter();
-  // ?next=/import brings a visitor back to the deal they arrived with (allow-listed)
-  const next = safeNextPath(useSearchParams().get("next"));
   const { login } = useAuth();
   const { t } = useTranslation();
 

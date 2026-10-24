@@ -13,13 +13,10 @@ export async function createRecsDeal(userId: number, tenantId: number, input: Re
     const message = `You can keep at most ${MAX_LIVE_DEALS} deals. Delete some, then save again.`;
     throw new AppError('VALIDATION_ERROR', message, 400, [{ field: 'limit', message }]);
   }
-  const deal = await recsDealRepo.createRecsDeal(tenantId, userId, input);
-  return {
-    id: deal.publicId,
-    c: deal.c,
-    name: deal.name,
-    createdAt: deal.createdAt.toISOString(),
-  };
+  const deal = await recsDealRepo.createRecsDeal(userId, tenantId, input);
+  // The create response is the list view without the payload, which the caller already has
+  const { d: _d, ...created } = toView(deal);
+  return created;
 }
 
 function toView(deal: RecsDeal): RecsDealView {

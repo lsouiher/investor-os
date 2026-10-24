@@ -747,4 +747,4 @@ Here's why the identity-first approach creates a defensible product:
 
 | # | Date | Change |
 |---|------|--------|
-| 1 | (merge date, set at /ship) | RECS hand-off: deals sent from RECS calculators are stored as opaque payloads and listed in the hub; the contract is RECS `docs/spec.md` §10.8 (FR-10.8.1, FR-10.8.2, DM-7) and D-108; Investor OS never decodes the payload (RECS calls this app InvestorsMap); spec `.specify/specs/003-recs-import/` |
+| 1 | 2026-10-23 (v0.5.0.0) | RECS hand-off: deals sent from RECS calculators are stored as opaque payloads and listed in the hub; the contract is RECS `docs/spec.md` §10.8 (FR-10.8.1, FR-10.8.2, DM-7) and D-108; Investor OS never decodes the payload (RECS calls this app InvestorsMap); spec `.specify/specs/003-recs-import/` |
