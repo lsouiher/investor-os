@@ -67,7 +67,7 @@ export function RecsDeals() {
             return (
               <li key={deal.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
                 <div className="min-w-0">
-                  <p className="break-words font-medium text-foreground-strong">{deal.name}</p>
+                  <p className="overflow-hidden break-words font-medium text-foreground-strong">{deal.name}</p>
                   <p className="mt-0.5 text-xs text-foreground-muted">
                     <span>{t(`recs.calculator.${deal.c}`)}</span>
                     <span aria-hidden="true"> · </span>

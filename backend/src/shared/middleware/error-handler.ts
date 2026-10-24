@@ -46,6 +46,21 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     return;
   }
 
+  // A body the JSON parser refused is the client's error. Never log it: the error carries the raw
+  // body, which can hold a user's deal payload
+  const parserError = (err as { type?: string }).type;
+  if (parserError === 'entity.parse.failed' || parserError === 'entity.too.large') {
+    const tooLarge = parserError === 'entity.too.large';
+    res.status(tooLarge ? 413 : 400).json({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: tooLarge ? 'Request body is too large.' : 'Request body is not valid JSON.',
+        details: [],
+      },
+    });
+    return;
+  }
+
   // Unexpected error — log and return generic
   console.error('Unhandled error:', err);
   res.status(500).json({

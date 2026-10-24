@@ -61,6 +61,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (retry.current) clearTimeout(retry.current);
     const storedToken = localStorage.getItem("token");
     if (!storedToken) {
+      // Signed out in another tab: forget this tab's held RECS deal and signup source too, so the
+      // next person on a shared device is not offered them. A visitor never signed in keeps theirs.
+      if (currentUser.current) {
+        clearImport();
+        clearSignupSource();
+      }
       setToken(null);
       setUser(null);
       setLoading(false);

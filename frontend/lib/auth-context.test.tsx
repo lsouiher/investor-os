@@ -371,3 +371,41 @@ describe("AuthProvider edges", () => {
     expect(screen.getByText(`a@example.com ${again}`)).toBeInTheDocument();
   });
 });
+
+// Review (adversarial): a sign-out in another tab must also forget this tab's held RECS deal
+describe("AuthProvider, sign-out in another tab", () => {
+  afterEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+
+  it("forgets the held deal and signup source of the account that was shown", async () => {
+    localStorage.setItem("token", "t1");
+    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm", d: "abc" }));
+    sessionStorage.setItem("investoros_signup_source", "recs");
+    mockGet.mockReset().mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" });
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
+    localStorage.removeItem("token");
+    storageEvent("token", null);
+    await waitFor(() => expect(screen.getByText("signed out")).toBeInTheDocument());
+    expect(sessionStorage.getItem("investoros_recs_import")).toBeNull();
+    expect(sessionStorage.getItem("investoros_signup_source")).toBeNull();
+  });
+
+  it("keeps a deal held by a visitor who was never signed in", async () => {
+    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm", d: "abc" }));
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    await screen.findByText("signed out");
+    storageEvent("token", null);
+    expect(sessionStorage.getItem("investoros_recs_import")).not.toBeNull();
+  });
+});

@@ -53,6 +53,24 @@ describe("api-client getEnvelope", () => {
   });
 });
 
+// Review (adversarial): a 401 for a token another tab has since replaced must not delete the new one
+describe("api-client 401 for a replaced token", () => {
+  it("keeps the newer token another tab stored meanwhile", async () => {
+    localStorage.setItem("token", "old-token");
+    global.fetch = jest.fn().mockImplementation(async () => {
+      localStorage.setItem("token", "new-token"); // another tab signs in while this request is out
+      return {
+        status: 401,
+        statusText: "",
+        headers: { get: () => "application/json" },
+        json: () => Promise.resolve({ error: { code: "UNAUTHORIZED", message: "Invalid or expired token.", details: [] } }),
+      };
+    }) as unknown as typeof fetch;
+    await expect(api.get("/recs-deals")).rejects.toThrow();
+    expect(localStorage.getItem("token")).toBe("new-token");
+  });
+});
+
 describe("loginUrl", () => {
   it("brings the user back to an allow-listed page, where a RECS deal is held", () => {
     expect(loginUrl("/import")).toBe("/login?next=/import");

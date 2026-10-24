@@ -44,8 +44,11 @@ export function loginUrl(pathname: string): string {
   return next ? `/login?next=${next}` : "/login";
 }
 
-function clearAuthAndRedirect(): void {
+// sentToken: the token the failed request carried. If another tab has stored a newer one since,
+// the 401 is about the old session and must not delete the new one
+function clearAuthAndRedirect(sentToken: string | null): void {
   if (typeof window === "undefined") return;
+  if (getToken() !== sentToken) return;
   localStorage.removeItem("token");
   localStorage.removeItem("user");
   window.location.href = loginUrl(window.location.pathname);
@@ -78,7 +81,7 @@ async function request<T>(
   });
 
   if (sessionExpired(res, path)) {
-    clearAuthAndRedirect();
+    clearAuthAndRedirect(token);
     throw new ApiError("UNAUTHORIZED", "Session expired");
   }
 
@@ -114,7 +117,7 @@ async function requestEnvelope<T, M extends object = Record<string, unknown>>(
 
   const res = await fetch(`${BASE_URL}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
   if (sessionExpired(res, path)) {
-    clearAuthAndRedirect();
+    clearAuthAndRedirect(token);
     throw new ApiError("UNAUTHORIZED", "Session expired");
   }
   if (!(res.headers.get("content-type") ?? "").includes("application/json")) {

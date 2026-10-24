@@ -114,7 +114,7 @@ function ImportView() {
     <Shell>
       <p className="text-sm text-foreground-muted">{t("import.title")}</p>
       {/* The name as received (after cleaning), rendered as text: never translated, never markup */}
-      <h1 className="mt-2 break-words text-2xl font-bold text-foreground">{deal.name}</h1>
+      <h1 className="mt-2 overflow-hidden break-words text-2xl font-bold text-foreground">{deal.name}</h1>
       <p className="mt-1 text-sm text-foreground-secondary">
         {t("import.from", { calculator: t(`recs.calculator.${deal.c}`) })}
       </p>
