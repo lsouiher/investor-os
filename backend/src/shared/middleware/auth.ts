@@ -35,9 +35,12 @@ declare global {
 }
 
 export async function authenticate(req: Request, _res: Response, next: NextFunction): Promise<void> {
+  // Async middleware: Express 4 does not catch a rejected promise, so every failure goes to
+  // next(err). A throw here would be an unhandled rejection and stop the process.
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
-    throw new AppError('UNAUTHORIZED', 'Authentication required.', 401);
+    next(new AppError('UNAUTHORIZED', 'Authentication required.', 401));
+    return;
   }
 
   const token = authHeader.slice(7);
@@ -74,9 +77,9 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
       email: user.email,
       role: user.role,
     };
-    next();
   } catch (err) {
-    if (err instanceof AppError) throw err;
-    throw new AppError('UNAUTHORIZED', 'Invalid or expired token.', 401);
+    next(err instanceof AppError ? err : new AppError('UNAUTHORIZED', 'Invalid or expired token.', 401));
+    return;
   }
+  next();
 }
