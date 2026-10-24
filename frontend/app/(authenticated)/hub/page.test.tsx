@@ -18,7 +18,8 @@ jest.mock("next/navigation", () => ({ useRouter: () => ({ push: jest.fn() }) }))
 let mockAuth: { user: { email: string } | null; token: string | null; loading: boolean };
 jest.mock("@/lib/auth-context", () => ({ useAuth: () => mockAuth }));
 
-jest.mock("@/lib/api-client", () => ({ api: { get: jest.fn().mockResolvedValue([]) } }));
+const mockGet = jest.fn().mockResolvedValue([]);
+jest.mock("@/lib/api-client", () => ({ api: { get: (...args: unknown[]) => mockGet(...args) } }));
 jest.mock("@/lib/recs-deals-api", () => ({
   listRecsDeals: jest.fn().mockResolvedValue([
     { id: "d1", c: "brrrr", name: "Elm St duplex", d: "abc", created_at: "2026-10-23T10:00:00.000Z" },
@@ -48,9 +49,17 @@ describe("Identity hub", () => {
   });
 
   it("waits, rather than asking to log in again, while another tab's sign-in is checked", async () => {
+    mockGet.mockClear();
     mockAuth = { user: null, token: "t2", loading: false };
-    await renderHub();
+    const { container } = render(
+      <I18nProvider>
+        <IdentityHubPage />
+      </I18nProvider>,
+    );
+    await act(async () => {});
     expect(screen.queryByText("Unable to load user data. Please log in again.")).not.toBeInTheDocument();
+    expect(container.querySelector(".animate-pulse")).not.toBeNull();
+    expect(mockGet).not.toHaveBeenCalledWith("/audits");
   });
 
   it("asks to log in again when there is no session at all", async () => {

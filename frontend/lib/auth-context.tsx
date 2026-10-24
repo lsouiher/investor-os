@@ -30,12 +30,26 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
+// The account a token belongs to: its sub claim, the user's public id (User.id). Read without
+// verifying the signature: only used to compare with the account already shown, never to trust.
+function tokenSubject(token: string): string | null {
+  try {
+    const payload = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    const sub = (JSON.parse(atob(payload)) as { sub?: unknown }).sub;
+    return typeof sub === "string" ? sub : null;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   // Each validation gets a number; a reply for an older one is ignored (two quick switches)
   const validation = useRef(0);
+  const currentUser = useRef<User | null>(null);
+  currentUser.current = user;
 
   // Check the stored token and validate it: on mount, and whenever another tab signs in or out
   const validateStoredToken = useCallback(() => {
@@ -48,11 +62,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Until /auth/me answers, show no account: the API client already sends the new token, so a
-    // page showing the previous user would act for someone else. loading stays as it is: the
-    // authenticated layout unmounts every page while loading, which would lose unsaved forms.
+    // Same account signed in again (in another tab): take the new token and keep the pages, so
+    // unsaved forms survive
+    const shown = currentUser.current;
+    if (shown && tokenSubject(storedToken) === shown.id) {
+      setToken(storedToken);
+      return;
+    }
+
+    // Another account (or unknown): show none until /auth/me answers, and load, so the
+    // authenticated layout remounts every page and none keeps the previous account's data (forms,
+    // dashboard) while the API client already sends the new token
     setToken(storedToken);
     setUser(null);
+    setLoading(true);
 
     api
       .get<User>("/auth/me")
@@ -89,11 +112,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [validateStoredToken]);
 
   const login = useCallback(async (email: string, password: string) => {
-    validation.current++; // a check still running for an older token must not undo this sign-in
     const result = await api.post<{ token: string; user: User }>(
       "/auth/login",
       { email, password }
     );
+    // Only now: a failed attempt must not cancel the check of the stored session; a check still
+    // running for an older token must not undo this one
+    validation.current++;
     localStorage.setItem("token", result.token);
     localStorage.setItem("user", JSON.stringify(result.user));
     setToken(result.token);
@@ -102,11 +127,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const register = useCallback(async (email: string, password: string) => {
-    validation.current++; // a check still running for an older token must not undo this sign-in
     const result = await api.post<{ token: string; user: User }>(
       "/auth/register",
       { email, password, signup_source: takeSignupSource() }
     );
+    // Only now: a failed attempt must not cancel the check of the stored session; a check still
+    // running for an older token must not undo this one
+    validation.current++;
     localStorage.setItem("token", result.token);
     localStorage.setItem("user", JSON.stringify(result.user));
     setToken(result.token);
