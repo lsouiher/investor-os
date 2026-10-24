@@ -409,3 +409,47 @@ describe("AuthProvider, sign-out in another tab", () => {
     expect(sessionStorage.getItem("investoros_recs_import")).not.toBeNull();
   });
 });
+
+// Review (ship): the provider's own /auth/me 401 must not delete a newer token another tab stored
+// before this tab handled its storage event; and a sign-out right after a switch still forgets the deal
+describe("AuthProvider, stale 401 and switch-then-sign-out", () => {
+  afterEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
+
+  it("keeps a newer token stored while the old token's check was failing", async () => {
+    localStorage.setItem("token", "old");
+    mockGet.mockReset().mockImplementationOnce(async () => {
+      localStorage.setItem("token", "new"); // another tab signs in; its storage event comes later
+      throw Object.assign(new Error("Session expired"), { code: "UNAUTHORIZED" });
+    }).mockResolvedValueOnce({ id: "u2", email: "b@example.com", role: "investor" });
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    await act(async () => {});
+    expect(localStorage.getItem("token")).toBe("new");
+    expect(await screen.findByText("b@example.com new")).toBeInTheDocument();
+  });
+
+  it("forgets the held deal when another tab switches account and then signs out", async () => {
+    localStorage.setItem("token", "t1");
+    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm", d: "abc" }));
+    mockGet.mockReset()
+      .mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" })
+      .mockImplementationOnce(() => new Promise(() => {}));
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
+    localStorage.setItem("token", "t2");
+    storageEvent("token", "t2");
+    localStorage.removeItem("token");
+    storageEvent("token", null);
+    expect(sessionStorage.getItem("investoros_recs_import")).toBeNull();
+  });
+});

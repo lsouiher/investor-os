@@ -49,6 +49,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Each validation gets a number; a reply for an older one is ignored (two quick switches)
   const validation = useRef(0);
   const currentUser = useRef<User | null>(null);
+  // This tab has shown a signed-in account since its held RECS deal was last cleared
+  const hadSession = useRef(false);
   useEffect(() => {
     currentUser.current = user;
   }, [user]);
@@ -63,9 +65,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!storedToken) {
       // Signed out in another tab: forget this tab's held RECS deal and signup source too, so the
       // next person on a shared device is not offered them. A visitor never signed in keeps theirs.
-      if (currentUser.current) {
+      if (hadSession.current) {
         clearImport();
         clearSignupSource();
+        hadSession.current = false;
       }
       setToken(null);
       setUser(null);
@@ -94,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .get<User>("/auth/me")
       .then((userData) => {
         if (run !== validation.current) return;
+        hadSession.current = true;
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
         setLoading(false);
@@ -101,7 +105,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .catch((err: { code?: string }) => {
         if (run !== validation.current) return;
         if (err?.code === "UNAUTHORIZED") {
-          // Token invalid: the API client has already cleared storage and redirects to sign-in
+          // Token invalid. Another tab may already have stored a newer one, whose storage event
+          // this tab has not handled yet: leave it and check that one instead
+          if (localStorage.getItem("token") !== storedToken) {
+            validateRef.current();
+            return;
+          }
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           setToken(null);
@@ -153,6 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     validation.current++;
     localStorage.setItem("token", result.token);
     localStorage.setItem("user", JSON.stringify(result.user));
+    hadSession.current = true;
     setToken(result.token);
     setUser(result.user);
     setLoading(false); // the check this sign-in superseded will not clear it
@@ -168,6 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     validation.current++;
     localStorage.setItem("token", result.token);
     localStorage.setItem("user", JSON.stringify(result.user));
+    hadSession.current = true;
     setToken(result.token);
     setUser(result.user);
     setLoading(false); // the check this sign-in superseded will not clear it
