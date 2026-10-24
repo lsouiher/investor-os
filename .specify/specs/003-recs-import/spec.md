@@ -119,7 +119,8 @@ RECS users who want to keep a deal have nowhere to keep it: RECS has no accounts
 - The RECS address is not configured in this deployment: see FR-5 (no "Open in RECS"; an empty section is hidden)
 - The visitor uses "Forgot your password?" while a deal is held: the reset link opens a new tab, and the held deal belongs to the first tab only, so it is not carried through the reset; the visitor sends it again from RECS (known limit, accepted at T038)
 - A link elsewhere carries `?ref=<other site>`: it is not a signup source; only `ref=recs` is (T038)
-- Sign-out forgets a held deal and the signup source, so the next person to sign in on a shared device is not offered it (T038)
+- Sign-out forgets a held deal and the signup source, so the next person to sign in on a shared device is not offered it (T038). So does another account signing in over the session in another tab; every other tab of that browser reloads (T040)
+- The session expires and another tab notices first: that tab removes the token, which every other tab treats as a sign-out, so a deal held there is forgotten and is sent again from RECS (known limit, accepted at T038)
 - Account deletion: every saved deal of the user is scrubbed (name set to `deleted`, payload emptied) and soft-deleted with the rest of their data, as the account-deletion script does for every user table (FR-7)
 
 ---

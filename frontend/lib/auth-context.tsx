@@ -99,9 +99,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event.key !== "token" && event.key !== null) return;
       const stored = localStorage.getItem("token");
       if (stored === tokenRef.current) return;
-      if (!stored && tokenRef.current) {
-        // Signed out elsewhere: forget this tab's held RECS deal and signup source too (they
-        // survive a reload), so the next person on a shared device is not offered them
+      if (tokenRef.current) {
+        // This tab's session ended elsewhere (signed out, or another account signed in over it):
+        // forget its held RECS deal and signup source too (they survive a reload), so the next
+        // person on a shared device is not offered them. A visitor never signed in keeps theirs.
         clearImport();
         clearSignupSource();
       }
