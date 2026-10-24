@@ -8,7 +8,7 @@ export function rememberSignupSource(search: string): void {
   try {
     const params = new URLSearchParams(search);
     const ref = params.get("ref")?.trim().toLowerCase();
-    const source = params.get("utm_source")?.trim().toLowerCase() ?? (ref === "recs" ? ref : undefined);
+    const source = params.get("utm_source")?.trim().toLowerCase() || (ref === "recs" ? ref : undefined);
     if (source && /^[a-z0-9_-]{1,32}$/.test(source)) sessionStorage.setItem(KEY, source);
   } catch {
     // sessionStorage unavailable (private mode quirks): the signup just has no source

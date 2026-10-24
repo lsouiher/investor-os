@@ -124,6 +124,14 @@ describe('validateRecsDeal', () => {
     expect(validateRecsDeal({ ...VALID, name: 'Elm\u00AD\u034FSt\u206A\uFFF9' }).name).toBe('ElmSt');
   });
 
+  // Review (adversarial): a lone surrogate in a JSON body would reach Prisma and could fail with
+  // the arguments, payload included, in the error log
+  it('removes lone surrogates and rejects a name made only of them', () => {
+    expect(validateRecsDeal({ ...VALID, name: 'Elm\uD800St\uDC00' }).name).toBe('ElmSt');
+    expect(failingField({ ...VALID, name: '\uDC00\uD800' })).toBe('name');
+    expect(validateRecsDeal({ ...VALID, name: 'Elm 🏠' }).name).toBe('Elm 🏠');
+  });
+
   it('keeps an emoji ZWJ sequence unchanged', () => {
     const family = '👨‍👩‍👧';
     expect(validateRecsDeal({ ...VALID, name: family }).name).toBe(family);

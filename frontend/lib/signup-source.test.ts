@@ -24,6 +24,12 @@ describe("rememberSignupSource", () => {
     expect(takeSignupSource()).toBeNull();
   });
 
+  // Review (adversarial): an empty utm_source must not hide ref=recs
+  it("records ref=recs when utm_source is empty", () => {
+    rememberSignupSource("?utm_source=&ref=recs");
+    expect(takeSignupSource()).toBe("recs");
+  });
+
   it("ignores an invalid ref", () => {
     rememberSignupSource("?ref=<script>");
     expect(takeSignupSource()).toBeNull();

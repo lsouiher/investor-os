@@ -85,3 +85,23 @@ describe('authenticate, valid token', () => {
     expect(req.user).toEqual({ userId: 42, publicId: 'pub42', tenantId: 7, email: 'a@example.com', role: 'investor' });
   });
 });
+
+// Review (adversarial): a database failure is not an expired session. A 401 makes the web app
+// delete the user's token, so one Postgres blip would sign out everyone making a request.
+describe('authenticate, database failure', () => {
+  it('passes the database error to next as itself, not as a 401', async () => {
+    const { prisma } = jest.requireMock('../db.js') as { prisma: { user: { findFirst: jest.Mock } } };
+    const failure = new Error('connection terminated');
+    prisma.user.findFirst.mockRejectedValueOnce(failure);
+    const token = jwt.sign({ sub: 'pub42', email: 'a@example.com', role: 'investor' }, 'test-secret');
+    const next = await run(`Bearer ${token}`);
+    expect(next).toHaveBeenCalledTimes(1);
+    expect(next).toHaveBeenCalledWith(failure);
+  });
+
+  it('still answers an expired token with 401', async () => {
+    const token = jwt.sign({ sub: 'pub42', email: 'a@example.com', role: 'investor' }, 'test-secret', { expiresIn: -10 });
+    const next = await run(`Bearer ${token}`);
+    expect(next.mock.calls[0][0].statusCode).toBe(401);
+  });
+});

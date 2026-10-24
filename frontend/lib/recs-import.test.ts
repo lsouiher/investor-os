@@ -75,6 +75,13 @@ describe("parseImportFragment", () => {
     expect(parseImportFragment("#c=brrrr&n=%09%E2%80%AE%20&d=abc")).toBeNull();
   });
 
+  // Review (adversarial): sessionStorage can hold what decodeURIComponent would refuse
+  it("removes lone surrogates from a held name and keeps real emoji", () => {
+    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm\uD800 🏠", d: "abc" }));
+    expect(readImport()?.name).toBe("Elm 🏠");
+    sessionStorage.clear();
+  });
+
   // Same rules as backend validation.ts
   it("removes zero-width, direction-mark and tag characters, and rejects a name of only those", () => {
     const n = encodeURIComponent("Elm \u200BSt\u200E\uFEFF\u2028\u{E0041}");

@@ -22,6 +22,9 @@ const CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F\u2028\u2029]/g;
 const INVISIBLE_FORMATTING =
   /[\u00AD\u034F\u061C\u115F\u1160\u180E\u200B\u200E\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\u3164\uFEFF\uFFA0\uFFF9-\uFFFB\u{E0000}-\u{E007F}]/gu;
 const JOINERS = /[\u200C\u200D]/g;
+// With the u flag a valid surrogate pair is one code point, so this matches only lone halves:
+// they are not text, and the database driver may refuse them
+const LONE_SURROGATES = /[\uD800-\uDFFF]/gu;
 
 export function isKnownSlug(c: string): boolean {
   return KNOWN_SLUGS.has(c);
@@ -31,7 +34,7 @@ export function isKnownSlug(c: string): boolean {
 function validate(c: unknown, name: unknown, d: unknown): RecsImport | null {
   if (typeof c !== "string" || !isKnownSlug(c)) return null;
   if (typeof name !== "string") return null;
-  const cleaned = name.replace(CONTROL_CHARS, " ").replace(INVISIBLE_FORMATTING, "").trim();
+  const cleaned = name.replace(LONE_SURROGATES, "").replace(CONTROL_CHARS, " ").replace(INVISIBLE_FORMATTING, "").trim();
   const length = [...cleaned].length;
   if (!cleaned.replace(JOINERS, "").trim() || length > MAX_NAME_CODE_POINTS) return null;
   if (typeof d !== "string" || !PAYLOAD_REGEX.test(d)) return null;

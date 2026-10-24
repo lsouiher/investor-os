@@ -18,7 +18,7 @@ Request:
 | Field | Rule |
 |---|---|
 | `c` | required string, in `config/recs.json` |
-| `name` | required string; control characters and U+2028/U+2029 become spaces, invisible characters (bidi, direction marks, soft hyphen, zero-width space, word joiners, BOM, tags, blank Hangul fillers; full list in spec FR-2) are removed, then trimmed; 1–120 code points and not only U+200C/U+200D. The cleaned name is what is stored and returned |
+| `name` | required string; control characters and U+2028/U+2029 become spaces, invisible characters (bidi, direction marks, soft hyphen, zero-width space, word joiners, BOM, tags, blank Hangul fillers, lone surrogates; full list in spec FR-2) are removed, then trimmed; 1–120 code points and not only U+200C/U+200D. The cleaned name is what is stored and returned |
 | `d` | required string; `^[A-Za-z0-9_-]{1,8000}$`; stored exactly as received |
 
 201:

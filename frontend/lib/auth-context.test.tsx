@@ -56,6 +56,35 @@ describe("AuthProvider across tabs", () => {
     expect(await screen.findByText("b@example.com t2")).toBeInTheDocument();
   });
 
+  // Review (adversarial): while the new token is checked, the page must not show the old account
+  // (Save would post with the new token), and a slow reply must not overwrite a newer one
+  it("shows no account while revalidating, and keeps the latest of two quick switches", async () => {
+    localStorage.setItem("token", "t1");
+    mockGet.mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" });
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
+
+    let resolveB!: (u: unknown) => void;
+    mockGet.mockImplementationOnce(() => new Promise((resolve) => { resolveB = resolve; }));
+    localStorage.setItem("token", "t2");
+    storageEvent("token", "t2");
+    expect(screen.queryByText(/a@example.com/)).not.toBeInTheDocument();
+
+    mockGet.mockResolvedValueOnce({ id: "u3", email: "c@example.com", role: "investor" });
+    localStorage.setItem("token", "t3");
+    storageEvent("token", "t3");
+    expect(await screen.findByText("c@example.com t3")).toBeInTheDocument();
+
+    await act(async () => {
+      resolveB({ id: "u2", email: "b@example.com", role: "investor" });
+    });
+    expect(screen.getByText("c@example.com t3")).toBeInTheDocument();
+  });
+
   it("clears the user when another tab signs out", async () => {
     localStorage.setItem("token", "t1");
     mockGet.mockResolvedValue({ id: "u1", email: "a@example.com", role: "investor" });

@@ -16,6 +16,9 @@ const CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F\u2028\u2029]/g;
 const INVISIBLE_FORMATTING =
   /[\u00AD\u034F\u061C\u115F\u1160\u180E\u200B\u200E\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\u3164\uFEFF\uFFA0\uFFF9-\uFFFB\u{E0000}-\u{E007F}]/gu;
 const JOINERS = /[\u200C\u200D]/g;
+// With the u flag a valid surrogate pair is one code point, so this matches only lone halves:
+// they are not text, and the database driver may refuse them
+const LONE_SURROGATES = /[\uD800-\uDFFF]/gu;
 
 // Read once at start; the API must not run without the list (research R1), so a missing or
 // malformed file throws and the process fails before it takes traffic.
@@ -47,7 +50,7 @@ function invalid(field: 'c' | 'name' | 'd', message: string): AppError {
 // so one deal's name cannot pass for another's (constitution X). Cleaned, never refused: RECS
 // accepts any non-blank name.
 export function cleanName(name: string): string {
-  return name.replace(CONTROL_CHARS, ' ').replace(INVISIBLE_FORMATTING, '').trim();
+  return name.replace(LONE_SURROGATES, '').replace(CONTROL_CHARS, ' ').replace(INVISIBLE_FORMATTING, '').trim();
 }
 
 export function validateRecsDeal(body: Record<string, unknown>): RecsDealInput {

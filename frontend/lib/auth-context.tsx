@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   useCallback,
   type ReactNode,
@@ -33,9 +34,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // Each validation gets a number; a reply for an older one is ignored (two quick switches)
+  const validation = useRef(0);
 
   // Check the stored token and validate it: on mount, and whenever another tab signs in or out
   const validateStoredToken = useCallback(() => {
+    const run = ++validation.current;
     const storedToken = localStorage.getItem("token");
     if (!storedToken) {
       setToken(null);
@@ -44,15 +48,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Until /auth/me answers, show no account: the API client already sends the new token, so a
+    // page showing the previous user would act for someone else
     setToken(storedToken);
+    setUser(null);
+    setLoading(true);
 
     api
       .get<User>("/auth/me")
       .then((userData) => {
+        if (run !== validation.current) return;
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
       })
       .catch(() => {
+        if (run !== validation.current) return;
         // Token invalid — clear everything
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -60,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
       })
       .finally(() => {
-        setLoading(false);
+        if (run === validation.current) setLoading(false);
       });
   }, []);
 
