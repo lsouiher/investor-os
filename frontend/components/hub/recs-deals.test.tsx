@@ -143,6 +143,27 @@ describe("RecsDeals", () => {
     expect(document.activeElement).toBe(screen.getByRole("heading", { name: "Deals from your calculators" }));
   });
 
+  it("keeps focus on the page when deleting the last deal hides the section", async () => {
+    delete process.env.NEXT_PUBLIC_RECS_URL;
+    mockList.mockResolvedValue([DEALS[0]]);
+    mockDelete.mockResolvedValue(undefined);
+    await act(async () => {
+      render(
+        <I18nProvider>
+          <h1 tabIndex={-1}>Identity hub</h1>
+          <RecsDeals />
+        </I18nProvider>,
+      );
+    });
+    const row = screen.getAllByRole("listitem")[0];
+    fireEvent.click(within(row).getByRole("button", { name: "Delete" }));
+    await act(async () => {
+      fireEvent.click(within(row).getByRole("button", { name: "Yes, delete" }));
+    });
+    expect(screen.queryByRole("heading", { name: "Deals from your calculators" })).not.toBeInTheDocument();
+    expect(document.activeElement).toBe(screen.getByRole("heading", { name: "Identity hub" }));
+  });
+
   it("shows an empty state pointing to the calculators when the RECS address is set", async () => {
     mockList.mockResolvedValue([]);
     await renderSection();

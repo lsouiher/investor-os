@@ -13,8 +13,9 @@ export default function RegisterPage() {
   return (
     <AuthProvider>
       {/* useSearchParams renders client-only up to its Suspense boundary; the fallback is the same
-          form without ?next=, so the page still prerenders in full */}
-      <Suspense fallback={<RegisterForm next={null} />}>
+          form, inert until hydration replaces it (typing into it would be lost), so the page still
+          prerenders in full */}
+      <Suspense fallback={<RegisterForm next={null} prerender />}>
         <RegisterFormWithNext />
       </Suspense>
     </AuthProvider>
@@ -26,7 +27,7 @@ function RegisterFormWithNext() {
   return <RegisterForm next={safeNextPath(useSearchParams().get("next"))} />;
 }
 
-function RegisterForm({ next }: { next: string | null }) {
+function RegisterForm({ next, prerender = false }: { next: string | null; prerender?: boolean }) {
   const router = useRouter();
   const { register } = useAuth();
   const { t } = useTranslation();
@@ -102,6 +103,7 @@ function RegisterForm({ next }: { next: string | null }) {
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium text-foreground">{t("auth.login.email_label")}</span>
               <input
+                disabled={prerender}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -117,6 +119,7 @@ function RegisterForm({ next }: { next: string | null }) {
                 {t("auth.login.password_label")}
               </span>
               <input
+                disabled={prerender}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -132,6 +135,7 @@ function RegisterForm({ next }: { next: string | null }) {
                 {t("auth.register.confirm_label")}
               </span>
               <input
+                disabled={prerender}
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -144,7 +148,7 @@ function RegisterForm({ next }: { next: string | null }) {
 
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || prerender}
               className="mt-2 h-10 bg-accent text-sm font-semibold text-on-accent transition-colors hover:bg-accent-hover disabled:opacity-50"
               style={{ borderRadius: "var(--radius-button)" }}
             >

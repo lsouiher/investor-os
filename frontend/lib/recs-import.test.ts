@@ -80,6 +80,8 @@ describe("parseImportFragment", () => {
     const n = encodeURIComponent("Elm \u200BSt\u200E\uFEFF\u2028\u{E0041}");
     expect(parseImportFragment(`#c=brrrr&n=${n}&d=abc`)?.name).toBe("Elm St");
     expect(parseImportFragment(`#c=brrrr&n=${encodeURIComponent("\u200B\u200D\u200C")}&d=abc`)).toBeNull();
+    expect(parseImportFragment(`#c=brrrr&n=${encodeURIComponent("\u3164\u00AD\u115F\uFFA0")}&d=abc`)).toBeNull();
+    expect(parseImportFragment(`#c=brrrr&n=${encodeURIComponent("Elm\u00AD\u034FSt\u206A\uFFF9")}&d=abc`)?.name).toBe("ElmSt");
     const family = "\u{1F468}\u200D\u{1F469}\u200D\u{1F467}";
     expect(parseImportFragment(`#c=brrrr&n=${encodeURIComponent(family)}&d=abc`)?.name).toBe(family);
   });

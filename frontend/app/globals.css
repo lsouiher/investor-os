@@ -167,10 +167,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* brand.md §4: a 2px accent outline, 2px offset, on everything focusable */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+/* brand.md §4: a 2px accent outline, 2px offset, on everything focusable. In the base layer so
+   utilities (outline-none, focus:ring-*) on inputs still take precedence */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
 
 body {

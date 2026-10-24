@@ -28,8 +28,10 @@ export function RecsDeals() {
     const before = deals;
     setConfirming(null);
     setDeals((current) => current?.filter((deal) => deal.id !== id) ?? null);
-    // The row and its buttons unmount: keep keyboard focus in the section, not at the page top
-    headingRef.current?.focus();
+    // The row and its buttons unmount: keep keyboard focus in the section, not at the page top.
+    // Deleting the last deal with no RECS address hides the section, so focus the page heading.
+    const hidesSection = deals?.length === 1 && !recsUrl;
+    (hidesSection ? document.querySelector<HTMLElement>("h1") : headingRef.current)?.focus();
     try {
       await deleteRecsDeal(id);
     } catch (err) {

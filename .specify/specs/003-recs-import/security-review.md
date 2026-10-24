@@ -29,3 +29,12 @@ The one low finding is **fixed** on this branch (owner decision, T038): 500 live
 Run `1792804595850-81c3d33140ef43c7` (recheck of 89b18400 on current source): **complete**, "No supported
 findings in the assessed scope." Evidence: `routes.ts:22` is the only caller of `createRecsDeal`;
 `service.ts:12` refuses at 500 live deals before inserting.
+
+## Ship review follow-up (T038 /ship, Step 9)
+
+The specialist security review found the cap counted live deals while soft delete kept the 8 KB
+payload, so a create/delete loop still grew storage. Fixed in `0a964c9`: deleting a deal blanks its
+name and payload. This **bounds** storage (a deleted row is about 120 bytes); it does not stop row
+count growth, which stays limited only by the per-user rate limit (120/min). Also fixed: logout
+forgets a held deal (shared devices), name cleaning covers every invisible character listed in
+FR-2, and only `ref=recs` counts as a signup source.

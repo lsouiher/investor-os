@@ -9,10 +9,12 @@ const SLUG_REGEX = /^[a-z0-9-]{1,64}$/;
 const PAYLOAD_REGEX = /^[A-Za-z0-9_-]{1,8000}$/;
 const MAX_NAME_CODE_POINTS = 120;
 const CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F\u2028\u2029]/g;
-// Invisible formatting characters: bidi embeddings and isolates, direction marks, zero-width
-// space, word joiners, BOM and tag characters. The joiners U+200C/U+200D stay (emoji sequences
-// and several scripts need them), but a name made only of joiners is blank.
-const INVISIBLE_FORMATTING = /[\u061C\u180E\u200B\u200E\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF\u{E0000}-\u{E007F}]/gu;
+// Invisible characters: bidi embeddings and isolates, direction marks, soft hyphen, grapheme
+// joiner, zero-width space, word joiners, deprecated format characters, interlinear annotation
+// marks, BOM, tag characters and the Hangul fillers that render blank. The joiners U+200C/U+200D
+// stay (emoji sequences and several scripts need them), but a name made only of joiners is blank.
+const INVISIBLE_FORMATTING =
+  /[\u00AD\u034F\u061C\u115F\u1160\u180E\u200B\u200E\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\u3164\uFEFF\uFFA0\uFFF9-\uFFFB\u{E0000}-\u{E007F}]/gu;
 const JOINERS = /[\u200C\u200D]/g;
 
 // Read once at start; the API must not run without the list (research R1), so a missing or

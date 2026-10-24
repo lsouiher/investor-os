@@ -117,6 +117,11 @@ describe('validateRecsDeal', () => {
 
   it('rejects a name made only of invisible characters, joiners included', () => {
     expect(failingField({ ...VALID, name: '\u200B\u200D\u200C\uFEFF' })).toBe('name');
+    expect(failingField({ ...VALID, name: '\u3164\u00AD\u115F\uFFA0' })).toBe('name');
+  });
+
+  it('removes the soft hyphen, the grapheme joiner and the deprecated format characters', () => {
+    expect(validateRecsDeal({ ...VALID, name: 'Elm\u00AD\u034FSt\u206A\uFFF9' }).name).toBe('ElmSt');
   });
 
   it('keeps an emoji ZWJ sequence unchanged', () => {
