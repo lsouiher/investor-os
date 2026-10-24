@@ -298,3 +298,76 @@ describe("AuthProvider, /auth/me fails for a reason other than 401", () => {
     expect(await screen.findByText("signed out")).toBeInTheDocument();
   });
 });
+
+// Review (ship): an unmounted provider must stop checking, and two quick switches in another tab
+// (to another account and straight back) must leave the shown account intact
+describe("AuthProvider edges", () => {
+  afterEach(() => {
+    localStorage.clear();
+    jest.useRealTimers();
+  });
+
+  it("cancels a pending retry when a newer sign-in arrives from another tab", async () => {
+    jest.useFakeTimers();
+    localStorage.setItem("token", "t1");
+    mockGet.mockReset()
+      .mockRejectedValueOnce(Object.assign(new Error("502"), { code: "NON_JSON_RESPONSE" }))
+      .mockResolvedValueOnce({ id: "u2", email: "b@example.com", role: "investor" });
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    await act(async () => {});
+    localStorage.setItem("token", "t2");
+    storageEvent("token", "t2");
+    await act(async () => {});
+    expect(screen.getByText("b@example.com t2")).toBeInTheDocument();
+    await act(async () => {
+      jest.advanceTimersByTime(10000);
+    });
+    expect(mockGet).toHaveBeenCalledTimes(2);
+  });
+
+  it("stops retrying after unmount", async () => {
+    jest.useFakeTimers();
+    localStorage.setItem("token", "t1");
+    let rejectCheck!: (err: Error) => void;
+    mockGet.mockReset().mockImplementationOnce(() => new Promise((_, reject) => { rejectCheck = reject; }));
+    const { unmount } = render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    unmount();
+    await act(async () => {
+      rejectCheck(Object.assign(new Error("Server returned an unexpected response (502)"), { code: "NON_JSON_RESPONSE" }));
+    });
+    await act(async () => {
+      jest.advanceTimersByTime(20000);
+    });
+    expect(mockGet).toHaveBeenCalledTimes(1);
+  });
+
+  // Both events land before React renders (one frame): the shortcut must restore the account
+  it("keeps the shown account when another tab switches away and straight back within one frame", async () => {
+    const mine = tokenFor("u1", 1);
+    localStorage.setItem("token", mine);
+    mockGet.mockReset().mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" });
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    expect(await screen.findByText(`a@example.com ${mine}`)).toBeInTheDocument();
+    mockGet.mockImplementationOnce(() => new Promise(() => {}));
+    const again = tokenFor("u1", 3);
+    act(() => {
+      localStorage.setItem("token", tokenFor("u2", 2));
+      window.dispatchEvent(new StorageEvent("storage", { key: "token", newValue: "x" }));
+      localStorage.setItem("token", again);
+      window.dispatchEvent(new StorageEvent("storage", { key: "token", newValue: again }));
+    });
+    expect(screen.getByText(`a@example.com ${again}`)).toBeInTheDocument();
+  });
+});

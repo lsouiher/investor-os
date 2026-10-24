@@ -156,3 +156,21 @@ describe('DELETE /recs-deals/:id', () => {
     expect((await request(app).delete('/recs-deals/pub10')).status).toBe(404);
   });
 });
+
+// Review (ship): a database failure in a handler is a server error with the standard shape, never a 401
+describe('recs-deals database failure', () => {
+  beforeEach(() => jest.spyOn(console, 'error').mockImplementation(() => {}));
+  afterEach(() => jest.restoreAllMocks());
+
+  it.each([
+    ['GET', () => request(app).get('/recs-deals'), () => mockList.mockRejectedValue(new Error('db down'))],
+    ['POST', () => request(app).post('/recs-deals').send(VALID), () => mockCount.mockRejectedValue(new Error('db down'))],
+    ['DELETE', () => request(app).delete('/recs-deals/pub10'), () => mockSoftDelete.mockRejectedValue(new Error('db down'))],
+  ])('%s answers 500 with the error shape', async (_method, send, fail) => {
+    fail();
+    const res = await send();
+    expect(res.status).toBe(500);
+    expect(res.body.error).toEqual(expect.objectContaining({ code: expect.any(String), message: expect.any(String) }));
+    expect(JSON.stringify(res.body)).not.toContain('db down');
+  });
+});

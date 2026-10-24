@@ -72,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const shown = currentUser.current;
     if (shown && tokenSubject(storedToken) === shown.id) {
       setToken(storedToken);
+      setUser(shown); // a switch away just before may already have cleared it
       setLoading(false); // this supersedes any check still running, which would have cleared it
       return;
     }
@@ -115,6 +116,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(
     () => () => {
+      // Unmounted: a reply still on its way must neither retry nor write storage
+      validation.current++;
       if (retry.current) clearTimeout(retry.current);
     },
     [],
