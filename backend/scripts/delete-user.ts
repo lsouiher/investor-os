@@ -49,6 +49,7 @@ async function main() {
       data: { name: 'deleted', email: null, phone: null, notes: null, deletedAt: now },
     });
     const tasks = await tx.task.updateMany({ where, data: { title: 'deleted', description: null, deletedAt: now } });
+    const recsDeals = await tx.recsDeal.updateMany({ where, data: { name: 'deleted', d: '', deletedAt: now } });
     await tx.user.update({
       where: { id: user.id },
       data: {
@@ -70,6 +71,7 @@ async function main() {
       aiLogs: aiLogs.count,
       contacts: contacts.count,
       tasks: tasks.count,
+      recsDeals: recsDeals.count,
     };
   });
 

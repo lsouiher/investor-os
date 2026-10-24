@@ -6,6 +6,7 @@ import { api } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
 import { useTranslation } from "@/lib/i18n";
 import { getDisclosureMessage } from "@/components/hub/disclosure-messages";
+import { RecsDeals } from "@/components/hub/recs-deals";
 
 interface AuditSummary {
   id: string;
@@ -319,6 +320,9 @@ export default function IdentityHubPage() {
           </button>
         </div>
       )}
+
+      {/* Deals sent from RECS calculators: last, below the audits (spec FR-5) */}
+      <RecsDeals />
     </div>
   );
 }

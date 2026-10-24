@@ -683,6 +683,13 @@ Set a template as the active version for its service_type (deactivates previous)
 
 ---
 
+## RECS Deals
+
+`POST`, `GET /api/v1/recs-deals` and `DELETE /api/v1/recs-deals/:id` (deals sent from RECS
+calculators) are specified in `.specify/specs/003-recs-import/contracts/recs-deals-api.md`.
+
+---
+
 ## Rate Limiting
 
 | Endpoint Group | Limit | Window |

@@ -87,7 +87,7 @@ the prompt seed run when the container starts. A deploy takes 3–5 minutes.
 |---|---|
 | `NEXT_PUBLIC_API_URL` | `https://api.yourdomain.com/api/v1` (the `/api/v1` suffix matters) |
 | `NEXT_PUBLIC_FEEDBACK_EMAIL` | the address for the "Send feedback" link |
-| `NEXT_PUBLIC_RECS_URL` | the RECS base URL for the "Calculators" link (empty hides it) |
+| `NEXT_PUBLIC_RECS_URL` | the RECS base URL for the "Calculators" link and the hub's "Open in RECS" (`<url>/calculators/<slug>#d=<payload>`); empty hides both |
 
 ## What happens on deploy
 
@@ -96,6 +96,23 @@ safe every time), then the server. `GET /api/v1/health` must report
 `{"status":"ok","checks":{"db":true,"ai":true,"encryption":true,"redis":true}}`; `ai` flips to
 `false` if the Anthropic account refuses a call (no credits, bad key), with the reason in the
 logs.
+
+## RECS import
+
+RECS calculators send deals to the public route `/import` (`/import?ref=recs#c=<slug>&n=<name>&d=<payload>`,
+spec `.specify/specs/003-recs-import/`). The page saves them to `recs_deals`; the hub lists them.
+
+- **Calculator list:** `backend/config/recs.json` ships in the API image (`COPY config ./config`)
+  and the API **will not start** without it. `frontend/config/recs.json` is a copy, kept identical by
+  `frontend/config/recs.drift.test.ts`.
+- **Adding a calculator:** add the slug to both `config/recs.json` files, add `recs.calculator.<slug>`
+  to `frontend/locales/en.json` and `fr.json`, deploy both services, **then** tell RECS so it turns
+  Send on for that slug (RECS Q-17). The other order shows RECS users a Send button that ends on
+  "Nothing to import".
+- **Retention:** saved deals are kept until the user deletes them (soft delete) or the account is
+  deleted (`npm run delete-user` scrubs and soft-deletes them). No scheduled purge.
+- **RECS side:** RECS's `VITE_INVESTORSMAP_URL` decides which app receives the deals; it is
+  changed in RECS, never from here.
 
 ## Custom domain (when the domain exists)
 
@@ -124,7 +141,7 @@ the `_railway-verify.<host>` TXT record it asks for instead.
 - `npm run funnel -- 7` — the beta funnel for the last 7 days, per signup source, with
   ratings and free-text feedback.
 - `npm run delete-user -- someone@example.com` — erase a user's answers, generated content,
-  contacts and AI logs, and deactivate the account (the promise on the terms page).
+  contacts, AI logs and saved RECS deals, and deactivate the account (the promise on the terms page).
 
 ## Local equivalents
 

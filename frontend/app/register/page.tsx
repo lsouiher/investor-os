@@ -1,23 +1,29 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth, AuthProvider } from "@/lib/auth-context";
 import { ApiError } from "@/lib/api-client";
 import { SiteHeader } from "@/components/shared/site-header";
 import { useTranslation } from "@/lib/i18n";
+import { safeNextPath } from "@/lib/next-path";
 
 export default function RegisterPage() {
   return (
     <AuthProvider>
-      <RegisterForm />
+      {/* useSearchParams needs a Suspense boundary for the static build */}
+      <Suspense>
+        <RegisterForm />
+      </Suspense>
     </AuthProvider>
   );
 }
 
 function RegisterForm() {
   const router = useRouter();
+  // ?next=/import brings a visitor back to the deal they arrived with (allow-listed)
+  const next = safeNextPath(useSearchParams().get("next"));
   const { register } = useAuth();
   const { t } = useTranslation();
 
@@ -53,7 +59,7 @@ function RegisterForm() {
     setSubmitting(true);
     try {
       await register(email, password);
-      router.push("/hub");
+      router.push(next ?? "/hub");
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message);
@@ -145,7 +151,7 @@ function RegisterForm() {
           <p className="mt-6 text-center text-sm text-foreground-muted">
             {t("auth.register.has_account")}{" "}
             <Link
-              href="/login"
+              href={next ? `/login?next=${next}` : "/login"}
               className="font-medium text-accent-text underline underline-offset-2"
             >
               {t("auth.register.login_link")}

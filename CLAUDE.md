@@ -32,7 +32,7 @@ scores are model-assessed against a rubric, see identity_synthesis in `prisma/se
 - **Auth:** JWT (jsonwebtoken + bcrypt), centralized middleware, RBAC (investor/admin)
 - **PDF:** Puppeteer (HTML template to PDF for Investment Blueprint)
 
-Backend follows a modular monolith pattern with service modules in `backend/src/modules/` (auth, audit, identity, strategy, simulation, contact, task, blueprint, insight, logging, admin, dashboard, growth). Each module has: `routes.ts`, `service.ts`, `repository.ts`, `types.ts`. Modules communicate via direct service function calls. Growth path generation runs on Bull workers (`backend/src/workers/`) backed by Redis.
+Backend follows a modular monolith pattern with service modules in `backend/src/modules/` (auth, audit, identity, strategy, simulation, contact, task, blueprint, insight, logging, admin, dashboard, growth, recs-deal). Each module has: `routes.ts`, `service.ts`, `repository.ts`, `types.ts`. Modules communicate via direct service function calls. Growth path generation runs on Bull workers (`backend/src/workers/`) backed by Redis.
 
 ## Constitution
 

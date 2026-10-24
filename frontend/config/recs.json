@@ -1,0 +1,13 @@
+{
+  "_about": "Calculator slugs accepted from RECS (RECS docs/spec.md §10.8, FR-10.8.2). Authoritative copy; frontend/config/recs.json must be identical (drift test). To add a calculator: add the slug here and in frontend/config/recs.json, add EN/FR labels (recs.calculator.<slug>), deploy, then tell RECS to turn Send on for it (.specify/specs/003-recs-import/quickstart.md §5).",
+  "calculators": [
+    { "slug": "multifamily" },
+    { "slug": "quick-screen" },
+    { "slug": "single-family" },
+    { "slug": "fix-and-flip" },
+    { "slug": "brrrr" },
+    { "slug": "wholesaling" },
+    { "slug": "subject-to" },
+    { "slug": "short-term-rental" }
+  ]
+}

@@ -33,10 +33,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // On mount, check for existing token and validate it
-  useEffect(() => {
+  // Check the stored token and validate it: on mount, and whenever another tab signs in or out
+  const validateStoredToken = useCallback(() => {
     const storedToken = localStorage.getItem("token");
     if (!storedToken) {
+      setToken(null);
+      setUser(null);
       setLoading(false);
       return;
     }
@@ -60,6 +62,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    validateStoredToken();
+  }, [validateStoredToken]);
+
+  // A sign-in or sign-out in another tab: a page left open (e.g. /import) must not act for a
+  // stale identity. key is null when another tab clears all of localStorage.
+  useEffect(() => {
+    function onStorage(event: StorageEvent) {
+      if (event.key === "token" || event.key === null) validateStoredToken();
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [validateStoredToken]);
 
   const login = useCallback(async (email: string, password: string) => {
     const result = await api.post<{ token: string; user: User }>(

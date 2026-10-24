@@ -88,24 +88,24 @@ read, since they answer §4's questions 1 and 3 the same way this note does.
 
 Source: `~/projects/recs/docs/spec.md` §10.8 FR-10.8.2 and DM-7; `~/projects/recs/docs/decisions.md`
 D-108 (2), (3), (4). Related: D-105, D-112, D-264, Q-14, Q-17 to Q-27, Appendix A row 8.
-Everything below is **missing** unless marked otherwise.
+Everything below was **missing** before 003-recs-import; each row is now **built** and checked in `.specify/specs/003-recs-import/qa.md` (T037, 2026-10-23).
 
 | # | Requirement (FR-10.8.2 / DM-7 / D-108 (2)) | Status | Notes |
 |---|---|---|---|
-| 1 | `/import` page reads the fragment `#c=<slug>&n=<name>&d=<payload>` from `<origin>/import?ref=recs` | **missing** | Must be client-side: a fragment never reaches the server, and that is the point of the design (RECS I5, D-02). |
-| 2 | Keeps the fragment across sign-in or sign-up | **missing** | Neither `/login` nor `/register` takes a return path today; login lands on `/dashboard`, register on `/hub`. The authenticated layout redirects to `/login` with no `next`. |
-| 3 | Shows the deal name and asks the user to confirm before storing | **missing** | `n` is URL-encoded; `d` is shown to no one. |
-| 4 | Stores `{ c, name, d }` for the user | **missing** | No endpoint, no module. |
-| 5 | Validation: `c` in a known-slug list | **missing** | RECS Q-17 to Q-27 assume a `config/recs.json` here. Registered RECS slugs today: `multifamily`, `quick-screen`, `single-family`, `fix-and-flip`, `brrrr`, `wholesaling`, `subject-to`, `short-term-rental`. RECS hides Send until the list here has the slug and `VITE_INVESTORSMAP_URL` is set. |
-| 6 | Validation: `name` under 120 characters | **missing** | |
-| 7 | Validation: `d` under 8,000 base64url characters, never decoded | **missing** | RECS caps `d` at 7,997 (D-112 (2)) so every stored deal reopens. We store opaque text; no lz-string, no schema (D-108 (3)). |
-| 8 | `recs_deals` table: `id`, `user_id`, `c`, `name`, `d`, `created_at`, `deleted_at` (DM-7) | **missing** | Plus `tenant_id` and `public_id` (CUID2) per this repo's constitution; soft delete via `deleted_at`. |
-| 9 | Hub section "Deals from your calculators": name, date, delete, "Open in RECS" | **missing** | "Open in RECS" = `<RECS URL>/calculators/<c>#d=<d>`. The URL base exists as `NEXT_PUBLIC_RECS_URL` (**partial**: the variable and its plumbing are built). |
-| 10 | Retention and account-deletion purge as for other rows | **missing** | `delete-user.ts` is the purge path; `recs_deals` is not in it. Retention is "90 days recommended, manual purge for now" (data-model.md), so there is nothing scheduled to extend. |
-| 11 | A second send adds a row; dedup is our choice | **missing** | Proposal: no dedup in v1 (DM-7 says RECS sends no id, so equality would have to be on `d`, and two edits of one deal are legitimately two rows). |
-| 12 | PRD amendment row naming RECS spec §10.8 as the contract (D-108 (4)) | **missing** | The PRD has no amendments section; one must be added. §7's "Property Deal Analyzer, V3.2" row should also note that calculators live in RECS and arrive by this hand-off. |
-| 13 | RECS acceptance: a sent deal opened from the list shows an identical summary strip (round trip) | **missing** | Follows from 7 and 9 if `d` is stored and echoed byte for byte. Worth one end-to-end check against a local RECS build before `VITE_INVESTORSMAP_URL` is set. |
-| 14 | `?ref=recs` is countable in our logs (D-105) | **partial** | Request logs see the query string; nothing records it. Extending `signup-source.ts` to read `ref` makes it a funnel source. |
+| 1 | `/import` page reads the fragment `#c=<slug>&n=<name>&d=<payload>` from `<origin>/import?ref=recs` | **built** (003, qa.md T037) | Must be client-side: a fragment never reaches the server, and that is the point of the design (RECS I5, D-02). |
+| 2 | Keeps the fragment across sign-in or sign-up | **built** (003, qa.md T037) | Neither `/login` nor `/register` takes a return path today; login lands on `/dashboard`, register on `/hub`. The authenticated layout redirects to `/login` with no `next`. |
+| 3 | Shows the deal name and asks the user to confirm before storing | **built** (003, qa.md T037) | `n` is URL-encoded; `d` is shown to no one. |
+| 4 | Stores `{ c, name, d }` for the user | **built** (003, qa.md T037) | No endpoint, no module. |
+| 5 | Validation: `c` in a known-slug list | **built** (003, qa.md T037) | RECS Q-17 to Q-27 assume a `config/recs.json` here. Registered RECS slugs today: `multifamily`, `quick-screen`, `single-family`, `fix-and-flip`, `brrrr`, `wholesaling`, `subject-to`, `short-term-rental`. RECS hides Send until the list here has the slug and `VITE_INVESTORSMAP_URL` is set. |
+| 6 | Validation: `name` under 120 characters | **built** (003, qa.md T037) | |
+| 7 | Validation: `d` under 8,000 base64url characters, never decoded | **built** (003, qa.md T037) | RECS caps `d` at 7,997 (D-112 (2)) so every stored deal reopens. We store opaque text; no lz-string, no schema (D-108 (3)). |
+| 8 | `recs_deals` table: `id`, `user_id`, `c`, `name`, `d`, `created_at`, `deleted_at` (DM-7) | **built** (003, qa.md T037) | Plus `tenant_id` and `public_id` (CUID2) per this repo's constitution; soft delete via `deleted_at`. |
+| 9 | Hub section "Deals from your calculators": name, date, delete, "Open in RECS" | **built** (003, qa.md T037) | "Open in RECS" = `<RECS URL>/calculators/<c>#d=<d>`. The URL base exists as `NEXT_PUBLIC_RECS_URL` (**partial**: the variable and its plumbing are built). |
+| 10 | Retention and account-deletion purge as for other rows | **built** (003, qa.md T037) | `delete-user.ts` is the purge path; `recs_deals` is not in it. Retention is "90 days recommended, manual purge for now" (data-model.md), so there is nothing scheduled to extend. |
+| 11 | A second send adds a row; dedup is our choice | **built** (003, qa.md T037) | Proposal: no dedup in v1 (DM-7 says RECS sends no id, so equality would have to be on `d`, and two edits of one deal are legitimately two rows). |
+| 12 | PRD amendment row naming RECS spec §10.8 as the contract (D-108 (4)) | **built** (003, qa.md T037) | The PRD has no amendments section; one must be added. §7's "Property Deal Analyzer, V3.2" row should also note that calculators live in RECS and arrive by this hand-off. |
+| 13 | RECS acceptance: a sent deal opened from the list shows an identical summary strip (round trip) | **built** (003, qa.md T037) | Follows from 7 and 9 if `d` is stored and echoed byte for byte. Worth one end-to-end check against a local RECS build before `VITE_INVESTORSMAP_URL` is set. |
+| 14 | `?ref=recs` is countable in our logs (D-105) | **built** (003, qa.md T037) | Request logs see the query string; nothing records it. Extending `signup-source.ts` to read `ref` makes it a funnel source. |
 
 FR-10.8.3 (InvestorsMap computes on sent deals, P2) is out of scope: it depends on RECS's
 engine package (P2-10) and our deal pipeline (PRD V3.1). Nothing here should decode `d`.

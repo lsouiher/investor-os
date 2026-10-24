@@ -1,3 +1,5 @@
+import { safeNextPath } from "./next-path";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001/api/v1";
 
 export interface ApiSuccessResponse<T> {
@@ -35,11 +37,24 @@ function getToken(): string | null {
   return localStorage.getItem("token");
 }
 
+// Where an expired session sends the user: back to an allow-listed page after sign-in, so a
+// RECS deal held on /import is not stranded on the dashboard
+export function loginUrl(pathname: string): string {
+  const next = safeNextPath(pathname);
+  return next ? `/login?next=${next}` : "/login";
+}
+
 function clearAuthAndRedirect(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  window.location.href = "/login";
+  window.location.href = loginUrl(window.location.pathname);
+}
+
+// A 401 from /auth/login is a wrong password, not an expired session: the server's message
+// is shown on the form instead of reloading the page
+function sessionExpired(res: Response, path: string): boolean {
+  return res.status === 401 && path !== "/auth/login";
 }
 
 async function request<T>(
@@ -62,10 +77,13 @@ async function request<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  if (res.status === 401) {
+  if (sessionExpired(res, path)) {
     clearAuthAndRedirect();
     throw new ApiError("UNAUTHORIZED", "Session expired");
   }
+
+  // 204 No Content (DELETE): nothing to parse
+  if (res.status === 204) return undefined as T;
 
   const contentType = res.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) {
@@ -95,7 +113,7 @@ async function requestEnvelope<T, M extends object = Record<string, unknown>>(
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const res = await fetch(`${BASE_URL}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
-  if (res.status === 401) {
+  if (sessionExpired(res, path)) {
     clearAuthAndRedirect();
     throw new ApiError("UNAUTHORIZED", "Session expired");
   }
