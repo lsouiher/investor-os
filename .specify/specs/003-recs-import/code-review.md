@@ -27,8 +27,9 @@ session-only hold, covered by `recs-import.test.ts`.
 - RLS on `recs_deals` is defense-in-depth only: `set_config(..., true)` outside a transaction and
   an unforced policy mean the repository filters (`userId` + `tenantId` + `deletedAt`) carry
   isolation, as for every other table (same pattern as earlier migrations).
-- After a sign-in in another tab, `/import` may show the old email until `/auth/me` returns
-  (sub-second); Save already uses the new token.
+- A sign-in, switch or sign-out in another tab reloads the page (simplified at /ship, 2026-10-24,
+  after three review cycles each found a new race in per-account revalidation). Cost: unsaved
+  form input is lost when the same account signs in again in another tab.
 - `tasks.md` T025/T039 describe the earlier `findRecsDealByPublicId` design; left as the record of
   what was planned.
 

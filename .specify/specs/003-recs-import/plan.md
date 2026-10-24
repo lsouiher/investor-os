@@ -38,7 +38,7 @@ No NEEDS CLARIFICATION remains; the six design questions are settled in [researc
 | III. Code structure | Module keeps routes / service / repository split; validation is a pure function in its own file with a co-located test (as `auth/validation.ts`). Fragment parsing and stash live in `frontend/lib/recs-import.ts`, separate from the page. Data access for the page and the hub section lives in `frontend/lib/recs-deals-api.ts` (`saveRecsDeal`, `listRecsDeals`, `deleteRecsDeal`); the two components call it and render, they do not call `api` themselves ("a file that fetches data MUST NOT also render UI"). | Pass |
 | IV. Data | `deleted_at` soft delete; CUID2 `public_id` in every URL and response; new append-only migration; FKs and the list filter indexed; nullable `deleted_at` documented. | Pass |
 | V. APIs | All writes server-side; routes mounted after `authenticate, userLimiter, setTenantContext`; standard `{ error: { code, message, details } }` and `{ data }` shapes; snake_case via existing middleware. | Pass |
-| VI. AuthN/Z | Centralized `authenticate` middleware; every query filters by `tenantId` and `userId`, pinned by a repository test (T039); another user's deal is 404. `AuthProvider` revalidates when the token changes in another tab (T040), so `/import` never offers Save for a stale identity. No new role. | Pass |
+| VI. AuthN/Z | Centralized `authenticate` middleware; every query filters by `tenantId` and `userId`, pinned by a repository test (T039); another user's deal is 404. `AuthProvider` reloads the page when the token changes in another tab (T040), so `/import` never offers Save for a stale identity. No new role. | Pass |
 | VII. Frontend | `/import` and the hub section are client components. **Documented reason:** the fragment, `sessionStorage` and the `localStorage` token exist only in the browser, and the hub page is already a client component. Validation in browser (UX) and server (correctness). Optimistic delete, no spinner on fast calls. Semantic buttons/links, keyboard reachable. | Pass (justified) |
 | VIII. Testing | Unit tests for both validators and the fragment parser, route tests with supertest, a repository test asserting the isolation filters (Prisma mocked, as `growth/service.test.ts`), component tests for the page and the list. All mocked, fast. One manual round trip (critical path). | Pass |
 | IX. Performance | Index `(tenant_id, user_id, deleted_at, created_at)` serves the only list query. Explicit targets in Technical Context, measured on staging in T041 before `/ship`. | Pass |
@@ -90,7 +90,7 @@ frontend/
 ├── lib/recs-import.ts + recs-import.test.ts           # NEW parse/validate fragment, stash/take, openInRecsUrl
 ├── lib/recs-deals-api.ts                              # NEW saveRecsDeal / listRecsDeals / deleteRecsDeal (data access only)
 ├── lib/next-path.ts + next-path.test.ts               # NEW allow-listed ?next=
-├── lib/auth-context.tsx + auth-context.test.tsx       # revalidate on cross-tab token change
+├── lib/auth-context.tsx + auth-context.test.tsx       # reload on cross-tab token change
 ├── lib/signup-source.ts (+ test)                      # reads utm_source, else ref
 ├── app/import/page.tsx + page.test.tsx                # NEW public client page
 ├── app/login/page.tsx, app/register/page.tsx          # honour ?next=, carry it across their cross-links

@@ -1,11 +1,11 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 
 const mockGet = jest.fn();
 jest.mock("./api-client", () => ({
   api: { get: (...args: unknown[]) => mockGet(...args), post: jest.fn() },
 }));
 
-import { AuthProvider, useAuth } from "./auth-context";
+import { AuthProvider, page, useAuth } from "./auth-context";
 
 function Probe() {
   const { user, token, loading } = useAuth();
@@ -19,28 +19,21 @@ function storageEvent(key: string | null, newValue: string | null) {
   });
 }
 
+// Another tab signs in, switches account or signs out: this tab reloads, so no page keeps showing
+// or acting for the previous account
 describe("AuthProvider across tabs", () => {
-  beforeEach(() => mockGet.mockReset());
-  afterEach(() => localStorage.clear());
-
-  it("revalidates when another tab signs in", async () => {
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    expect(await screen.findByText("signed out")).toBeInTheDocument();
-    expect(mockGet).not.toHaveBeenCalled();
-
-    mockGet.mockResolvedValue({ id: "u1", email: "a@example.com", role: "investor" });
-    localStorage.setItem("token", "t2");
-    storageEvent("token", "t2");
-
-    expect(await screen.findByText("a@example.com t2")).toBeInTheDocument();
-    expect(mockGet).toHaveBeenCalledWith("/auth/me");
+  let reload: jest.SpyInstance;
+  beforeEach(() => {
+    mockGet.mockReset();
+    reload = jest.spyOn(page, "reload").mockImplementation(() => {});
+  });
+  afterEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+    reload.mockRestore();
   });
 
-  it("revalidates when another tab switches account", async () => {
+  async function signedIn() {
     localStorage.setItem("token", "t1");
     mockGet.mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" });
     render(
@@ -49,75 +42,35 @@ describe("AuthProvider across tabs", () => {
       </AuthProvider>,
     );
     expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
+  }
 
-    mockGet.mockResolvedValueOnce({ id: "u2", email: "b@example.com", role: "investor" });
+  it("reloads when another tab signs in", async () => {
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    await screen.findByText("signed out");
     localStorage.setItem("token", "t2");
     storageEvent("token", "t2");
-    expect(await screen.findByText("b@example.com t2")).toBeInTheDocument();
+    expect(reload).toHaveBeenCalledTimes(1);
   });
 
-  // Review (adversarial): while the new token is checked, the page must not show the old account
-  // (Save would post with the new token), and a slow reply must not overwrite a newer one
-  it("shows no account while revalidating, and keeps the latest of two quick switches", async () => {
-    localStorage.setItem("token", "t1");
-    mockGet.mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" });
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
-
-    let resolveB!: (u: unknown) => void;
-    mockGet.mockImplementationOnce(() => new Promise((resolve) => { resolveB = resolve; }));
+  it("reloads when another tab switches account", async () => {
+    await signedIn();
     localStorage.setItem("token", "t2");
     storageEvent("token", "t2");
-    expect(screen.queryByText(/a@example.com/)).not.toBeInTheDocument();
-    // A different account: loading, so the authenticated layout remounts every page and no page
-    // keeps account A's data (forms, dashboard) under account B's token
-    expect(screen.getByText("loading")).toBeInTheDocument();
-
-    mockGet.mockResolvedValueOnce({ id: "u3", email: "c@example.com", role: "investor" });
-    localStorage.setItem("token", "t3");
-    storageEvent("token", "t3");
-    expect(await screen.findByText("c@example.com t3")).toBeInTheDocument();
-
-    await act(async () => {
-      resolveB({ id: "u2", email: "b@example.com", role: "investor" });
-    });
-    expect(screen.getByText("c@example.com t3")).toBeInTheDocument();
+    expect(reload).toHaveBeenCalledTimes(1);
   });
 
-  it("clears the user when another tab signs out", async () => {
-    localStorage.setItem("token", "t1");
-    mockGet.mockResolvedValue({ id: "u1", email: "a@example.com", role: "investor" });
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
-
-    localStorage.removeItem("token");
-    storageEvent("token", null);
-    await waitFor(() => expect(screen.getByText("signed out")).toBeInTheDocument());
-  });
-
-  it("signs out when another tab clears all of storage (key null)", async () => {
-    localStorage.setItem("token", "t1");
-    mockGet.mockResolvedValue({ id: "u1", email: "a@example.com", role: "investor" });
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
+  it("reloads when another tab clears all of storage (key null)", async () => {
+    await signedIn();
     localStorage.clear();
     storageEvent(null, null);
-    await waitFor(() => expect(screen.getByText("signed out")).toBeInTheDocument());
+    expect(reload).toHaveBeenCalledTimes(1);
   });
 
-  it("ignores other keys", async () => {
+  it("ignores other keys, and a clear that leaves the token as it was", async () => {
     render(
       <AuthProvider>
         <Probe />
@@ -125,7 +78,52 @@ describe("AuthProvider across tabs", () => {
     );
     await screen.findByText("signed out");
     storageEvent("locale", "fr");
+    storageEvent(null, null);
+    expect(reload).not.toHaveBeenCalled();
     expect(mockGet).not.toHaveBeenCalled();
+  });
+
+  // Review (adversarial): sessionStorage survives the reload, so a sign-out elsewhere must forget
+  // this tab's held RECS deal and signup source first
+  it("forgets the held deal and signup source when another tab signs out", async () => {
+    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm", d: "abc" }));
+    sessionStorage.setItem("investoros_signup_source", "recs");
+    await signedIn();
+    localStorage.removeItem("token");
+    storageEvent("token", null);
+    expect(sessionStorage.getItem("investoros_recs_import")).toBeNull();
+    expect(sessionStorage.getItem("investoros_signup_source")).toBeNull();
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a deal held by a visitor who was never signed in", async () => {
+    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm", d: "abc" }));
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    await screen.findByText("signed out");
+    localStorage.setItem("token", "t2");
+    storageEvent("token", "t2");
+    expect(sessionStorage.getItem("investoros_recs_import")).not.toBeNull();
+  });
+
+  // Review (ship): the provider's own /auth/me 401 must not delete a newer token another tab stored
+  // before this tab handled its storage event
+  it("keeps a newer token stored while the old token's check was failing", async () => {
+    localStorage.setItem("token", "old");
+    mockGet.mockImplementationOnce(async () => {
+      localStorage.setItem("token", "new"); // another tab signs in; its storage event reloads
+      throw Object.assign(new Error("Session expired"), { code: "UNAUTHORIZED" });
+    });
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    await act(async () => {});
+    expect(localStorage.getItem("token")).toBe("new");
   });
 });
 
@@ -191,35 +189,6 @@ describe("AuthProvider sign-in during a pending validation", () => {
     });
     expect(localStorage.getItem("token")).toBe("fresh");
     expect(screen.getByRole("button")).toHaveTextContent("a@example.com ready");
-  });
-});
-
-// A JWT-shaped token whose payload carries sub (the user's public id); the signature is not checked
-function tokenFor(sub: string, n: number) {
-  const payload = btoa(JSON.stringify({ sub, n })).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
-  return `h.${payload}.s`;
-}
-
-// Review (ship): a new token for the same account (signed in again in another tab) must not
-// reset the pages, which would lose unsaved forms
-describe("AuthProvider, same account signs in again in another tab", () => {
-  afterEach(() => localStorage.clear());
-
-  it("keeps the user and the page, and takes the new token", async () => {
-    const first = tokenFor("u1", 1);
-    const second = tokenFor("u1", 2);
-    localStorage.setItem("token", first);
-    mockGet.mockReset().mockResolvedValue({ id: "u1", email: "a@example.com", role: "investor" });
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    expect(await screen.findByText(`a@example.com ${first}`)).toBeInTheDocument();
-    localStorage.setItem("token", second);
-    storageEvent("token", second);
-    expect(screen.getByText(`a@example.com ${second}`)).toBeInTheDocument();
-    expect(screen.queryByText("loading")).not.toBeInTheDocument();
   });
 });
 
@@ -299,34 +268,10 @@ describe("AuthProvider, /auth/me fails for a reason other than 401", () => {
   });
 });
 
-// Review (ship): an unmounted provider must stop checking, and two quick switches in another tab
-// (to another account and straight back) must leave the shown account intact
 describe("AuthProvider edges", () => {
   afterEach(() => {
     localStorage.clear();
     jest.useRealTimers();
-  });
-
-  it("cancels a pending retry when a newer sign-in arrives from another tab", async () => {
-    jest.useFakeTimers();
-    localStorage.setItem("token", "t1");
-    mockGet.mockReset()
-      .mockRejectedValueOnce(Object.assign(new Error("502"), { code: "NON_JSON_RESPONSE" }))
-      .mockResolvedValueOnce({ id: "u2", email: "b@example.com", role: "investor" });
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    await act(async () => {});
-    localStorage.setItem("token", "t2");
-    storageEvent("token", "t2");
-    await act(async () => {});
-    expect(screen.getByText("b@example.com t2")).toBeInTheDocument();
-    await act(async () => {
-      jest.advanceTimersByTime(10000);
-    });
-    expect(mockGet).toHaveBeenCalledTimes(2);
   });
 
   it("stops retrying after unmount", async () => {
@@ -349,107 +294,20 @@ describe("AuthProvider edges", () => {
     expect(mockGet).toHaveBeenCalledTimes(1);
   });
 
-  // Both events land before React renders (one frame): the shortcut must restore the account
-  it("keeps the shown account when another tab switches away and straight back within one frame", async () => {
-    const mine = tokenFor("u1", 1);
-    localStorage.setItem("token", mine);
-    mockGet.mockReset().mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" });
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    expect(await screen.findByText(`a@example.com ${mine}`)).toBeInTheDocument();
-    mockGet.mockImplementationOnce(() => new Promise(() => {}));
-    const again = tokenFor("u1", 3);
-    act(() => {
-      localStorage.setItem("token", tokenFor("u2", 2));
-      window.dispatchEvent(new StorageEvent("storage", { key: "token", newValue: "x" }));
-      localStorage.setItem("token", again);
-      window.dispatchEvent(new StorageEvent("storage", { key: "token", newValue: again }));
-    });
-    expect(screen.getByText(`a@example.com ${again}`)).toBeInTheDocument();
-  });
-});
-
-// Review (adversarial): a sign-out in another tab must also forget this tab's held RECS deal
-describe("AuthProvider, sign-out in another tab", () => {
-  afterEach(() => {
-    localStorage.clear();
-    sessionStorage.clear();
-  });
-
-  it("forgets the held deal and signup source of the account that was shown", async () => {
+  it("stops retrying once this tab signs in with a new token", async () => {
+    jest.useFakeTimers();
     localStorage.setItem("token", "t1");
-    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm", d: "abc" }));
-    sessionStorage.setItem("investoros_signup_source", "recs");
-    mockGet.mockReset().mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" });
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
-    localStorage.removeItem("token");
-    storageEvent("token", null);
-    await waitFor(() => expect(screen.getByText("signed out")).toBeInTheDocument());
-    expect(sessionStorage.getItem("investoros_recs_import")).toBeNull();
-    expect(sessionStorage.getItem("investoros_signup_source")).toBeNull();
-  });
-
-  it("keeps a deal held by a visitor who was never signed in", async () => {
-    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm", d: "abc" }));
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    await screen.findByText("signed out");
-    storageEvent("token", null);
-    expect(sessionStorage.getItem("investoros_recs_import")).not.toBeNull();
-  });
-});
-
-// Review (ship): the provider's own /auth/me 401 must not delete a newer token another tab stored
-// before this tab handled its storage event; and a sign-out right after a switch still forgets the deal
-describe("AuthProvider, stale 401 and switch-then-sign-out", () => {
-  afterEach(() => {
-    localStorage.clear();
-    sessionStorage.clear();
-  });
-
-  it("keeps a newer token stored while the old token's check was failing", async () => {
-    localStorage.setItem("token", "old");
-    mockGet.mockReset().mockImplementationOnce(async () => {
-      localStorage.setItem("token", "new"); // another tab signs in; its storage event comes later
-      throw Object.assign(new Error("Session expired"), { code: "UNAUTHORIZED" });
-    }).mockResolvedValueOnce({ id: "u2", email: "b@example.com", role: "investor" });
+    mockGet.mockReset().mockRejectedValueOnce(Object.assign(new Error("502"), { code: "NON_JSON_RESPONSE" }));
     render(
       <AuthProvider>
         <Probe />
       </AuthProvider>,
     );
     await act(async () => {});
-    expect(localStorage.getItem("token")).toBe("new");
-    expect(await screen.findByText("b@example.com new")).toBeInTheDocument();
-  });
-
-  it("forgets the held deal when another tab switches account and then signs out", async () => {
-    localStorage.setItem("token", "t1");
-    sessionStorage.setItem("investoros_recs_import", JSON.stringify({ c: "brrrr", name: "Elm", d: "abc" }));
-    mockGet.mockReset()
-      .mockResolvedValueOnce({ id: "u1", email: "a@example.com", role: "investor" })
-      .mockImplementationOnce(() => new Promise(() => {}));
-    render(
-      <AuthProvider>
-        <Probe />
-      </AuthProvider>,
-    );
-    expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
-    localStorage.setItem("token", "t2");
-    storageEvent("token", "t2");
-    localStorage.removeItem("token");
-    storageEvent("token", null);
-    expect(sessionStorage.getItem("investoros_recs_import")).toBeNull();
+    localStorage.setItem("token", "fresh");
+    await act(async () => {
+      jest.advanceTimersByTime(10000);
+    });
+    expect(mockGet).toHaveBeenCalledTimes(1);
   });
 });
