@@ -15,9 +15,14 @@ import { I18nProvider } from "@/lib/i18n";
 
 const mockPush = jest.fn();
 let mockSearch = "";
+// true: useSearchParams suspends, as during the static prerender, so the Suspense fallback renders
+let mockSuspend = false;
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
-  useSearchParams: () => new URLSearchParams(mockSearch),
+  useSearchParams: () => {
+    if (mockSuspend) throw new Promise(() => {});
+    return new URLSearchParams(mockSearch);
+  },
 }));
 
 const mockRegister = jest.fn();
@@ -32,6 +37,7 @@ beforeEach(() => {
   mockPush.mockReset();
   mockRegister.mockReset().mockResolvedValue(undefined);
   mockSearch = "";
+  mockSuspend = false;
 });
 
 async function registerAccount() {
@@ -68,4 +74,20 @@ describe("/register ?next", () => {
       expect(document.querySelector('a[href^="/login"]')?.getAttribute("href")).toBe("/login");
     },
   );
+});
+
+// Review (ship): the prerendered page shows the form, inert until hydration replaces it
+describe("/register prerender fallback", () => {
+  it("renders the whole form with its fields and button disabled", () => {
+    mockSuspend = true;
+    render(
+      <I18nProvider>
+        <RegisterPage />
+      </I18nProvider>,
+    );
+    const form = screen.getByLabelText("Email").closest("form")!;
+    const controls = Array.from(form.querySelectorAll("input, button"));
+    expect(controls.length).toBeGreaterThan(1);
+    controls.forEach((control) => expect(control).toBeDisabled());
+  });
 });

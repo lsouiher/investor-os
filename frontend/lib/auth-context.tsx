@@ -49,10 +49,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Until /auth/me answers, show no account: the API client already sends the new token, so a
-    // page showing the previous user would act for someone else
+    // page showing the previous user would act for someone else. loading stays as it is: the
+    // authenticated layout unmounts every page while loading, which would lose unsaved forms.
     setToken(storedToken);
     setUser(null);
-    setLoading(true);
 
     api
       .get<User>("/auth/me")
@@ -89,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [validateStoredToken]);
 
   const login = useCallback(async (email: string, password: string) => {
+    validation.current++; // a check still running for an older token must not undo this sign-in
     const result = await api.post<{ token: string; user: User }>(
       "/auth/login",
       { email, password }
@@ -97,9 +98,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("user", JSON.stringify(result.user));
     setToken(result.token);
     setUser(result.user);
+    setLoading(false); // the check this sign-in superseded will not clear it
   }, []);
 
   const register = useCallback(async (email: string, password: string) => {
+    validation.current++; // a check still running for an older token must not undo this sign-in
     const result = await api.post<{ token: string; user: User }>(
       "/auth/register",
       { email, password, signup_source: takeSignupSource() }
@@ -108,9 +111,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("user", JSON.stringify(result.user));
     setToken(result.token);
     setUser(result.user);
+    setLoading(false); // the check this sign-in superseded will not clear it
   }, []);
 
   const logout = useCallback(() => {
+    validation.current++;
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     // A shared device: the next person to sign in in this tab must not be offered this user's

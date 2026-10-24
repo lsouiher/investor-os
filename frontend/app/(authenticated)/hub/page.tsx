@@ -86,13 +86,16 @@ function StepIcon({ status }: { status: "completed" | "current" | "not_started" 
 
 export default function IdentityHubPage() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, token, loading: authLoading } = useAuth();
+  // A token without a user: another tab's sign-in is being checked, so wait rather than say
+  // "log in again"
+  const checkingSession = !user && !!token;
   const { t } = useTranslation();
   const [audits, setAudits] = useState<AuditSummary[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || checkingSession) return;
     if (!user) {
       setLoading(false);
       return;
@@ -106,7 +109,7 @@ export default function IdentityHubPage() {
         setAudits([]);
       })
       .finally(() => setLoading(false));
-  }, [user, authLoading]);
+  }, [user, authLoading, checkingSession]);
 
   const auditMap = new Map(audits.map((a) => [a.audit_type, a]));
 
@@ -131,7 +134,7 @@ export default function IdentityHubPage() {
     return "not_started";
   }
 
-  if (loading) {
+  if (loading || checkingSession) {
     return (
       <div className="max-w-5xl mx-auto py-12">
         <div className="animate-pulse space-y-6">

@@ -73,6 +73,8 @@ describe("AuthProvider across tabs", () => {
     localStorage.setItem("token", "t2");
     storageEvent("token", "t2");
     expect(screen.queryByText(/a@example.com/)).not.toBeInTheDocument();
+    // Not "loading": the authenticated layout unmounts every page while loading, losing form state
+    expect(screen.queryByText("loading")).not.toBeInTheDocument();
 
     mockGet.mockResolvedValueOnce({ id: "u3", email: "c@example.com", role: "investor" });
     localStorage.setItem("token", "t3");
@@ -97,6 +99,20 @@ describe("AuthProvider across tabs", () => {
 
     localStorage.removeItem("token");
     storageEvent("token", null);
+    await waitFor(() => expect(screen.getByText("signed out")).toBeInTheDocument());
+  });
+
+  it("signs out when another tab clears all of storage (key null)", async () => {
+    localStorage.setItem("token", "t1");
+    mockGet.mockResolvedValue({ id: "u1", email: "a@example.com", role: "investor" });
+    render(
+      <AuthProvider>
+        <Probe />
+      </AuthProvider>,
+    );
+    expect(await screen.findByText("a@example.com t1")).toBeInTheDocument();
+    localStorage.clear();
+    storageEvent(null, null);
     await waitFor(() => expect(screen.getByText("signed out")).toBeInTheDocument());
   });
 
@@ -137,5 +153,42 @@ describe("AuthProvider logout", () => {
     act(() => screen.getByRole("button", { name: "out" }).click());
     expect(sessionStorage.getItem("investoros_recs_import")).toBeNull();
     expect(sessionStorage.getItem("investoros_signup_source")).toBeNull();
+  });
+});
+
+// Review (ship): a validation still running when the user signs in in this tab must not undo it
+describe("AuthProvider sign-in during a pending validation", () => {
+  afterEach(() => {
+    localStorage.clear();
+    jest.restoreAllMocks();
+  });
+
+  it("keeps the new session when the old token's check fails afterwards", async () => {
+    localStorage.setItem("token", "expired");
+    let rejectOld!: (err: Error) => void;
+    mockGet.mockReset().mockImplementationOnce(() => new Promise((_, reject) => { rejectOld = reject; }));
+    const { api } = jest.requireMock("./api-client") as { api: { post: jest.Mock } };
+    api.post.mockResolvedValueOnce({ token: "fresh", user: { id: "u1", email: "a@example.com", role: "investor" } });
+    function SignIn() {
+      const { login, user, loading } = useAuth();
+      return (
+        <button onClick={() => login("a@example.com", "pw")}>
+          {user ? user.email : "in"} {loading ? "loading" : "ready"}
+        </button>
+      );
+    }
+    render(
+      <AuthProvider>
+        <SignIn />
+      </AuthProvider>,
+    );
+    await act(async () => {
+      screen.getByRole("button").click();
+    });
+    await act(async () => {
+      rejectOld(new Error("401"));
+    });
+    expect(localStorage.getItem("token")).toBe("fresh");
+    expect(screen.getByRole("button")).toHaveTextContent("a@example.com ready");
   });
 });
