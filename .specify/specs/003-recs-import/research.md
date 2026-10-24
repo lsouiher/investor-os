@@ -45,7 +45,8 @@ Decisions taken during `/speckit-plan` (2026-10-23). The owner's product decisio
   both sides. Constitution X asks to sanitize before storing, and a U+202E can make one deal's
   name read as another's. Refusing such names was rejected: RECS's `text()` schema accepts any
   non-blank string (read at RECS `5463018`), so a refusal loses a deal RECS sent. The payload `d`
-  carries RECS's own copy of the name, so reopening in RECS is unaffected.
+  carries RECS's own copy of the name, so reopening in RECS is unaffected. Widened at T038: line
+  separators also become a space, and every invisible character in spec FR-2's list is removed.
 
 ## R4. Holding the deal across sign-in
 
@@ -53,6 +54,7 @@ Decisions taken during `/speckit-plan` (2026-10-23). The owner's product decisio
   (`investoros_recs_import`), records `?ref=` via `rememberSignupSource`, then
   `history.replaceState(null, "", "/import")` so the fragment and query leave the address bar.
   The page then renders from the stash. Save or Cancel clears it. A new fragment replaces the stash.
+  Sign-out, or this tab's session ending in another tab, also clears it (added at T038 and T040).
 - **Rationale:** matches `signup-source.ts` (session-scoped, try/catch around storage) and the
   candidate's D-131. The server sees nothing until Save. Stripping the hash makes reload and
   share harmless (spec Scenario 1).
@@ -75,7 +77,8 @@ Decisions taken during `/speckit-plan` (2026-10-23). The owner's product decisio
 
 ## R6. Signup source
 
-- **Decision:** `rememberSignupSource` reads `utm_source`, else `ref`; same regex. `/import` calls it.
+- **Decision:** `rememberSignupSource` reads `utm_source`, else `ref` when it is `recs` (narrowed at
+  T038: other sites append their own `?ref=`); same regex. `/import` calls it.
   The backend's `validateSignupSource` already accepts `recs`; a test pins it. The existing
   `npm run funnel` groups by source, so RECS arrivals appear with no report change.
 - **Alternatives:** a separate `ref` column (one more field for the same fact).

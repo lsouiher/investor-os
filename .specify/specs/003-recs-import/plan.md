@@ -42,7 +42,7 @@ No NEEDS CLARIFICATION remains; the six design questions are settled in [researc
 | VII. Frontend | `/import` and the hub section are client components. **Documented reason:** the fragment, `sessionStorage` and the `localStorage` token exist only in the browser, and the hub page is already a client component. Validation in browser (UX) and server (correctness). Optimistic delete, no spinner on fast calls. Semantic buttons/links, keyboard reachable. | Pass (justified) |
 | VIII. Testing | Unit tests for both validators and the fragment parser, route tests with supertest, a repository test asserting the isolation filters (Prisma mocked, as `growth/service.test.ts`), component tests for the page and the list. All mocked, fast. One manual round trip (critical path). | Pass |
 | IX. Performance | Index `(tenant_id, user_id, deleted_at, created_at)` serves the only list query. Explicit targets in Technical Context, measured on staging in T041 before `/ship`. | Pass |
-| X. Security | Name sanitized before storing: both validators turn control characters into spaces and remove bidi formatting characters before trimming (cleaned, not refused, because RECS accepts any non-blank name; research R3); `d` is never touched; rendered as text (React escaping), never as markup; `d` validated against a strict alphabet before storage and before building the RECS link; `next` allow-listed (no open redirect); account deletion purges rows. | Pass |
+| X. Security | Name sanitized before storing: both validators turn control characters into spaces and remove bidi formatting characters before trimming (widened at T038 to spec FR-2's full list of invisible characters; cleaned, not refused, because RECS accepts any non-blank name; research R3); `d` is never touched; rendered as text (React escaping), never as markup; `d` validated against a strict alphabet before storage and before building the RECS link; `next` allow-listed (no open redirect); account deletion purges rows. | Pass |
 | XI. Governance | No amendment needed. | Pass |
 
 **Post-design re-check:** unchanged after Phase 1. One justified deviation: the known-slug list is
@@ -87,11 +87,11 @@ backend/
 frontend/
 ├── config/recs.json                                   # NEW copy of the slug list
 ├── config/recs.drift.test.ts                          # NEW: equals backend/config/recs.json; every slug has EN+FR label
-├── lib/recs-import.ts + recs-import.test.ts           # NEW parse/validate fragment, stash/take, openInRecsUrl
+├── lib/recs-import.ts + recs-import.test.ts           # NEW parse/validate fragment, stash/read/clear, openInRecsUrl
 ├── lib/recs-deals-api.ts                              # NEW saveRecsDeal / listRecsDeals / deleteRecsDeal (data access only)
 ├── lib/next-path.ts + next-path.test.ts               # NEW allow-listed ?next=
 ├── lib/auth-context.tsx + auth-context.test.tsx       # reload on cross-tab token change
-├── lib/signup-source.ts (+ test)                      # reads utm_source, else ref
+├── lib/signup-source.ts (+ test)                      # reads utm_source, else ref=recs
 ├── app/import/page.tsx + page.test.tsx                # NEW public client page
 ├── app/login/page.tsx, app/register/page.tsx          # honour ?next=, carry it across their cross-links
 ├── components/hub/recs-deals.tsx + recs-deals.test.tsx # NEW hub section

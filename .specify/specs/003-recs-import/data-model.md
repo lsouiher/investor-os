@@ -63,7 +63,7 @@ the API never writes it, only the purge.)
 | Field | Rule | Error `details.field` |
 |---|---|---|
 | `c` | string, in the known-slug list | `c` |
-| `name` | string; C0/C1 control characters replaced by a space and bidirectional formatting characters (U+202A–U+202E, U+2066–U+2069) removed, before trimming; trimmed; 1–120 code points | `name` |
+| `name` | string; C0/C1 control characters and U+2028/U+2029 replaced by a space and invisible characters removed (bidi formatting, direction marks, zero-width space, BOM and the rest of spec FR-2's list, as widened at T038), before trimming; trimmed; 1–120 code points and not only U+200C/U+200D | `name` |
 | `d` | string; `^[A-Za-z0-9_-]{1,8000}$` | `d` |
 
 ## Known calculator list (new config)
@@ -93,4 +93,5 @@ Gains the value `recs`. No schema change.
 ## Session-held import (browser only, not persisted server-side)
 
 `sessionStorage["investoros_recs_import"] = JSON { c, name, d }`, already validated. Written on
-arrival, removed on Save or Cancel, gone when the tab closes.
+arrival, removed on Save or Cancel, on sign-out, and when this tab's session ends in another tab
+(a sign-out or any sign-in over it, `frontend/lib/auth-context.tsx`); gone when the tab closes.

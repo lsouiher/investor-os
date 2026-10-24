@@ -47,7 +47,7 @@ The project constitution at `.specify/memory/constitution.md` is **the law** —
 
 ## Specification Artifacts
 
-All spec-kit artifacts live in `.specify/specs/001-identity-platform/`:
+The identity platform's spec-kit artifacts live in `.specify/specs/001-identity-platform/` (later features: `.specify/specs/002-ui-personalization/`, `.specify/specs/003-recs-import/`, `specs/001-growth-strategy-engine/`):
 
 | File | Contents |
 |------|----------|

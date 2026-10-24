@@ -27,7 +27,8 @@ http://localhost:3000/import?ref=recs#c=multifamily&n=Elm%20St%20%26%20Co%20%231
 
 - Signed out: name "Elm St & Co #12" and "Multifamily" show, with Sign in / Create an account.
   Register → back on `/import` → Save → hub lists it last, below the audit cards.
-- Address bar shows `/import` only after arrival. Reload: nothing to import.
+- Address bar shows `/import` only after arrival. Reload: the same deal is offered again (held in
+  `sessionStorage`). After Save, a reload shows nothing to import.
 - `c=nope`, `d=abc+def` or a 121-character name: "nothing to import".
 - `SELECT signup_source FROM users ORDER BY id DESC LIMIT 1;` → `recs`.
 
