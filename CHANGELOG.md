@@ -2,6 +2,22 @@
 
 All notable changes to InvestorOS will be documented in this file.
 
+## [0.5.1.0] - 2026-10-30
+
+Dev tooling only, no product change: the ten test personas of `docs/test-personas.md` as fixtures, a seeding CLI, an in-app fill panel and an eval harness, so this repo and the candidate can be run on identical inputs and compared persona by persona before 2026-12-04. Everything is gated on `NODE_ENV != production` **and** `ENABLE_DEV_SEED=true` (`backend/src/modules/dev-seed/guard.ts`); a production build contains none of it.
+
+### Added
+
+- **Persona fixtures** `backend/fixtures/personas/{A..J}.json` (candidate lettering: A=1 … J=10, D=5, E=4) with the complete five-audit payload in the audit pages' field vocabulary, the doc's predictions, and `must_include` / `must_exclude` assertions. Tests on both sides fail if a fixture drifts from the completion validation or from the pages' option values; I is checked to be a twin of A outside ten preference fields
+- **Seeding:** `npm run seed:persona -- A [--generate] [--activate]`, `npm run seed:personas`, `npm run seed:clean` (seeded users carry `signup_source = "persona-seed"` and are hard-deleted)
+- **Dev routes** `GET /api/v1/dev/personas` and `POST /api/v1/dev/personas/:letter/fill-all`, and a **fill panel** on every audit page (persona dropdown, "Fill this page" through the form's own state path, "Fill all audits", a list of what was filled); needs `NEXT_PUBLIC_ENABLE_DEV_SEED=true` as well
+- **Eval harness** `npm run eval:personas -- --n 1 --yes [--persona A,I] [--activate] [--model <id>]`: prints the model and the estimated cost (prices in `backend/config/ai-pricing.json`) and refuses without `--yes`; stores raw outputs under `docs/evals/results/<model>/<timestamp>/raw/` (gitignored) and a committed `SUMMARY.md` + `summary.json` with tokens, cost and latency per call and the assertion results; `--dry` replays stored outputs with no model call
+
+### Changed
+
+- `shared/ai/client.ts` emits an in-process `aiCallEvents` event per call with the input/output token split (the `ai_call_logs` row stores only the sum)
+- The five audit pages' section definitions moved verbatim to `frontend/components/audit/sections/*.ts`
+
 ## [0.5.0.0] - 2026-10-24
 
 Deals sent from RECS calculators can be kept here. A RECS user presses "Send to InvestorsMap" (RECS's button label), lands on `/import`, signs in or signs up without losing the deal, and finds it in the hub, where it reopens in RECS exactly as it was. Spec: `.specify/specs/003-recs-import/`.
