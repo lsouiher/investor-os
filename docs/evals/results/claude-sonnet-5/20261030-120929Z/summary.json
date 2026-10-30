@@ -1,0 +1,1159 @@
+{
+  "started_at": "2026-10-30T12:09:29.768Z",
+  "n": 1,
+  "personas": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J"
+  ],
+  "activate": false,
+  "base_url": "http://localhost:3999",
+  "mock": true,
+  "model_overridden": false,
+  "kept_users": false,
+  "totals": {
+    "cost_usd": 0.10404,
+    "assertions_passed": 22,
+    "assertions_total": 49,
+    "assertions_skipped": 0
+  },
+  "rows": [
+    {
+      "persona": "A",
+      "label": "Time-rich starter",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 3,
+        "failed": 2,
+        "skipped": 0,
+        "total": 5
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "house.?hack|owner.?occup|live in one"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /house.?hack|owner.?occup|live in one/i: matched 1/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "House Hacker",
+              "Cash Flow Hunter",
+              "Conservative Builder"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {House Hacker | Cash Flow Hunter | Conservative Builder}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              25,
+              65
+            ]
+          },
+          "status": "fail",
+          "detail": "readiness within [25, 65]: got 74"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "develop|syndicat|\\bflip|wholesal|out.?of.?state"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /develop|syndicat|\\bflip|wholesal|out.?of.?state/i: absent from 3"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "save more|not enough capital|insufficient capital"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /save more|not enough capital|insufficient capital/i: absent from 3"
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2329,
+          "output_tokens": 177,
+          "cost_usd": 0.006428,
+          "latency_ms": 29,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 8,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 6,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010338,
+      "latency_ms": 43
+    },
+    {
+      "persona": "B",
+      "label": "Capital-rich, time-poor",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 2,
+        "failed": 3,
+        "skipped": 0,
+        "total": 5
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "turnkey|professionally managed|property manag|stabiliz|DSCR|private lend"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /turnkey|professionally managed|property manag|stabiliz|DSCR|private lend/i: matched 1/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "Passive Capital Partner",
+              "Wealth Architect",
+              "Conservative Builder",
+              "Cash Flow Hunter"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {Passive Capital Partner | Wealth Architect | Conservative Builder | Cash Flow Hunter}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              40,
+              80
+            ]
+          },
+          "status": "pass",
+          "detail": "readiness within [40, 80]: got 74"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "sub_score:time",
+            "band": [
+              0,
+              45
+            ]
+          },
+          "status": "fail",
+          "detail": "sub_score:time within [0, 45]: got 62"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "\\bflip|BRRRR|heavy rehab|gut rehab|self.?manag|develop"
+          },
+          "status": "fail",
+          "detail": "strategy ~ /\\bflip|BRRRR|heavy rehab|gut rehab|self.?manag|develop/i: found in \"BRRRR Light Cosmetic rehabs with refinance to recycle capital.\""
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2358,
+          "output_tokens": 177,
+          "cost_usd": 0.006486,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 7,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 10,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010395999999999999,
+      "latency_ms": 21
+    },
+    {
+      "persona": "C",
+      "label": "Skilled, capital-poor",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 2,
+        "failed": 3,
+        "skipped": 0,
+        "total": 5
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "partner|joint venture|\\bJV\\b|sweat equity|BRRRR|value.?add|rehab"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /partner|joint venture|\\bJV\\b|sweat equity|BRRRR|value.?add|rehab/i: matched 1/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "Skilled Trades Investor",
+              "Value-Add Operator"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {Skilled Trades Investor | Value-Add Operator}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              20,
+              60
+            ]
+          },
+          "status": "fail",
+          "detail": "readiness within [20, 60]: got 74"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "turnkey|limited partner|\\bLP\\b|syndicat|all.?cash"
+          },
+          "status": "fail",
+          "detail": "strategy ~ /turnkey|limited partner|\\bLP\\b|syndicat|all.?cash/i: found in \"Turnkey Cash Flow Rentals Buy stabilized rentals in cash-flow markets.\""
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "not enough capital|insufficient capital|lacks? the capital|save more|wait until you"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /not enough capital|insufficient capital|lacks? the capital|save more|wait until you/i: absent from 3"
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2368,
+          "output_tokens": 177,
+          "cost_usd": 0.006506,
+          "latency_ms": 5,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 5,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 5,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010416,
+      "latency_ms": 15
+    },
+    {
+      "persona": "D",
+      "label": "Scaler with a misaligned portfolio",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 3,
+        "failed": 2,
+        "skipped": 0,
+        "total": 5
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "portfolio|refinanc|\\bsell|reposition|redeploy|property manag|optimi[sz]"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /portfolio|refinanc|\\bsell|reposition|redeploy|property manag|optimi[sz]/i: matched 1/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "Portfolio Scaler",
+              "Cash Flow Hunter",
+              "Value-Add Operator",
+              "Wealth Architect"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {Portfolio Scaler | Cash Flow Hunter | Value-Add Operator | Wealth Architect}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              45,
+              85
+            ]
+          },
+          "status": "pass",
+          "detail": "readiness within [45, 85]: got 74"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "insights",
+            "match": "14 hours|fourteen|over.?(allocated|committed|budget)|more (time|hours) than"
+          },
+          "status": "fail",
+          "detail": "insights ~ /14 hours|fourteen|over.?(allocated|committed|budget)|more (time|hours) than/i: no match in 1"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "heavy rehab|gut rehab|\\bflip"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /heavy rehab|gut rehab|\\bflip/i: absent from 3"
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2472,
+          "output_tokens": 177,
+          "cost_usd": 0.006714,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010624,
+      "latency_ms": 11
+    },
+    {
+      "persona": "E",
+      "label": "Passive high earner, accredited",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 2,
+        "failed": 3,
+        "skipped": 0,
+        "total": 5
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "syndicat|limited partner|\\bLP\\b|passive|private lend|turnkey|fund"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /syndicat|limited partner|\\bLP\\b|passive|private lend|turnkey|fund/i: matched 1/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "Passive Capital Partner"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {Passive Capital Partner}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              40,
+              80
+            ]
+          },
+          "status": "pass",
+          "detail": "readiness within [40, 80]: got 74"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "sub_score:time",
+            "band": [
+              0,
+              40
+            ]
+          },
+          "status": "fail",
+          "detail": "sub_score:time within [0, 40]: got 62"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "house.?hack|BRRRR|\\bflip|self.?manag|wholesal"
+          },
+          "status": "fail",
+          "detail": "strategy ~ /house.?hack|BRRRR|\\bflip|self.?manag|wholesal/i: found in \"BRRRR Light Cosmetic rehabs with refinance to recycle capital.\""
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2345,
+          "output_tokens": 177,
+          "cost_usd": 0.00646,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010369999999999999,
+      "latency_ms": 12
+    },
+    {
+      "persona": "F",
+      "label": "Conservative, short horizon",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 1,
+        "failed": 4,
+        "skipped": 0,
+        "total": 5
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "all.?cash|low.?leverage|private lend|professionally managed|property manag|stabiliz|turnkey"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /all.?cash|low.?leverage|private lend|professionally managed|property manag|stabiliz|turnkey/i: matched 1/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "Conservative Builder",
+              "Cash Flow Hunter",
+              "Passive Capital Partner"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {Conservative Builder | Cash Flow Hunter | Passive Capital Partner}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              30,
+              70
+            ]
+          },
+          "status": "fail",
+          "detail": "readiness within [30, 70]: got 74"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "insights",
+            "match": "five.?year|5.?year|short (time )?horizon|horizon"
+          },
+          "status": "fail",
+          "detail": "insights ~ /five.?year|5.?year|short (time )?horizon|horizon/i: no match in 1"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "\\bflip|BRRRR|develop|high.?leverage|maximum leverage"
+          },
+          "status": "fail",
+          "detail": "strategy ~ /\\bflip|BRRRR|develop|high.?leverage|maximum leverage/i: found in \"BRRRR Light Cosmetic rehabs with refinance to recycle capital.\""
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2356,
+          "output_tokens": 177,
+          "cost_usd": 0.006482,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010392,
+      "latency_ms": 10
+    },
+    {
+      "persona": "G",
+      "label": "Aggressive young high earner",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 3,
+        "failed": 1,
+        "skipped": 0,
+        "total": 4
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "BRRRR|value.?add|multifamily|multi-family|scal|phase"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /BRRRR|value.?add|multifamily|multi-family|scal|phase/i: matched 2/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "Value-Add Operator",
+              "Portfolio Scaler",
+              "Wealth Architect"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {Value-Add Operator | Portfolio Scaler | Wealth Architect}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              45,
+              85
+            ]
+          },
+          "status": "pass",
+          "detail": "readiness within [45, 85]: got 74"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "rank": 1,
+            "match": "turnkey|limited partner|\\bLP\\b|syndicat|all.?cash"
+          },
+          "status": "pass",
+          "detail": "strategy#1 ~ /turnkey|limited partner|\\bLP\\b|syndicat|all.?cash/i: absent from 1"
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2337,
+          "output_tokens": 177,
+          "cost_usd": 0.006444,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 5,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010354,
+      "latency_ms": 13
+    },
+    {
+      "persona": "H",
+      "label": "The conflicted profile",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 2,
+        "failed": 4,
+        "skipped": 0,
+        "total": 6
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "first|start|save|reserve|house.?hack|partner|educat|learn"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /first|start|save|reserve|house.?hack|partner|educat|learn/i: matched 1/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "contradictions",
+            "match": "risk|aggressive|conservative|three.?year|3.?year|timeline"
+          },
+          "status": "fail",
+          "detail": "contradictions ~ /risk|aggressive|conservative|three.?year|3.?year|timeline/i: no match in 1"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "insights",
+            "match": "three.?year|3.?year|not (reachable|realistic|feasible|achievable)|unrealistic|longer than"
+          },
+          "status": "fail",
+          "detail": "insights ~ /three.?year|3.?year|not (reachable|realistic|feasible|achievable)|unrealistic|longer than/i: no match in 1"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "Conservative Builder",
+              "House Hacker",
+              "Cash Flow Hunter"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {Conservative Builder | House Hacker | Cash Flow Hunter}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              5,
+              40
+            ]
+          },
+          "status": "fail",
+          "detail": "readiness within [5, 40]: got 74"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "within three years|in three years|in 3 years|three.?year plan"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /within three years|in three years|in 3 years|three.?year plan/i: absent from 3"
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2351,
+          "output_tokens": 177,
+          "cost_usd": 0.006472,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010382,
+      "latency_ms": 9
+    },
+    {
+      "persona": "I",
+      "label": "Twin of A",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 1,
+        "failed": 3,
+        "skipped": 0,
+        "total": 4
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "out.?of.?state|remote|turnkey|professionally managed|property manag|partner"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /out.?of.?state|remote|turnkey|professionally managed|property manag|partner/i: matched 1/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "Cash Flow Hunter",
+              "Passive Capital Partner",
+              "Conservative Builder"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {Cash Flow Hunter | Passive Capital Partner | Conservative Builder}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              25,
+              65
+            ]
+          },
+          "status": "fail",
+          "detail": "readiness within [25, 65]: got 74"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "house.?hack|owner.?occup|live in one|self.?manag|\\bflip"
+          },
+          "status": "fail",
+          "detail": "strategy ~ /house.?hack|owner.?occup|live in one|self.?manag|\\bflip/i: found in \"House Hack a Small Multifamily Buy a 2-4 unit, live in one, rent the rest.\""
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2351,
+          "output_tokens": 177,
+          "cost_usd": 0.006472,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010382,
+      "latency_ms": 9
+    },
+    {
+      "persona": "J",
+      "label": "Expensive local market",
+      "run": 1,
+      "archetype": "Analytical Cash Flow Builder",
+      "readiness": 74,
+      "sub_scores": {
+        "risk": 80,
+        "time": 62,
+        "skills": 70,
+        "horizon": 82,
+        "financial": 78
+      },
+      "strategies": [
+        "House Hack a Small Multifamily",
+        "Turnkey Cash Flow Rentals",
+        "BRRRR Light"
+      ],
+      "assertions": {
+        "passed": 3,
+        "failed": 2,
+        "skipped": 0,
+        "total": 5
+      },
+      "results": [
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "strategy",
+            "match": "house.?hack|partner|out.?of.?state|remote|gap|expensive|high.?cost|afford|revisit"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /house.?hack|partner|out.?of.?state|remote|gap|expensive|high.?cost|afford|revisit/i: matched 1/3"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "insights",
+            "match": "expensive|high.?cost|price|gap|afford|local market|out.?of.?state"
+          },
+          "status": "pass",
+          "detail": "insights ~ /expensive|high.?cost|price|gap|afford|local market|out.?of.?state/i: matched 1/1"
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "archetype",
+            "one_of": [
+              "House Hacker",
+              "Cash Flow Hunter",
+              "Conservative Builder",
+              "Wealth Architect"
+            ]
+          },
+          "status": "fail",
+          "detail": "archetype ∈ {House Hacker | Cash Flow Hunter | Conservative Builder | Wealth Architect}: got \"Analytical Cash Flow Builder\""
+        },
+        {
+          "kind": "include",
+          "assertion": {
+            "target": "readiness",
+            "band": [
+              25,
+              65
+            ]
+          },
+          "status": "fail",
+          "detail": "readiness within [25, 65]: got 74"
+        },
+        {
+          "kind": "exclude",
+          "assertion": {
+            "target": "strategy",
+            "match": "\\bflip|develop|syndicat"
+          },
+          "status": "pass",
+          "detail": "strategy ~ /\\bflip|develop|syndicat/i: absent from 3"
+        }
+      ],
+      "calls": [
+        {
+          "service_type": "identity_synthesis",
+          "model": "claude-sonnet-5",
+          "input_tokens": 2353,
+          "output_tokens": 177,
+          "cost_usd": 0.006476,
+          "latency_ms": 3,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "strategy_generation",
+          "model": "claude-sonnet-5",
+          "input_tokens": 435,
+          "output_tokens": 155,
+          "cost_usd": 0.00242,
+          "latency_ms": 2,
+          "stop_reason": "end_turn",
+          "success": true
+        },
+        {
+          "service_type": "insight",
+          "model": "claude-sonnet-5",
+          "input_tokens": 305,
+          "output_tokens": 88,
+          "cost_usd": 0.00149,
+          "latency_ms": 4,
+          "stop_reason": "end_turn",
+          "success": true
+        }
+      ],
+      "cost_usd": 0.010386,
+      "latency_ms": 9
+    }
+  ],
+  "replayed_at": "2026-10-30T12:09:37.147Z",
+  "dry": true
+}

@@ -1,0 +1,197 @@
+{
+  "letter": "I",
+  "doc_number": 9,
+  "label": "Twin of A",
+  "summary": "29, renting, salaried $75k, single. Same capacity as A (deployable ≈ $26.5k, 12 h/wk, risk 4/5, 17 years) but fully passive, will not live in a rental, cash flow first, open to out-of-state.",
+  "audits": {
+    "financial": {
+      "income": {
+        "primary_income": "50000-75000",
+        "secondary_income": "none",
+        "income_stability": "w2",
+        "income_trend": "growing"
+      },
+      "assets": {
+        "liquid_cash": "15000-50000",
+        "retirement_accounts": "under-25000",
+        "existing_re_equity": "none",
+        "other_investments": "none",
+        "business_equity": "none"
+      },
+      "liabilities": {
+        "total_monthly_debt": "under-500",
+        "mortgage_rent": "500-1500",
+        "student_loans": "under-25000",
+        "auto_loans": "none",
+        "credit_card_balances": "none"
+      },
+      "credit": {
+        "credit_score_range": "740-799",
+        "credit_history_length": "5-10",
+        "recent_inquiries": "0"
+      },
+      "tax": {
+        "filing_status": "single",
+        "effective_tax_rate": "15-22",
+        "has_accountant": "no"
+      }
+    },
+    "time": {
+      "work": {
+        "work_hours_per_week": "40-50",
+        "commute_hours_per_week": "3-7",
+        "caregiving_hours": "none",
+        "side_projects_hours": "none"
+      },
+      "availability": {
+        "re_hours_per_week": "10-20",
+        "best_times": "weekday-evenings"
+      },
+      "flexibility": {
+        "calls_during_work": "rarely",
+        "weekday_property_visits": "no",
+        "travel_willingness": "national",
+        "seasonal_changes": "no"
+      },
+      "preferences": {
+        "hands_on_preference": "purely-passive",
+        "willingness_to_learn": "very-willing",
+        "management_style": "fully-managed"
+      },
+      "runway": {
+        "sustainability": "6-12-months",
+        "future_changes": "no-changes"
+      }
+    },
+    "skills": {
+      "re_experience": {
+        "deals_closed": "0",
+        "deal_types": "none",
+        "current_holdings": "none",
+        "biggest_success": "",
+        "biggest_failure": ""
+      },
+      "professional": {
+        "profession": "Salaried analyst (W-2)",
+        "years_experience": "5-10",
+        "management_experience": "none",
+        "negotiation_skill": "beginner",
+        "analytical_skill": "beginner"
+      },
+      "transferable": {
+        "construction_knowledge": "none",
+        "sales_marketing": "some",
+        "legal_knowledge": "none",
+        "accounting_knowledge": "basic",
+        "project_management": "none",
+        "technology_comfort": "moderate"
+      },
+      "education": {
+        "courses_completed": "books-podcasts",
+        "licenses": "none",
+        "current_learning": "Podcasts and a local investor meetup"
+      },
+      "network": {
+        "has_agent": "looking",
+        "has_lender": "no",
+        "has_contractor": "no",
+        "has_attorney": "no",
+        "has_cpa": "no",
+        "has_mentor": "no"
+      }
+    },
+    "risk": {
+      "self_assessment": {
+        "risk_tolerance_self": "aggressive"
+      },
+      "scenarios": {
+        "vacancy_scenario": "expected-reserves",
+        "unexpected_repair": "manageable",
+        "market_drop": "concerned-hold",
+        "time_pressure": "cautious-analysis",
+        "out_of_scope": "research-first"
+      },
+      "safety": {
+        "emergency_fund": "6-12",
+        "backup_income": "no",
+        "dependents": "0",
+        "insurance_coverage": "moderate"
+      },
+      "behavioral": {
+        "stock_market_reaction": "do-nothing",
+        "check_frequency": "weekly",
+        "panic_decisions": "no"
+      },
+      "comfort_zones": {
+        "leverage_comfort": "aggressive",
+        "single_deal_risk": "50-75",
+        "out_of_state": "yes",
+        "partners": "open"
+      }
+    },
+    "horizon": {
+      "objectives": {
+        "primary_objective": "cash-flow",
+        "secondary_objective": "financial-freedom"
+      },
+      "financial_targets": {
+        "passive_income_goal": "5000-10000",
+        "net_worth_goal": "1m-5m",
+        "property_count_goal": "5-10",
+        "return_expectations": "8-12"
+      },
+      "timeline": {
+        "first_deal_timeline": "6-12-months",
+        "financial_freedom_timeline": "10-20-years",
+        "retirement_timeline": "40-50",
+        "exit_strategy": "hold-forever"
+      },
+      "lifestyle": {
+        "relocation_willingness": "no",
+        "house_hacking": "no",
+        "full_time_re": "no",
+        "family_alignment": "not-applicable"
+      },
+      "constraints": {
+        "geographic_constraints": "national",
+        "property_type_preference": "single-family",
+        "ethical_constraints": "",
+        "deal_breakers": "I will not live in a property I rent out. I want to go part-time in about five years."
+      }
+    }
+  },
+  "predicted_primary": "Out-of-state professionally managed rentals, or a partnership — explicitly not a house hack.",
+  "predicted_exclusions": [
+    "house hack",
+    "self-management",
+    "flips"
+  ],
+  "tests": "The product thesis. If A and I receive the same plan, the audits are being used and the preferences are being ignored. Run this pair after every prompt change.",
+  "must_include": [
+    {
+      "target": "strategy",
+      "match": "out.?of.?state|remote|turnkey|professionally managed|property manag|partner"
+    },
+    {
+      "target": "archetype",
+      "one_of": [
+        "Cash Flow Hunter",
+        "Passive Capital Partner",
+        "Conservative Builder"
+      ]
+    },
+    {
+      "target": "readiness",
+      "band": [
+        25,
+        65
+      ]
+    }
+  ],
+  "must_exclude": [
+    {
+      "target": "strategy",
+      "match": "house.?hack|owner.?occup|live in one|self.?manag|\\bflip"
+    }
+  ]
+}

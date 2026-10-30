@@ -36,3 +36,6 @@ backend/prisma/*.db
 # Claude Code skills (vendored/generated - each dev runs setup locally)
 .claude/skills/
 .gstack/
+
+# Persona eval harness: raw model outputs stay local; SUMMARY.md and summary.json are committed
+docs/evals/results/**/raw/

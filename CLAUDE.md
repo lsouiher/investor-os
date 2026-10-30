@@ -97,7 +97,13 @@ The Growth Strategy Engine is gated per tenant: `GROWTH_STRATEGY_DEFAULT_ENABLED
 new signups; for an existing tenant, `UPDATE tenants SET feature_flags = '{"growth_strategy_enabled": true}'`.
 
 Ops: `npm run funnel -- 7` (beta funnel per signup source) and `npm run delete-user -- <email>`
-(erase + deactivate) from `backend/`. Production images: `backend/Dockerfile`, `frontend/Dockerfile`
+(erase + deactivate) from `backend/`.
+
+Persona fixtures + eval harness (dev only, gated on `NODE_ENV != production` **and** `ENABLE_DEV_SEED=true`;
+`backend/src/modules/dev-seed/`, fixtures in `backend/fixtures/personas/{A..J}.json`, from `docs/test-personas.md`):
+`npm run seed:persona -- A [--generate] [--activate]`, `npm run seed:personas`, `npm run seed:clean`,
+`npm run eval:personas -- --n 1 --yes` (results in `docs/evals/results/<model>/<timestamp>/`, `--dry` replays them).
+The in-app fill panel on the audit pages also needs `NEXT_PUBLIC_ENABLE_DEV_SEED=true` in the frontend. Production images: `backend/Dockerfile`, `frontend/Dockerfile`
 (see `docs/deploy.md`).
 
 **WSL note:** the repo lives on `/mnt/c` (OneDrive). File watchers do not get change events there, so

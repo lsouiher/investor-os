@@ -22,6 +22,8 @@ import taskRoutes from './modules/task/routes.js';
 import dashboardRoutes from './modules/dashboard/routes.js';
 import growthRoutes from './modules/growth/routes.js';
 import recsDealRoutes from './modules/recs-deal/routes.js';
+import devSeedRoutes from './modules/dev-seed/routes.js';
+import { devSeedEnabled } from './modules/dev-seed/guard.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -92,6 +94,13 @@ app.use('/api/v1/growth-strategy', growthRoutes);
 // gstack-shortcut(dec-7c22e17c-1a6d-48e6-8729-35796bf865f2): no test that this sits behind authenticate (listen runs on import),
 // checked live with a no-token POST; upgrade when main.ts exports app without listening
 app.use('/api/v1/recs-deals', recsDealRoutes);
+
+// Dev-only persona seeding (NODE_ENV != production AND ENABLE_DEV_SEED=true): mounted only when the
+// gate is open, and the router re-checks it per request (modules/dev-seed/guard.ts)
+if (devSeedEnabled()) {
+  logger.warn('ENABLE_DEV_SEED is on: /api/v1/dev persona routes are mounted');
+  app.use('/api/v1/dev', devSeedRoutes);
+}
 
 // Error handler (must be last)
 app.use(errorHandler);

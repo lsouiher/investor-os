@@ -10,7 +10,11 @@
     "test": "jest",
     "lint": "eslint src/",
     "delete-user": "tsx scripts/delete-user.ts",
-    "funnel": "tsx scripts/funnel-report.ts"
+    "funnel": "tsx scripts/funnel-report.ts",
+    "seed:persona": "tsx scripts/seed-persona.ts",
+    "seed:personas": "tsx scripts/seed-persona.ts all",
+    "seed:clean": "tsx scripts/seed-persona.ts --clean",
+    "eval:personas": "tsx scripts/eval-personas.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

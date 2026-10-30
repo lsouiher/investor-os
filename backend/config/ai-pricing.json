@@ -1,0 +1,6 @@
+{
+  "_comment": "USD per million tokens, by model id, for the persona eval harness (scripts/eval-personas.ts). A model id missing here makes the harness refuse to estimate.",
+  "claude-sonnet-5": { "input": 2, "output": 10 },
+  "claude-opus-5": { "input": 5, "output": 25 },
+  "claude-haiku-5": { "input": 1, "output": 5 }
+}

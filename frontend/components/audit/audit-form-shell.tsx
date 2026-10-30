@@ -1,6 +1,16 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import dynamic from "next/dynamic";
+
+// Dev-only persona fill panel. Both conditions are inlined at build time, and `next build` sets
+// NODE_ENV=production, so the import below is dead code in every production bundle — the panel
+// is excluded, not hidden. The backend gate (modules/dev-seed/guard.ts) is checked independently.
+const DEV_FILL_ENABLED =
+  process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_ENABLE_DEV_SEED === "true";
+const DevFillPanel = DEV_FILL_ENABLED
+  ? dynamic(() => import("./dev-fill-panel"), { ssr: false })
+  : null;
 
 export interface AuditField {
   name: string;
@@ -73,6 +83,27 @@ export default function AuditFormShell({
     []
   );
 
+  // The dev fill panel writes through updateField, field by field, exactly as typing does; the
+  // filled sections become jumpable so the list on the panel can be verified page by page.
+  const fillFromPersona = useCallback(
+    (values: Record<string, Record<string, string>>) => {
+      const filledSections: string[] = [];
+      for (const section of sections) {
+        const sectionValues = values[section.id];
+        if (!sectionValues) continue;
+        for (const field of section.fields) {
+          if (sectionValues[field.name] !== undefined) {
+            updateField(section.id, field.name, sectionValues[field.name]);
+          }
+        }
+        filledSections.push(section.id);
+      }
+      setCompletedSections((prev) => new Set([...prev, ...filledSections]));
+      setValidationErrors({});
+    },
+    [sections, updateField]
+  );
+
   const validateCurrentSection = useCallback((): boolean => {
     const errors: Record<string, string> = {};
     for (const field of currentSection.fields) {
@@ -131,6 +162,9 @@ export default function AuditFormShell({
 
   return (
     <div className="max-w-5xl mx-auto">
+      {DevFillPanel && (
+        <DevFillPanel auditType={auditType} sections={sections} onFillPage={fillFromPersona} />
+      )}
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">

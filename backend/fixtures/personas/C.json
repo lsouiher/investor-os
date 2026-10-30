@@ -1,0 +1,201 @@
+{
+  "letter": "C",
+  "doc_number": 3,
+  "label": "Skilled, capital-poor",
+  "summary": "35, licensed contractor, self-employed ~$95k variable. Liquid $18k, 22 h/wk with weekday daytime, contractor and PM skills high, risk 3/5. Deployable ≈ $6k.",
+  "audits": {
+    "financial": {
+      "income": {
+        "primary_income": "75000-100000",
+        "secondary_income": "none",
+        "income_stability": "self-employed-variable",
+        "income_trend": "volatile"
+      },
+      "assets": {
+        "liquid_cash": "15000-50000",
+        "retirement_accounts": "under-25000",
+        "existing_re_equity": "none",
+        "other_investments": "none",
+        "business_equity": "under-50000"
+      },
+      "liabilities": {
+        "total_monthly_debt": "500-1000",
+        "mortgage_rent": "500-1500",
+        "student_loans": "none",
+        "auto_loans": "under-10000",
+        "credit_card_balances": "under-5000"
+      },
+      "credit": {
+        "credit_score_range": "670-739",
+        "credit_history_length": "5-10",
+        "recent_inquiries": "1-2"
+      },
+      "tax": {
+        "filing_status": "single",
+        "effective_tax_rate": "15-22",
+        "has_accountant": "planning-to"
+      }
+    },
+    "time": {
+      "work": {
+        "work_hours_per_week": "40-50",
+        "commute_hours_per_week": "3-7",
+        "caregiving_hours": "none",
+        "side_projects_hours": "none"
+      },
+      "availability": {
+        "re_hours_per_week": "20-30",
+        "best_times": "flexible"
+      },
+      "flexibility": {
+        "calls_during_work": "yes",
+        "weekday_property_visits": "yes",
+        "travel_willingness": "regional",
+        "seasonal_changes": "no"
+      },
+      "preferences": {
+        "hands_on_preference": "very-hands-on",
+        "willingness_to_learn": "very-willing",
+        "management_style": "self-manage"
+      },
+      "runway": {
+        "sustainability": "3-6-months",
+        "future_changes": "no-changes"
+      }
+    },
+    "skills": {
+      "re_experience": {
+        "deals_closed": "0",
+        "deal_types": "none",
+        "current_holdings": "none",
+        "biggest_success": "Ten years of full-gut renovations and additions for clients, on budget.",
+        "biggest_failure": ""
+      },
+      "professional": {
+        "profession": "Licensed general contractor",
+        "years_experience": "10-20",
+        "management_experience": "small-team",
+        "negotiation_skill": "intermediate",
+        "analytical_skill": "beginner"
+      },
+      "transferable": {
+        "construction_knowledge": "professional",
+        "sales_marketing": "some",
+        "legal_knowledge": "basic",
+        "accounting_knowledge": "basic",
+        "project_management": "professional",
+        "technology_comfort": "moderate"
+      },
+      "education": {
+        "courses_completed": "online-courses",
+        "licenses": "contractor-license",
+        "current_learning": "How to analyze a rental deal"
+      },
+      "network": {
+        "has_agent": "no",
+        "has_lender": "no",
+        "has_contractor": "yes",
+        "has_attorney": "no",
+        "has_cpa": "no",
+        "has_mentor": "no"
+      }
+    },
+    "risk": {
+      "self_assessment": {
+        "risk_tolerance_self": "moderate"
+      },
+      "scenarios": {
+        "vacancy_scenario": "opportunity",
+        "unexpected_repair": "no-issue",
+        "market_drop": "concerned-hold",
+        "time_pressure": "cautious-analysis",
+        "out_of_scope": "open-with-mentor"
+      },
+      "safety": {
+        "emergency_fund": "3-6",
+        "backup_income": "no",
+        "dependents": "0",
+        "insurance_coverage": "minimal"
+      },
+      "behavioral": {
+        "stock_market_reaction": "no-investments",
+        "check_frequency": "monthly",
+        "panic_decisions": "no"
+      },
+      "comfort_zones": {
+        "leverage_comfort": "aggressive",
+        "single_deal_risk": "50-75",
+        "out_of_state": "no",
+        "partners": "prefer"
+      }
+    },
+    "horizon": {
+      "objectives": {
+        "primary_objective": "appreciation",
+        "secondary_objective": "financial-freedom"
+      },
+      "financial_targets": {
+        "passive_income_goal": "5000-10000",
+        "net_worth_goal": "1m-5m",
+        "property_count_goal": "5-10",
+        "return_expectations": "12-20"
+      },
+      "timeline": {
+        "first_deal_timeline": "3-6-months",
+        "financial_freedom_timeline": "10-20-years",
+        "retirement_timeline": "50-60",
+        "exit_strategy": "1031-exchange"
+      },
+      "lifestyle": {
+        "relocation_willingness": "no",
+        "house_hacking": "maybe",
+        "full_time_re": "yes-eventually",
+        "family_alignment": "not-applicable"
+      },
+      "constraints": {
+        "geographic_constraints": "local-only",
+        "property_type_preference": "small-multi",
+        "ethical_constraints": "",
+        "deal_breakers": ""
+      }
+    }
+  },
+  "predicted_primary": "Skill-for-equity joint venture — a capital partner funds, he contributes construction and project management; BRRRR or heavy value-add.",
+  "predicted_exclusions": [
+    "anything requiring large solo capital",
+    "passive LP",
+    "turnkey",
+    "all-cash"
+  ],
+  "tests": "No dead ends. If the plan says he lacks the capital to start, that is a hard failure.",
+  "must_include": [
+    {
+      "target": "strategy",
+      "match": "partner|joint venture|\\bJV\\b|sweat equity|BRRRR|value.?add|rehab"
+    },
+    {
+      "target": "archetype",
+      "one_of": [
+        "Skilled Trades Investor",
+        "Value-Add Operator"
+      ]
+    },
+    {
+      "target": "readiness",
+      "band": [
+        20,
+        60
+      ]
+    }
+  ],
+  "must_exclude": [
+    {
+      "target": "strategy",
+      "match": "turnkey|limited partner|\\bLP\\b|syndicat|all.?cash"
+    },
+    {
+      "target": "strategy",
+      "match": "not enough capital|insufficient capital|lacks? the capital|save more|wait until you"
+    }
+  ]
+}
