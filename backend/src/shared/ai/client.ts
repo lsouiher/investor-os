@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createHash } from 'crypto';
+import { EventEmitter } from 'node:events';
 import { prisma } from '../db.js';
 import { logger } from '../logger.js';
 import { encryptField } from '../encryption/field-encryption.js';
@@ -9,6 +10,23 @@ let client: Anthropic | null = null;
 
 // Model is env-configurable so it can be upgraded without a deploy.
 export const AI_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
+
+export interface AiCallEvent {
+  serviceType: PromptServiceType;
+  userId: number;
+  tenantId: number;
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+  latencyMs: number;
+  stopReason: string | null;
+  success: boolean;
+  error?: string;
+}
+
+// In-process listener for dev tooling: the persona eval harness (scripts/eval-personas.ts) reads
+// the input/output token split here, because the ai_call_logs row stores only the sum.
+export const aiCallEvents = new EventEmitter();
 
 function getClient(): Anthropic {
   if (!client) {
@@ -184,6 +202,17 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
       'AI call completed',
     );
     noteAiOutcome();
+    aiCallEvents.emit('call', {
+      serviceType: options.serviceType,
+      userId: options.userId,
+      tenantId: options.tenantId,
+      model: AI_MODEL,
+      inputTokens: response.usage?.input_tokens ?? 0,
+      outputTokens: response.usage?.output_tokens ?? 0,
+      latencyMs,
+      stopReason: response.stop_reason ?? null,
+      success: true,
+    } satisfies AiCallEvent);
 
     // Log the AI call (encrypt prompt/response — may contain decrypted financial data)
     await prisma.aiCallLog.create({
@@ -206,6 +235,18 @@ export async function callClaude(options: AiCallOptions): Promise<AiCallResult> 
   } catch (err) {
     const latencyMs = Date.now() - start;
     noteAiOutcome(err);
+    aiCallEvents.emit('call', {
+      serviceType: options.serviceType,
+      userId: options.userId,
+      tenantId: options.tenantId,
+      model: AI_MODEL,
+      inputTokens: 0,
+      outputTokens: 0,
+      latencyMs,
+      stopReason: null,
+      success: false,
+      error: err instanceof Error ? err.message : 'Unknown error',
+    } satisfies AiCallEvent);
 
     await prisma.aiCallLog.create({
       data: {

@@ -1,0 +1,207 @@
+{
+  "letter": "B",
+  "doc_number": 2,
+  "label": "Capital-rich, time-poor",
+  "summary": "52, engineer $180k, married, two kids in college, retiring in ~10 years. Liquid $120k, brokerage $300k, 4 h/wk, risk 2/5, needs liquidity. Deployable ≈ $375k.",
+  "audits": {
+    "financial": {
+      "income": {
+        "primary_income": "150000-250000",
+        "secondary_income": "10000-25000",
+        "income_stability": "w2",
+        "income_trend": "stable"
+      },
+      "assets": {
+        "liquid_cash": "100000-250000",
+        "retirement_accounts": "over-500000",
+        "existing_re_equity": "150000-500000",
+        "other_investments": "over-250000",
+        "business_equity": "none"
+      },
+      "liabilities": {
+        "total_monthly_debt": "2500-5000",
+        "mortgage_rent": "1500-3000",
+        "student_loans": "none",
+        "auto_loans": "none",
+        "credit_card_balances": "none"
+      },
+      "credit": {
+        "credit_score_range": "740-799",
+        "credit_history_length": "over-10",
+        "recent_inquiries": "0"
+      },
+      "tax": {
+        "filing_status": "married-joint",
+        "effective_tax_rate": "22-32",
+        "has_accountant": "yes"
+      }
+    },
+    "time": {
+      "work": {
+        "work_hours_per_week": "40-50",
+        "commute_hours_per_week": "3-7",
+        "caregiving_hours": "none",
+        "side_projects_hours": "under-5"
+      },
+      "availability": {
+        "re_hours_per_week": "2-5",
+        "best_times": "weekends"
+      },
+      "flexibility": {
+        "calls_during_work": "rarely",
+        "weekday_property_visits": "no",
+        "travel_willingness": "regional",
+        "seasonal_changes": "no"
+      },
+      "preferences": {
+        "hands_on_preference": "minimal",
+        "willingness_to_learn": "somewhat",
+        "management_style": "fully-managed"
+      },
+      "runway": {
+        "sustainability": "indefinitely",
+        "future_changes": "less-time"
+      }
+    },
+    "skills": {
+      "re_experience": {
+        "deals_closed": "1-2",
+        "deal_types": "primary-residence",
+        "current_holdings": "primary-only",
+        "biggest_success": "",
+        "biggest_failure": ""
+      },
+      "professional": {
+        "profession": "Engineer",
+        "years_experience": "over-20",
+        "management_experience": "medium-team",
+        "negotiation_skill": "intermediate",
+        "analytical_skill": "advanced"
+      },
+      "transferable": {
+        "construction_knowledge": "none",
+        "sales_marketing": "none",
+        "legal_knowledge": "basic",
+        "accounting_knowledge": "basic",
+        "project_management": "formal",
+        "technology_comfort": "advanced"
+      },
+      "education": {
+        "courses_completed": "books-podcasts",
+        "licenses": "none",
+        "current_learning": ""
+      },
+      "network": {
+        "has_agent": "no",
+        "has_lender": "no",
+        "has_contractor": "no",
+        "has_attorney": "yes",
+        "has_cpa": "yes",
+        "has_mentor": "no"
+      }
+    },
+    "risk": {
+      "self_assessment": {
+        "risk_tolerance_self": "conservative"
+      },
+      "scenarios": {
+        "vacancy_scenario": "stressed-lower-rent",
+        "unexpected_repair": "uncomfortable",
+        "market_drop": "worried-hold",
+        "time_pressure": "pass-always",
+        "out_of_scope": "unlikely"
+      },
+      "safety": {
+        "emergency_fund": "6-12",
+        "backup_income": "spouse-partner",
+        "dependents": "2-3",
+        "insurance_coverage": "comprehensive"
+      },
+      "behavioral": {
+        "stock_market_reaction": "do-nothing",
+        "check_frequency": "monthly",
+        "panic_decisions": "no"
+      },
+      "comfort_zones": {
+        "leverage_comfort": "minimal",
+        "single_deal_risk": "10-25",
+        "out_of_state": "maybe",
+        "partners": "open"
+      }
+    },
+    "horizon": {
+      "objectives": {
+        "primary_objective": "retirement",
+        "secondary_objective": "cash-flow"
+      },
+      "financial_targets": {
+        "passive_income_goal": "5000-10000",
+        "net_worth_goal": "1m-5m",
+        "property_count_goal": "2-5",
+        "return_expectations": "5-8"
+      },
+      "timeline": {
+        "first_deal_timeline": "6-12-months",
+        "financial_freedom_timeline": "5-10-years",
+        "retirement_timeline": "60-65",
+        "exit_strategy": "sell-at-retirement"
+      },
+      "lifestyle": {
+        "relocation_willingness": "no",
+        "house_hacking": "no",
+        "full_time_re": "no",
+        "family_alignment": "fully-aligned"
+      },
+      "constraints": {
+        "geographic_constraints": "regional",
+        "property_type_preference": "small-multi",
+        "ethical_constraints": "",
+        "deal_breakers": "I need to keep money reachable and I have about four hours a week; nothing that needs my time or a renovation."
+      }
+    }
+  },
+  "predicted_primary": "Professionally managed stabilized rentals, multiple doors, conventional or DSCR, B class; possibly private lending for a slice.",
+  "predicted_exclusions": [
+    "flips",
+    "BRRRR",
+    "heavy rehab",
+    "self-management",
+    "development"
+  ],
+  "tests": "Does high capital override a low time budget and a low risk cap? It must not.",
+  "must_include": [
+    {
+      "target": "strategy",
+      "match": "turnkey|professionally managed|property manag|stabiliz|DSCR|private lend"
+    },
+    {
+      "target": "archetype",
+      "one_of": [
+        "Passive Capital Partner",
+        "Wealth Architect",
+        "Conservative Builder",
+        "Cash Flow Hunter"
+      ]
+    },
+    {
+      "target": "readiness",
+      "band": [
+        40,
+        80
+      ]
+    },
+    {
+      "target": "sub_score:time",
+      "band": [
+        0,
+        45
+      ]
+    }
+  ],
+  "must_exclude": [
+    {
+      "target": "strategy",
+      "match": "\\bflip|BRRRR|heavy rehab|gut rehab|self.?manag|develop"
+    }
+  ]
+}

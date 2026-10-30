@@ -1,0 +1,204 @@
+{
+  "letter": "E",
+  "doc_number": 4,
+  "label": "Passive high earner, accredited",
+  "summary": "45, physician $400k, married, two young children, accredited. Liquid $200k, brokerage $400k, 3 h/wk, all skills low, risk 3/5, wants fully passive. Deployable ≈ $278k.",
+  "audits": {
+    "financial": {
+      "income": {
+        "primary_income": "250000-500000",
+        "secondary_income": "none",
+        "income_stability": "w2",
+        "income_trend": "stable"
+      },
+      "assets": {
+        "liquid_cash": "100000-250000",
+        "retirement_accounts": "over-500000",
+        "existing_re_equity": "none",
+        "other_investments": "over-250000",
+        "business_equity": "none"
+      },
+      "liabilities": {
+        "total_monthly_debt": "2500-5000",
+        "mortgage_rent": "3000-5000",
+        "student_loans": "none",
+        "auto_loans": "none",
+        "credit_card_balances": "none"
+      },
+      "credit": {
+        "credit_score_range": "740-799",
+        "credit_history_length": "over-10",
+        "recent_inquiries": "0"
+      },
+      "tax": {
+        "filing_status": "married-joint",
+        "effective_tax_rate": "32-37",
+        "has_accountant": "yes"
+      }
+    },
+    "time": {
+      "work": {
+        "work_hours_per_week": "50-60",
+        "commute_hours_per_week": "under-3",
+        "caregiving_hours": "5-15",
+        "side_projects_hours": "none"
+      },
+      "availability": {
+        "re_hours_per_week": "2-5",
+        "best_times": "weekends"
+      },
+      "flexibility": {
+        "calls_during_work": "no",
+        "weekday_property_visits": "no",
+        "travel_willingness": "no-travel",
+        "seasonal_changes": "no"
+      },
+      "preferences": {
+        "hands_on_preference": "purely-passive",
+        "willingness_to_learn": "minimal",
+        "management_style": "fully-managed"
+      },
+      "runway": {
+        "sustainability": "indefinitely",
+        "future_changes": "no-changes"
+      }
+    },
+    "skills": {
+      "re_experience": {
+        "deals_closed": "0",
+        "deal_types": "none",
+        "current_holdings": "none",
+        "biggest_success": "",
+        "biggest_failure": ""
+      },
+      "professional": {
+        "profession": "Physician (accredited investor)",
+        "years_experience": "10-20",
+        "management_experience": "small-team",
+        "negotiation_skill": "beginner",
+        "analytical_skill": "beginner"
+      },
+      "transferable": {
+        "construction_knowledge": "none",
+        "sales_marketing": "none",
+        "legal_knowledge": "none",
+        "accounting_knowledge": "basic",
+        "project_management": "none",
+        "technology_comfort": "moderate"
+      },
+      "education": {
+        "courses_completed": "none",
+        "licenses": "other",
+        "current_learning": ""
+      },
+      "network": {
+        "has_agent": "no",
+        "has_lender": "no",
+        "has_contractor": "no",
+        "has_attorney": "yes",
+        "has_cpa": "yes",
+        "has_mentor": "no"
+      }
+    },
+    "risk": {
+      "self_assessment": {
+        "risk_tolerance_self": "moderate"
+      },
+      "scenarios": {
+        "vacancy_scenario": "expected-reserves",
+        "unexpected_repair": "no-issue",
+        "market_drop": "concerned-hold",
+        "time_pressure": "pass-always",
+        "out_of_scope": "research-first"
+      },
+      "safety": {
+        "emergency_fund": "6-12",
+        "backup_income": "spouse-partner",
+        "dependents": "2-3",
+        "insurance_coverage": "comprehensive"
+      },
+      "behavioral": {
+        "stock_market_reaction": "do-nothing",
+        "check_frequency": "quarterly",
+        "panic_decisions": "no"
+      },
+      "comfort_zones": {
+        "leverage_comfort": "moderate",
+        "single_deal_risk": "under-10",
+        "out_of_state": "yes",
+        "partners": "prefer"
+      }
+    },
+    "horizon": {
+      "objectives": {
+        "primary_objective": "cash-flow",
+        "secondary_objective": "tax-benefits"
+      },
+      "financial_targets": {
+        "passive_income_goal": "10000-25000",
+        "net_worth_goal": "over-5m",
+        "property_count_goal": "no-specific",
+        "return_expectations": "8-12"
+      },
+      "timeline": {
+        "first_deal_timeline": "6-12-months",
+        "financial_freedom_timeline": "10-20-years",
+        "retirement_timeline": "50-60",
+        "exit_strategy": "hold-forever"
+      },
+      "lifestyle": {
+        "relocation_willingness": "no",
+        "house_hacking": "no",
+        "full_time_re": "no",
+        "family_alignment": "mostly-supportive"
+      },
+      "constraints": {
+        "geographic_constraints": "national",
+        "property_type_preference": "open",
+        "ethical_constraints": "",
+        "deal_breakers": "Fully passive only; nothing that needs my time. I am an accredited investor."
+      }
+    }
+  },
+  "predicted_primary": "Passive LP / syndication, private lending, turnkey with full management; a diversified allocation rather than one deal.",
+  "predicted_exclusions": [
+    "house hack",
+    "BRRRR",
+    "flips",
+    "self-management",
+    "wholesale"
+  ],
+  "tests": "Accreditation opening LP options, and involvement preference dominating despite large capital.",
+  "must_include": [
+    {
+      "target": "strategy",
+      "match": "syndicat|limited partner|\\bLP\\b|passive|private lend|turnkey|fund"
+    },
+    {
+      "target": "archetype",
+      "one_of": [
+        "Passive Capital Partner"
+      ]
+    },
+    {
+      "target": "readiness",
+      "band": [
+        40,
+        80
+      ]
+    },
+    {
+      "target": "sub_score:time",
+      "band": [
+        0,
+        40
+      ]
+    }
+  ],
+  "must_exclude": [
+    {
+      "target": "strategy",
+      "match": "house.?hack|BRRRR|\\bflip|self.?manag|wholesal"
+    }
+  ]
+}

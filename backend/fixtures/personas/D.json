@@ -1,0 +1,200 @@
+{
+  "letter": "D",
+  "doc_number": 5,
+  "label": "Scaler with a misaligned portfolio",
+  "summary": "41, operations manager, owns three doors (one misaligned C-class SFH). Liquid $60k, commits 8 h/wk but spends ~14, risk 3/5, 12-year horizon. Deployable ≈ $23k.",
+  "audits": {
+    "financial": {
+      "income": {
+        "primary_income": "75000-100000",
+        "secondary_income": "25000-50000",
+        "income_stability": "w2",
+        "income_trend": "stable"
+      },
+      "assets": {
+        "liquid_cash": "50000-100000",
+        "retirement_accounts": "100000-250000",
+        "existing_re_equity": "150000-500000",
+        "other_investments": "under-25000",
+        "business_equity": "none"
+      },
+      "liabilities": {
+        "total_monthly_debt": "2500-5000",
+        "mortgage_rent": "1500-3000",
+        "student_loans": "none",
+        "auto_loans": "under-10000",
+        "credit_card_balances": "none"
+      },
+      "credit": {
+        "credit_score_range": "740-799",
+        "credit_history_length": "over-10",
+        "recent_inquiries": "1-2"
+      },
+      "tax": {
+        "filing_status": "married-joint",
+        "effective_tax_rate": "22-32",
+        "has_accountant": "yes"
+      }
+    },
+    "time": {
+      "work": {
+        "work_hours_per_week": "40-50",
+        "commute_hours_per_week": "3-7",
+        "caregiving_hours": "none",
+        "side_projects_hours": "10-20"
+      },
+      "availability": {
+        "re_hours_per_week": "5-10",
+        "best_times": "weekday-evenings"
+      },
+      "flexibility": {
+        "calls_during_work": "sometimes",
+        "weekday_property_visits": "with-notice",
+        "travel_willingness": "national",
+        "seasonal_changes": "no"
+      },
+      "preferences": {
+        "hands_on_preference": "moderate",
+        "willingness_to_learn": "somewhat",
+        "management_style": "hybrid"
+      },
+      "runway": {
+        "sustainability": "6-12-months",
+        "future_changes": "no-changes"
+      }
+    },
+    "skills": {
+      "re_experience": {
+        "deals_closed": "3-5",
+        "deal_types": "mixed",
+        "current_holdings": "2-4-rentals",
+        "biggest_success": "A B-class duplex (value $310k, debt $195k, rent $2,900, expenses $1,600, hybrid management) and an out-of-state SFH (value $240k, debt $170k, rent $1,950, expenses $1,350, full property management). Both fit my goals.",
+        "biggest_failure": "A C-class SFH (value $135k, debt $88k, rent $1,250, expenses $900) that I self-manage at about 6 hours a month. It is misaligned with where I want to go, and across the three properties I spend about 14 hours a week against the 8 I committed to."
+      },
+      "professional": {
+        "profession": "Operations manager",
+        "years_experience": "10-20",
+        "management_experience": "medium-team",
+        "negotiation_skill": "intermediate",
+        "analytical_skill": "intermediate"
+      },
+      "transferable": {
+        "construction_knowledge": "basic-diy",
+        "sales_marketing": "some",
+        "legal_knowledge": "basic",
+        "accounting_knowledge": "moderate",
+        "project_management": "formal",
+        "technology_comfort": "advanced"
+      },
+      "education": {
+        "courses_completed": "multiple",
+        "licenses": "none",
+        "current_learning": ""
+      },
+      "network": {
+        "has_agent": "yes",
+        "has_lender": "yes",
+        "has_contractor": "looking",
+        "has_attorney": "no",
+        "has_cpa": "yes",
+        "has_mentor": "no"
+      }
+    },
+    "risk": {
+      "self_assessment": {
+        "risk_tolerance_self": "moderate"
+      },
+      "scenarios": {
+        "vacancy_scenario": "expected-reserves",
+        "unexpected_repair": "manageable",
+        "market_drop": "concerned-hold",
+        "time_pressure": "cautious-analysis",
+        "out_of_scope": "research-first"
+      },
+      "safety": {
+        "emergency_fund": "6-12",
+        "backup_income": "spouse-partner",
+        "dependents": "0",
+        "insurance_coverage": "moderate"
+      },
+      "behavioral": {
+        "stock_market_reaction": "do-nothing",
+        "check_frequency": "weekly",
+        "panic_decisions": "no"
+      },
+      "comfort_zones": {
+        "leverage_comfort": "moderate",
+        "single_deal_risk": "10-25",
+        "out_of_state": "yes",
+        "partners": "open"
+      }
+    },
+    "horizon": {
+      "objectives": {
+        "primary_objective": "cash-flow",
+        "secondary_objective": "appreciation"
+      },
+      "financial_targets": {
+        "passive_income_goal": "5000-10000",
+        "net_worth_goal": "1m-5m",
+        "property_count_goal": "5-10",
+        "return_expectations": "8-12"
+      },
+      "timeline": {
+        "first_deal_timeline": "6-12-months",
+        "financial_freedom_timeline": "10-20-years",
+        "retirement_timeline": "50-60",
+        "exit_strategy": "1031-exchange"
+      },
+      "lifestyle": {
+        "relocation_willingness": "no",
+        "house_hacking": "no",
+        "full_time_re": "undecided",
+        "family_alignment": "mostly-supportive"
+      },
+      "constraints": {
+        "geographic_constraints": "national",
+        "property_type_preference": "small-multi",
+        "ethical_constraints": "",
+        "deal_breakers": "No new heavy-rehab projects while I am already over my time budget."
+      }
+    }
+  },
+  "predicted_primary": "Portfolio review before acquisition — sell or refinance the C-class, change its management, redeploy; then a B-class acquisition.",
+  "predicted_exclusions": [
+    "new heavy-rehab projects while over-allocated on time"
+  ],
+  "tests": "Does portfolio management engage, and does 14-vs-8 hours get flagged?",
+  "must_include": [
+    {
+      "target": "strategy",
+      "match": "portfolio|refinanc|\\bsell|reposition|redeploy|property manag|optimi[sz]"
+    },
+    {
+      "target": "archetype",
+      "one_of": [
+        "Portfolio Scaler",
+        "Cash Flow Hunter",
+        "Value-Add Operator",
+        "Wealth Architect"
+      ]
+    },
+    {
+      "target": "readiness",
+      "band": [
+        45,
+        85
+      ]
+    },
+    {
+      "target": "insights",
+      "match": "14 hours|fourteen|over.?(allocated|committed|budget)|more (time|hours) than"
+    }
+  ],
+  "must_exclude": [
+    {
+      "target": "strategy",
+      "match": "heavy rehab|gut rehab|\\bflip"
+    }
+  ]
+}

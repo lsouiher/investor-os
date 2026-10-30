@@ -1,0 +1,198 @@
+{
+  "letter": "G",
+  "doc_number": 7,
+  "label": "Aggressive young high earner",
+  "summary": "32, tech sales $210k plus variable, single, remote. Liquid $85k, brokerage $95k, 15 h/wk with some weekday daytime, negotiation and networking high, risk 5/5, 20 years, $20k/mo target. Deployable ≈ $151k.",
+  "audits": {
+    "financial": {
+      "income": {
+        "primary_income": "150000-250000",
+        "secondary_income": "none",
+        "income_stability": "commission-based",
+        "income_trend": "growing"
+      },
+      "assets": {
+        "liquid_cash": "50000-100000",
+        "retirement_accounts": "25000-100000",
+        "existing_re_equity": "none",
+        "other_investments": "25000-100000",
+        "business_equity": "none"
+      },
+      "liabilities": {
+        "total_monthly_debt": "under-500",
+        "mortgage_rent": "1500-3000",
+        "student_loans": "none",
+        "auto_loans": "none",
+        "credit_card_balances": "none"
+      },
+      "credit": {
+        "credit_score_range": "740-799",
+        "credit_history_length": "5-10",
+        "recent_inquiries": "1-2"
+      },
+      "tax": {
+        "filing_status": "single",
+        "effective_tax_rate": "32-37",
+        "has_accountant": "planning-to"
+      }
+    },
+    "time": {
+      "work": {
+        "work_hours_per_week": "40-50",
+        "commute_hours_per_week": "0",
+        "caregiving_hours": "none",
+        "side_projects_hours": "none"
+      },
+      "availability": {
+        "re_hours_per_week": "10-20",
+        "best_times": "flexible"
+      },
+      "flexibility": {
+        "calls_during_work": "yes",
+        "weekday_property_visits": "with-notice",
+        "travel_willingness": "national",
+        "seasonal_changes": "no"
+      },
+      "preferences": {
+        "hands_on_preference": "moderate",
+        "willingness_to_learn": "very-willing",
+        "management_style": "hybrid"
+      },
+      "runway": {
+        "sustainability": "6-12-months",
+        "future_changes": "no-changes"
+      }
+    },
+    "skills": {
+      "re_experience": {
+        "deals_closed": "0",
+        "deal_types": "none",
+        "current_holdings": "none",
+        "biggest_success": "",
+        "biggest_failure": ""
+      },
+      "professional": {
+        "profession": "Enterprise technology sales",
+        "years_experience": "5-10",
+        "management_experience": "small-team",
+        "negotiation_skill": "advanced",
+        "analytical_skill": "intermediate"
+      },
+      "transferable": {
+        "construction_knowledge": "none",
+        "sales_marketing": "professional",
+        "legal_knowledge": "basic",
+        "accounting_knowledge": "basic",
+        "project_management": "informal",
+        "technology_comfort": "advanced"
+      },
+      "education": {
+        "courses_completed": "multiple",
+        "licenses": "none",
+        "current_learning": "Multifamily underwriting"
+      },
+      "network": {
+        "has_agent": "looking",
+        "has_lender": "looking",
+        "has_contractor": "no",
+        "has_attorney": "no",
+        "has_cpa": "no",
+        "has_mentor": "yes"
+      }
+    },
+    "risk": {
+      "self_assessment": {
+        "risk_tolerance_self": "very-aggressive"
+      },
+      "scenarios": {
+        "vacancy_scenario": "opportunity",
+        "unexpected_repair": "no-issue",
+        "market_drop": "buy-more",
+        "time_pressure": "thrive",
+        "out_of_scope": "excited"
+      },
+      "safety": {
+        "emergency_fund": "6-12",
+        "backup_income": "no",
+        "dependents": "0",
+        "insurance_coverage": "moderate"
+      },
+      "behavioral": {
+        "stock_market_reaction": "buy-more",
+        "check_frequency": "daily",
+        "panic_decisions": "no"
+      },
+      "comfort_zones": {
+        "leverage_comfort": "aggressive",
+        "single_deal_risk": "25-50",
+        "out_of_state": "yes",
+        "partners": "open"
+      }
+    },
+    "horizon": {
+      "objectives": {
+        "primary_objective": "financial-freedom",
+        "secondary_objective": "appreciation"
+      },
+      "financial_targets": {
+        "passive_income_goal": "10000-25000",
+        "net_worth_goal": "over-5m",
+        "property_count_goal": "10-25",
+        "return_expectations": "12-20"
+      },
+      "timeline": {
+        "first_deal_timeline": "3-6-months",
+        "financial_freedom_timeline": "10-20-years",
+        "retirement_timeline": "50-60",
+        "exit_strategy": "1031-exchange"
+      },
+      "lifestyle": {
+        "relocation_willingness": "already-flexible",
+        "house_hacking": "maybe",
+        "full_time_re": "yes-eventually",
+        "family_alignment": "not-applicable"
+      },
+      "constraints": {
+        "geographic_constraints": "national",
+        "property_type_preference": "open",
+        "ethical_constraints": "",
+        "deal_breakers": ""
+      }
+    }
+  },
+  "predicted_primary": "A sequenced multi-phase plan with triggers — value-add or BRRRR first, scaling into larger multifamily; short-term rental plausible as secondary.",
+  "predicted_exclusions": [
+    "turnkey as primary",
+    "passive LP as primary",
+    "all-cash"
+  ],
+  "tests": "Does the engine sequence several designs rather than naming one?",
+  "must_include": [
+    {
+      "target": "strategy",
+      "match": "BRRRR|value.?add|multifamily|multi-family|scal|phase"
+    },
+    {
+      "target": "archetype",
+      "one_of": [
+        "Value-Add Operator",
+        "Portfolio Scaler",
+        "Wealth Architect"
+      ]
+    },
+    {
+      "target": "readiness",
+      "band": [
+        45,
+        85
+      ]
+    }
+  ],
+  "must_exclude": [
+    {
+      "target": "strategy",
+      "rank": 1,
+      "match": "turnkey|limited partner|\\bLP\\b|syndicat|all.?cash"
+    }
+  ]
+}
