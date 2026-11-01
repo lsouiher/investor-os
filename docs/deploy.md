@@ -20,6 +20,38 @@ Project `investoros` in Leo's Railway workspace, environment `production`:
   Squarespace forward to `https://app.investorsmap.com`.
 - Account: Hobby plan (upgraded 2026-09-14).
 
+## Staging environment (2026-11-01)
+
+Same project, environment `staging`, duplicated from `production` with its own Postgres and
+Redis volumes (empty at creation; migrations and the prompt seed run on the first api start).
+Nothing in it is shared with production.
+
+- web: https://web-staging-9290.up.railway.app
+- api: https://api-staging-cf02.up.railway.app (health: `/api/v1/health`)
+- Variables that differ from production: api `NODE_ENV=staging`, `ENABLE_DEV_SEED=true`,
+  `APP_URL` and `CORS_ORIGIN` set to the staging web URL; web `NEXT_PUBLIC_API_URL` set to the
+  staging api URL and `NEXT_PUBLIC_ENABLE_DEV_SEED=true`. Everything else (Anthropic key,
+  encryption key, JWT secret, Resend) was copied from production.
+- The persona routes (`/api/v1/dev/*`) are mounted here and only here. The in-app fill panel is
+  still absent: `next build` sets `NODE_ENV=production`, which the panel's gate reads, so it
+  is excluded from every Docker-built web image, staging included. Use the CLI or the routes.
+- Deploy with the same commands as production plus `--environment staging`:
+
+```bash
+cd ~/investoros-deploy && git pull origin master
+cd backend  && railway up --detach --environment staging --service api
+cd ../frontend && railway up --detach --environment staging --service web
+railway deployment list --service api --environment staging --json | head -c 300
+```
+
+- Run the persona harness against staging from a local shell with the staging database:
+  `railway variables --service api --environment staging --json` gives `DATABASE_URL`
+  (private host; use the Postgres service's public TCP proxy URL from the Railway dashboard
+  instead), then from `backend/`:
+  `DATABASE_URL=<staging proxy url> ENABLE_DEV_SEED=true npm run eval:personas -- --persona A,I --yes`.
+  Or run it inside the staging api container: `railway run --environment staging --service api npm run eval:personas -- --persona A,I --yes`
+  (results are written in the container; prefer the local run so they land in `docs/evals/results/`).
+
 ## Deploying a change
 
 Deploy from a clone on the Linux filesystem, never from `/mnt/c`: the Railway CLI's upload
