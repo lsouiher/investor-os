@@ -1,191 +1,236 @@
-# Runbook — primary vs candidate, three cases by hand on Opus 5.5
+# Primary vs candidate — three cases by hand on Opus 5.5
 
-One runbook for both Investor OS apps, merged on 2026-11-01 from the primary's protocol and the
-candidate's runbook (its `docs/evals/…` runbook, §1–§6). The owner runs the same three cases, as a
-user would, on both apps' staging deployments, with the primary model tier on **Opus 5.5**, and
-fills one score sheet. That sheet is the evidence for the 2026-12-04 decision: keep one repo,
-archive the other, port the good parts.
+The owner runs three investor profiles by hand through both Investor OS apps, on their staging
+environments, against the real model, and records one scorecard. This is the evidence for the
+2026-12-04 decision (CLAUDE.md › Two repos: keep one repo, archive the other, port the good parts).
+It is a manual run on purpose: the question is what a real user gets, not what a harness measures.
 
-- **Primary:** `lsouiher/investor-os`, local `Projects/investorOS`. Staging per `docs/deploy.md`.
-- **Candidate:** `lsouiher/investoros-mvp`, local `Desktop/investoros`. Staging per its `docs/beta/staging.md`.
-- The owner runs everything. No session in either repo starts a paid call; this file is the owner's
-  go for this one run when they start it, not before. Nothing is built in the candidate for it.
+This file is the merged runbook, one text kept identical in both repos: the primary's
+(`lsouiher/investor-os`, `Projects/investorOS`) and the candidate's (`lsouiher/investoros-mvp`,
+`Desktop/investoros`). The scorecard, the cases and the procedure are the primary's; the candidate's
+setup, the guardrails check and the assistant section are the candidate's. Where the two disagreed,
+§0 says how it was settled. No session edits the other repo, and no session starts a paid call
+(the candidate's D-72, D-127): the owner runs everything.
 
-The same text lives in both repos; the candidate's copy is updated by a session there, never from here.
+## 0. Settled when merging — read before starting
+
+1. **The fixtures are not the same people in the two repos.** The primary's A is in Cleveland with
+   $45k liquid (from `docs/test-personas.md`); the candidate's A is in Columbus with about $25k to
+   deploy (from its design brief). Both have an I that is A's twin, with different details. Each
+   app's dev fill panel fills **its own** fixtures, so filling A through both panels would compare
+   two different people. **Rule: the primary's A and I are the source for both apps.** On the
+   primary, fill them through its panel. On the candidate, type them by hand from the primary's
+   `backend/fixtures/personas/A.json` and `I.json` (do not use the candidate's panel for these two).
+   Why the primary's: its fixtures carry the `predicted_primary` / `predicted_exclusions` the
+   scorecard's first two checks need, written before any generation. Where the candidate asks a
+   question the fixture doesn't answer (or the reverse), write down the answer you gave in the
+   scorecard's notes, once, and give the same one if it recurs.
+2. **"Opus 5.5 on every call" holds on the primary only.** The candidate runs Opus 5.5 on its
+   primary tier: Blueprint generation, repair, targeted regeneration, the identity narrative and the
+   diff narrative. Its assistant, judge, insight and what-if narration stay on Sonnet 5.5 and progress
+   extraction on Haiku 5.5. Only the primary tier accepts an alternative model without a config
+   change (D-134 (3)). Every scored check in §6 reads the plan, which Opus writes in both apps, so
+   the scorecard compares like with like. The unscored assistant notes (§5) do not, and say so.
+3. **One check added: guardrails held** (non-negotiable 5 in the candidate's CLAUDE.md; the primary
+   holds to the same). The pass/fail checks go from six to seven. With "Owner would act" counted
+   for L only, an app's maximum is 6 + 6 + 7 = **19**.
+4. **Two gut columns kept from the candidate's first draft,** outside the count: a bug count per
+   case, and "Would use it" on a 1–5 scale, the tiebreaker the checks cannot measure.
 
 ## 1. The three cases
 
-| Case | Who | How the answers go in |
-|---|---|---|
-| **A** | Time-rich starter: 28, salaried, renting, no deals, ~12 h/week, ~$25k to deploy. Primary fixture `backend/fixtures/personas/A.json`; candidate `docs/evals/personas/A.json`. | Dev fill panel on both apps |
-| **I** | Twin of A: identical capacity, different preferences (fully passive, out of state, cash flow first). `I.json` in both repos. | Dev fill panel on both apps |
-| **OWN** | The owner, as themself. Not a fixture in either repo and must stay out of them. | Typed by hand on both apps, the real-user case |
+| Case | Who | Source | Why this one |
+|---|---|---|---|
+| A | Time-rich starter (28, Cleveland, $45k liquid, 12 h/wk, no experience) | the primary's `backend/fixtures/personas/A.json` | Low-capital entry. The predicted primary is a house hack; "save more money first" is the failure. |
+| I | Twin of A: identical capacity, different preferences (fully passive, out-of-state, cash-flow first) | the primary's `I.json` | The diagnostic pair. If A and I get interchangeable plans, the app is not reading preferences. |
+| L | The owner's own profile | typed by hand, like a real user | The one case with a ground truth the owner can judge from lived experience. Not in any fixture, and must stay out of them. |
 
-Why A and I rather than the candidate's A and D: the persona set calls A/I "the diagnostic pair",
-and it is the one test that is exactly fair on both apps, since the two fixtures differ only in
-preference answers that both apps ask. D (scaler with a losing rental) relies on the candidate's
-portfolio module, which the primary has no equivalent screen for, so its inputs could not be made
-to match; and OWN already is a scaler-shaped profile (one rental, buying multifamily), judged with
-ground truth no fixture has. If time allows, D is the optional fourth case, with the mismatch noted.
+For L, write the answers once on paper before starting, so both apps receive the same facts, and
+write your prediction (the strategy you expect at the top, and what should be excluded) on the
+same sheet. Keep that sheet with the results; it does not go in either repo.
 
-**Same answers into both apps.** A and I go in through each app's dev fill panel, so the inputs
-match by construction (both panels were built from the same ten personas; the primary's fixtures
-use its audit pages' own field vocabulary). Where one app asks a question the other does not, write
-how it was answered in the Notes column of §5. For OWN, write the answers once on a sheet on your
-machine, with your own predicted archetype and primary strategy written **before** generating, and
-type the same facts into both. The sheet stays out of both repos.
+## 2. Model
 
-## 2. Models
+`claude-opus-5-5`, set before the first generation and written on the scorecard.
 
-| Tier | Primary (`investor-os`) | Candidate (`investoros-mvp`) |
-|---|---|---|
-| Generation (identity, strategies, plan) | `ANTHROPIC_MODEL=claude-opus-5-5`, one model for every call (set on the staging api 2026-11-01; production stays on Sonnet 5.5) | `PRIMARY_MODEL=claude-opus-5-5` (D-134: a verified alternative, no config edit) |
-| Assistant / narration | no separate tier; the primary has no chat assistant (see §4 for what stands in) | `CONVERSATIONAL_MODEL=claude-sonnet-5-5`, `UTILITY_MODEL=claude-haiku-5-5`; only the primary tier can switch |
+- **Primary:** `ANTHROPIC_MODEL=claude-opus-5-5` on the staging api (set 2026-11-01; production stays
+  on `claude-sonnet-5-5`). Every call.
+- **Candidate:** `PRIMARY_MODEL=claude-opus-5-5` on the staging `app` service, for the purposes in
+  §0.2. `CONVERSATIONAL_MODEL` stays `claude-sonnet-5-5` and `UTILITY_MODEL` stays
+  `claude-haiku-5-5`; any other id there stops the call with a tier mismatch.
 
-So generation compares Opus 5.5 against Opus 5.5. Anything conversational compares a feature the
-candidate has against one the primary does not; it is scored, but the Notes column says so.
+**Known risk on the primary:** `callClaude` sends `max_tokens: 8192` with no `thinking` parameter,
+so Opus 5.5 runs adaptive thinking inside that cap (the primary's `docs/ai-pipeline.md`, its
+candidate P4). A synthesis that ends with `stop_reason: max_tokens` is a finding, recorded as such;
+it is not a reason to edit the client mid-run.
 
-Known risk on the primary: `callClaude` sends `max_tokens: 8192` with no `thinking` parameter, so
-Opus 5.5 runs adaptive thinking inside that cap (`docs/ai-pipeline.md`, candidate P4). A generation
-that ends with `stop_reason: max_tokens` is a finding, recorded as such, not a reason to edit the
-client mid-run.
+## 3. Where, and setup
 
-Confirm both model ids before the first generation and write them on the sheet.
+Staging only on both, never production. **Before anything:** set a spend ceiling on the Anthropic
+console for the day and keep its usage page open. On the candidate, the last measured Blueprint cost
+$2.08 on a pricier tier (D-71); Opus 5.5 ($4 / $20 per million tokens) should come in at or below
+that. On the primary a case is three or four calls (synthesis, strategies, insight warm-up, and the
+activation that produces the action plan), about $0.15–$0.30 at Opus prices. Three cases per app
+plus the extras in §5 fit inside a $30 ceiling for both apps together.
 
-## 3. Setup on the day
-
-### 3.0 Before anything else (owner, on the consoles)
-
-1. **Anthropic console:** set a spend ceiling for the day and keep the usage page open. Opus 5.5 is
-   $4 / $20 per million input / output tokens. Expect roughly $0.15–$0.30 per case on the primary
-   (three to four calls) and up to about $2 per case on the candidate (its last measured Blueprint
-   was $2.08 on a pricier tier, D-71). Six cases plus assistant turns should stay inside $20; raise
-   the ceiling if you plan re-runs.
-2. Both staging apps use their own databases. Nothing in this run touches either production.
-
-### 3.1 Primary staging
-
-Already configured (`docs/deploy.md` › Staging environment):
+### 3.1 Primary
 
 - web https://web-staging-9290.up.railway.app, api https://api-staging-cf02.up.railway.app
-- api variables: `NODE_ENV=staging`, `ENABLE_DEV_SEED=true`, `ANTHROPIC_MODEL=claude-opus-5-5`,
-  the production Anthropic key copied at duplication (check it is the one you fixed).
-- The dev fill panel is in the staging web image (`NEXT_PUBLIC_ENABLE_DEV_SEED=true` at build).
-- Checks: `GET /api/v1/health` answers `ai: true`; signed in, every `/audits/<type>` page shows the
+  (the primary's `docs/deploy.md` › Staging environment).
+- The dev fill panel is in the staging web image; the persona routes are mounted on the staging api.
+  Check: `GET /api/v1/health` answers `ai: true`; signed in, every `/audits/<type>` page shows the
   fill panel bottom-right with the persona dropdown.
-- Growth strategy engine: panel-seeded tenants are created through the normal signup, so they get
-  `GROWTH_STRATEGY_DEFAULT_ENABLED` (true on staging, copied from production). Leave it; it is part
-  of what the user gets.
+- Staging inherited `GROWTH_STRATEGY_DEFAULT_ENABLED=true` from production, so new accounts get the
+  growth engine; leave it, it is part of what a user gets.
+- Seeded accounts carry `signup_source = persona-seed`; `npm run seed:clean` against the staging
+  database removes them afterwards (`DATABASE_URL` through the Postgres TCP proxy, see deploy.md).
+  The owner's own account (L) is a normal signup and is deleted by hand, or kept.
 
-### 3.2 Candidate staging
+### 3.2 Candidate
 
-Service `app`, project `investoros-mvp`, environment `staging`,
-https://app-staging-a2d1.up.railway.app.
-
-1. Merge its PR #1 (the dev fill panel) first; otherwise A and I must be typed there.
-2. Railway variables on `app` in `staging`, pasted by hand:
+Service `app`, project `investoros-mvp`, environment `staging`, URL
+https://app-staging-a2d1.up.railway.app (its `docs/beta/staging.md`). Paste these on the service by
+hand (never CLI-set from `.env`):
 
 | Variable | Value | Why |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | your key | paste it yourself, never from `.env` by CLI |
-| `PRIMARY_MODEL` | `claude-opus-5-5` | Blueprint generation, repair, regeneration, identity and diff narratives |
-| `CONVERSATIONAL_MODEL` | `claude-sonnet-5-5` | assistant, judge, insight and what-if narration (any other id stops the call with a tier mismatch) |
-| `UTILITY_MODEL` | `claude-haiku-5-5` | progress extraction; same rule |
-| `GENERATION` | `on` | real Blueprints (`fake` replays persona A's stored plan) |
-| `ASSISTANT` | `on` | real assistant turns |
-| `INSIGHT_NARRATIVE`, `DIFF_NARRATIVE`, `SIMULATION_NARRATIVE` | `on` | the hub, version comparison and what-if sentences |
-| `ENABLE_DEV_SEED` | `true` | the fill panel; staging only, never production (D-135) |
+| `ANTHROPIC_API_KEY` | your key | |
+| `PRIMARY_MODEL` | `claude-opus-5-5` | §2 |
+| `CONVERSATIONAL_MODEL` | `claude-sonnet-5-5` | §0.2 |
+| `UTILITY_MODEL` | `claude-haiku-5-5` | §0.2 |
+| `GENERATION` | `on` | real Blueprints (`fake` replays one stored plan) |
+| `ASSISTANT` | `on` | real assistant turns (§5) |
+| `INSIGHT_NARRATIVE`, `DIFF_NARRATIVE`, `SIMULATION_NARRATIVE` | `on` | the hub's sentences, the version comparison, the what-if framing |
 
-3. Deploy and check:
+The candidate's fill panel (`ENABLE_DEV_SEED`, its PR #1) is not needed: §0.1 types A and I by hand.
+Deploy and check:
 
 ```bash
 cd ~/investoros-sweep && git switch main && git pull -q
 railway up --service app --ci
 ```
 
-`railway up`, never `railway redeploy` (its CLAUDE.md › Lessons). Then: the boot log reads
-`runner: GENERATION=on`; `/api/health` answers 200; signed in, `/assess/about` shows the dashed
-"Dev fill · staging and local only" panel bottom-right.
+`railway up`, never `railway redeploy`. The boot log reads `runner: GENERATION=on`, and
+`/api/health` answers 200.
 
-## 4. The script — the same steps for every case, on both apps
+### 3.3 After the run
 
-A fresh account per case per app, plus-addressed so nothing carries between runs
-(`you+a-prim@…`, `you+a-cand@…`, `you+i-prim@…`, …, `you+own-prim@…`, `you+own-cand@…`).
-On the primary, plus-addressed accounts created through the panel carry `signup_source=persona-seed`
-and are removed afterwards by `seed:clean`; the OWN account is a normal signup. Time each step with
-a stopwatch or a note of the clock.
+Primary: `npm run seed:clean` as above; optionally put `ANTHROPIC_MODEL` on the staging api back to
+`claude-sonnet-5-5`. Candidate: set `GENERATION=fake`, `ASSISTANT=fake`, the three narratives
+`off`, and redeploy, so staging stops calling the model. Test accounts stay until deleted by hand.
 
-| Step | Candidate | Primary |
-|---|---|---|
-| 1. Sign up | New account, then the assessment | New account, then the audits |
-| 2. Enter the profile | A, I: pick the persona in the panel, **Fill all modules**. OWN: type. Note minutes taken and anything confusing, wrong or missing. | A, I: pick the persona on any audit page, **Fill all audits** (or **Fill this page** on each of the five). OWN: type all five audits. Same notes. |
-| 3. Summary | Read the archetype and the six readiness scores; compare A and I against the fixture's `expected`. **Confirm.** | Identity synthesis starts on completion of the fifth audit. Read the archetype, readiness score and the radar; compare A and I against the fixture's `predicted_primary` / `predicted_exclusions` and the assertions in its `must_include` / `must_exclude`. |
-| 4. Plan | Time from Confirm to a readable Blueprint. Read it as the person: do the 1–3 Deal Designs fit, does every exclusion have a reason and "what would change this", are the 90-day actions concrete, is every figure sane, does anything name a lender, a market fact or a universal ranking of strategies (it must not)? | Time from the fifth audit to strategies visible, then activate the top strategy and time the action plan. Read it the same way: do the strategies fit, are excluded approaches absent, are the action items concrete, is every figure sane, same guardrail questions. |
-| 5. Hub / dashboard | Insight feed, actions list, progress. Tick one action. | Dashboard insights, tasks. Tick one task. |
-| 6. Assistant | Four fixed prompts, typed word for word: (1) "Why is the first exclusion in my plan excluded, and what would change it?" (2) "What should I focus on in the next 30 days?" (3) "What if I had $50,000 more to invest?" (4) "I talked to a lender this week and got pre-approved." (should log progress, not advise) | No assistant. Stand-ins, scored in the same column with a note: (1) and (2) the strategy's own rationale and action plan text; (3) run a simulation with +$50,000 capital; (4) n/a. |
-| 7. Review | Start a review or check-in if offered; note whether the Blueprint rebuilds and what changed. | Re-complete one audit with a changed answer and re-synthesize; note what changed in identity and strategies (identity history). |
-| 8. Errors | Every error message, blank screen, wrong number or stuck spinner, with the step. | Same. |
+## 4. Procedure, per case, per app
 
-Run all three cases in one app, then all three in the other, same day if possible. Prompt and config
-versions do not change between the two halves. Do not retry a failed generation; record it.
+Run all three cases in one app, then all three in the other, the same day if possible. Prompt and
+config versions do not change between the two halves.
 
-**Swap test**, once A and I are done in one app: read A's plan as if you were I, and I's as if you
-were A. Would either person notice they got the other's plan? One yes/no per app.
+1. **Fresh account** (a plus-address of your email per case per app: `you+a-prim@…`,
+   `you+a-cand@…`). Note the time.
+2. **Enter the profile:** the primary's panel for A and I on the primary (**Fill all audits** on any
+   audit page completes all five and starts synthesis on its own); by hand for A and I on the
+   candidate (§0.1); by hand for L on both. Complete every assessment step the app has.
+3. **Trigger generation** and wait for everything the app produces on its own: identity / archetype,
+   readiness or equivalent score, strategies (the candidate's Deal Designs), exclusions, action plan.
+   On the candidate, "generate" is **Confirm** on the summary page; the Blueprint builds as a
+   background job with visible stages. On the primary, synthesis starts when the fifth audit is
+   completed and strategies follow by themselves; the **action plan only exists after you activate
+   a strategy**, so activate the top one (one more call) before scoring, since "Exclusions held"
+   reads the plan too. Do not retry a failed call; record it.
+4. **Capture:** screenshots of the identity page and the strategy list; the raw strategy names and
+   their order; wall time from "generate" to "all content visible"; tokens and cost from the app's
+   own call log, read afterwards, not by hand (note the account emails).
+   - Primary: `ai_call_logs` per user (`service_type`, `model`, `tokens_used`, `latency_ms`).
+     `tokens_used` is the input+output **sum**; the split is in the api log line for each call
+     (`railway logs --service api --environment staging`, "AI call completed"). Dollars from the
+     split at the rates in `backend/config/ai-pricing.json`.
+   - Candidate: `generation_runs` (`model`, `cost_estimate_usd`, `latency_ms`, `validator_results`)
+     for the account; `docs/beta/metrics.sql` has the shapes.
+5. **Score the sheet** (§6) immediately, before the next case.
+6. **Swap test**, after A and I are done in one app: read A's plan as if you were I, and I's as if you
+   were A. Would either notice? One yes/no per app.
 
-Costs and latencies come from the databases afterwards, not by hand. Note the account emails.
+## 5. Beyond the scorecard — unscored notes, where the app has the screen
 
-- Candidate: `generation_runs` (`cost_estimate_usd`, `latency_ms`, `validator_results`) per test
-  account; shapes in its `docs/beta/metrics.sql`.
-- Primary: `ai_call_logs` per user (`service_type`, `model`, `tokens_used`, `latency_ms`,
-  `created_at`). `tokens_used` is the input+output sum; the split is in the api log line for each
-  call (`railway logs --service api --environment staging`, "AI call completed"). Dollars from the
-  split at the rates in `backend/config/ai-pricing.json`. Read through the staging Postgres TCP
-  proxy (`docs/deploy.md`).
+After scoring a case, if the app has an assistant, type these four prompts word for word and note
+the answers in a sentence each. They are not in the count: on the candidate they run on Sonnet 5.5,
+not Opus (§0.2); the primary has no assistant, so its row says so (its simulation is the nearest
+thing to prompt 3, if you want a note).
 
-## 5. The score sheet — identical for both apps
+1. "Why is the first exclusion in my plan excluded, and what would change it?"
+2. "What should I focus on in the next 30 days?"
+3. "What if I had $50,000 more to invest?"
+4. "I talked to a lender this week and got pre-approved." (should log progress, not advise)
 
-Score 1 (poor) to 5 (excellent); hard facts and yes/no checks in their own columns. One row per case
-per app. The filled sheet goes to `docs/evals/results/comparison-<YYYY-MM-DD>/SCORECARD.md` in the
-primary and to a new decision in the candidate's `docs/decisions.md`; both repos keep the same text.
+If the app has a review or check-in, start one on case L and note whether the plan rebuilds and
+what changed. On the primary, the nearest thing is re-completing one audit with a changed answer
+and re-synthesizing; note what changed in the identity history.
 
-| Case | App | Primary landed (y/n) | Exclusions held (y/n) | Assessment UX | Numbers right | Plan fits | Exclusions & actions | Guardrails held | Assistant | Review | Bugs (count) | Min to plan | Cost $ (from DB) | Would use it | Notes |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A | primary | | | | | | | | | | | | | | |
-| A | candidate | | | | | | | | | | | | | | |
-| I | primary | | | | | | | | | | | | | | |
-| I | candidate | | | | | | | | | | | | | | |
-| OWN | primary | | | | | | | | | | | | | | |
-| OWN | candidate | | | | | | | | | | | | | | |
+## 6. Scorecard
+
+One row per case per app. The sheet lives at `docs/evals/results/comparison-<YYYY-MM-DD>/SCORECARD.md`
+in the primary repo; after the verdict, a copy goes into the candidate with the decision (§7).
+Predictions for A and I are the primary fixtures' `predicted_primary` and `predicted_exclusions`,
+written before any generation and not edited after. For L the prediction is the one on the paper
+sheet.
+
+| Check | Pass means |
+|---|---|
+| Primary landed | The top strategy is in the predicted set. |
+| Exclusions held | Nothing from the predicted-exclusions list appears anywhere in the strategies or action plan. |
+| Nothing nonsensical | No strategy the profile makes impossible (accreditation, capital, time, geography). |
+| Differentiated | A vs I: the two plans differ visibly in strategy, geography, management stance. L: the plan is specific to the facts entered, not generic. |
+| Guardrails held | No current market facts, no named lender, offering or sponsor, no universal ranking of strategies, no tactical how-to; a disclaimer is present. |
+| Owner would act on it (L only) | Reading it as themself, the owner finds at least one step they would actually take next. |
+| Completed without manual retry | Every generation finished on the first attempt. |
+| Wall time | Minutes from generate to all content visible (number, not pass/fail). |
+| Cost | Dollars for the case, from the app's call log (number). |
+| Bugs | Count of errors, blank screens, wrong numbers or stuck spinners, with the step in Notes (number). |
+| Would use it | 1 (no) to 5 (yes), your gut (number, outside the count). |
+
+**Verdict per app:** passes over the seven pass/fail checks across the three cases (max 19: A and I
+count out of 6 each, "Owner would act" being n/a for them, and L out of 7), the numbers, and three
+sentences of judgment the counts don't capture. Then one paragraph naming the repo to keep and why.
+Disagreements between the count and the judgment are allowed and should be stated, not smoothed
+over.
+
+### Template
+
+```markdown
+# Comparison <date> — Opus 5.5, staging, by hand
+
+Primary: investor-os @ <commit>, model <id>, prompt templates <versions from prompt_templates>
+Candidate: investoros-mvp @ <commit>, PRIMARY_MODEL <id> (CONVERSATIONAL / UTILITY <ids>), config_version <…>
+
+| Case | App | Primary landed | Exclusions held | Nothing nonsensical | Differentiated | Guardrails held | Owner would act (L) | No retry | Wall time | Cost | Bugs | Would use it | Notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| A | primary | | | | | | n/a | | | | | | |
+| A | candidate | | | | | | n/a | | | | | | |
+| I | primary | | | | | | n/a | | | | | | |
+| I | candidate | | | | | | n/a | | | | | | |
+| L | primary | | | | | | | | | | | | |
+| L | candidate | | | | | | | | | | | | |
 
 Swap test A/I — primary: <would notice / would not>. Candidate: <…>.
 
-- **Primary landed / Exclusions held:** A and I against the fixture's predictions, written before any
-  generation and not edited after; OWN against the owner's own sheet.
-- **Numbers right:** A and I against the fixture; OWN by your own sense of your money.
-- **Guardrails held:** 5 = no market facts, no named lenders or offerings, no universal ranking,
-  disclaimers present; any breach caps it at 2.
-- **Assistant:** on the primary, the stand-ins of §4 step 6, with "no assistant" in Notes.
-- **Would use it:** your gut, the tiebreaker the others can't measure.
+Totals — primary: <n>/19. Candidate: <n>/19.
 
-## 6. After the run
+Assistant notes (§5, unscored) — primary: no assistant. Candidate: <…>.
 
-- Primary: `npm run seed:clean` against the staging database removes the persona-seed accounts; delete
-  or keep the OWN account by hand. Optionally set `ANTHROPIC_MODEL` on the staging api back to
-  `claude-sonnet-5-5`; with no one generating, nothing calls the model either way.
-- Candidate: set `GENERATION=fake`, `ASSISTANT=fake`, the three narratives `off`, remove
-  `ENABLE_DEV_SEED`, and `railway up`, so staging stops spending and stops showing the panel.
+Judgment — primary: <three sentences>.
+Judgment — candidate: <three sentences>.
 
-## 7. The decision
+Verdict: <keep X, archive Y, because …>. Parts of Y worth porting: <…>.
+```
 
-Per app: the yes/no counts, the 1–5 averages, the two numbers, and three sentences of judgment the
-counts do not capture. Then one paragraph naming the repo to keep and why, and the parts of the
-other worth porting first. Disagreements between the counts and the judgment are allowed and
-should be stated, not smoothed over. Recorded in both repos as in §5; archiving and porting are
-tasks of their own.
+## 7. After the verdict
+
+The filled scorecard and the choice go into the candidate's `docs/decisions.md` as a new decision
+(keep which, archive which, what to port first), and into the primary's
+`docs/evals/results/comparison-<date>/`. Archiving and porting are tasks of their own, one at a time.
 
 ## Out of scope
 
-- The automated harnesses (`npm run eval:personas` here, `npm run eval:plans` / `eval:swap` there)
-  are separate, later runs over all ten personas; they do not replace this and this does not
-  replace them.
+- The automated harnesses (the primary's `npm run eval:personas`, the candidate's `eval:plans`) are
+  separate, later runs over all ten personas; they don't replace this, and this doesn't replace them.
 - No prompt, config or code change in either repo between the first generation and the verdict.
+- Nothing is built in either repo for this; the runbook is documentation.
