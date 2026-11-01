@@ -32,9 +32,9 @@ Nothing in it is shared with production.
   `APP_URL` and `CORS_ORIGIN` set to the staging web URL; web `NEXT_PUBLIC_API_URL` set to the
   staging api URL and `NEXT_PUBLIC_ENABLE_DEV_SEED=true`. Everything else (Anthropic key,
   encryption key, JWT secret, Resend) was copied from production.
-- The persona routes (`/api/v1/dev/*`) are mounted here and only here. The in-app fill panel is
-  still absent: `next build` sets `NODE_ENV=production`, which the panel's gate reads, so it
-  is excluded from every Docker-built web image, staging included. Use the CLI or the routes.
+- The persona routes (`/api/v1/dev/*`) are mounted here and only here, and the in-app fill panel
+  is in the staging web image (built with `NEXT_PUBLIC_ENABLE_DEV_SEED=true`; production builds
+  leave it unset, which excludes the panel from the bundle).
 - Deploy with the same commands as production plus `--environment staging`:
 
 ```bash

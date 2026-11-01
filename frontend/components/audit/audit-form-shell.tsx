@@ -3,11 +3,12 @@
 import { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 
-// Dev-only persona fill panel. Both conditions are inlined at build time, and `next build` sets
-// NODE_ENV=production, so the import below is dead code in every production bundle — the panel
-// is excluded, not hidden. The backend gate (modules/dev-seed/guard.ts) is checked independently.
-const DEV_FILL_ENABLED =
-  process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_ENABLE_DEV_SEED === "true";
+// Dev-only persona fill panel. NEXT_PUBLIC_ENABLE_DEV_SEED is inlined at build time, so unless a
+// build is made with it set to "true" (local dev, the Railway staging image) the import below is
+// dead code and the panel is excluded from the bundle, not hidden. Production builds never set it.
+// Not gated on NODE_ENV: `next build` always sets NODE_ENV=production, which would also exclude it
+// from staging. The backend gate (modules/dev-seed/guard.ts) is checked independently on every call.
+const DEV_FILL_ENABLED = process.env.NEXT_PUBLIC_ENABLE_DEV_SEED === "true";
 const DevFillPanel = DEV_FILL_ENABLED
   ? dynamic(() => import("./dev-fill-panel"), { ssr: false })
   : null;
