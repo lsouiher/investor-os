@@ -45,9 +45,9 @@ railway deployment list --service api --environment staging --json | head -c 300
 ```
 
 - Run the persona harness against staging from a local shell with the staging database. The
-  staging Postgres has no public TCP proxy yet (neither does production); add one on the
-  Postgres service in the `staging` environment (Settings → Networking → TCP proxy, port 5432),
-  build the URL from `PGUSER`/`PGPASSWORD` and the proxy host:port, then from `backend/`:
+  staging Postgres has a public TCP proxy at `crossover.proxy.rlwy.net:22315` (production has
+  none); build the URL as `postgresql://<PGUSER>:<PGPASSWORD>@crossover.proxy.rlwy.net:22315/<PGDATABASE>`
+  from `railway variables --service Postgres --environment staging`, then from `backend/`:
   `DATABASE_URL=<staging proxy url> ENABLE_DEV_SEED=true npm run eval:personas -- --persona A,I --yes`.
   Or run it inside the staging api container: `railway run --environment staging --service api npm run eval:personas -- --persona A,I --yes`
   (results are written in the container; prefer the local run so they land in `docs/evals/results/`).
